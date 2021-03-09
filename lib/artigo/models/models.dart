@@ -1,0 +1,1 @@
+export './artigo.dart';
