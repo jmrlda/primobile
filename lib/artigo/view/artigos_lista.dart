@@ -50,7 +50,10 @@ class _ArtigoLista extends State<ArtigoLista> {
             itemBuilder: (BuildContext context, int index) {
               return index >= state.artigos.length
                   ? BottomLoader()
-                  : ArtigoListaItem(artigo: state.artigos[index]);
+                  : ArtigoListaItem(
+                      artigo: state.artigos[index],
+                      artigoBloc: _artigoBloc,
+                    );
             },
             itemCount: state.hasReachedMax
                 ? state.artigos.length
@@ -69,7 +72,10 @@ class _ArtigoLista extends State<ArtigoLista> {
             itemBuilder: (BuildContext context, int index) {
               return index >= state.artigos.length
                   ? BottomLoader()
-                  : ArtigoListaItem(artigo: state.artigos[index]);
+                  : ArtigoListaItem(
+                      artigo: state.artigos[index],
+                      artigoBloc: _artigoBloc,
+                    );
             },
             itemCount: state.hasReachedMax
                 ? state.artigos.length
