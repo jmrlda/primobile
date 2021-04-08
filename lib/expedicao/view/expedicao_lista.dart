@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:primobile/artigo/artigos.dart';
 import 'package:primobile/artigo/widgets/bottom_loader.dart';
-import 'package:primobile/cliente/bloc/bloc.dart';
-import 'package:primobile/cliente/cliente.dart';
 import 'package:primobile/expedicao/bloc/bloc.dart';
+import 'package:primobile/expedicao/models/models.dart';
 import 'package:primobile/expedicao/widgets/widgets.dart';
+import 'package:http/http.dart' as http;
 
 class ExpedicaoLista extends StatefulWidget {
   ExpedicaoLista({Key key, this.title, this.isSelected = false})
@@ -12,6 +13,7 @@ class ExpedicaoLista extends StatefulWidget {
 
   final String title;
   final bool isSelected;
+
   @override
   _ExpedicaoLista createState() => _ExpedicaoLista(isSeleted: isSelected);
 }
@@ -20,9 +22,12 @@ class _ExpedicaoLista extends State<ExpedicaoLista> {
   final _scrollController = ScrollController();
   final _scrollThreshold = 200.0;
   final bool isSeleted;
+  List<ArtigoExpedicao> data;
   _ExpedicaoLista({this.isSeleted = false});
   ExpedicaoBloc _expedicaoBloc;
-
+  http.Client httpClient = http.Client();
+  var sessao;
+  String token;
   @override
   void initState() {
     super.initState();
@@ -51,6 +56,7 @@ class _ExpedicaoLista extends State<ExpedicaoLista> {
               child: Text('Sem expedicao'),
             );
           }
+
           return ListView.builder(
             itemBuilder: (BuildContext context, int index) {
               return index >= state.expedicao.length
