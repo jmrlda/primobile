@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:primobile/artigo/view/view.dart';
 import 'package:primobile/encomenda/view/encomenda_editor_page.dart';
 import 'package:primobile/sessao/loginPage.dart';
+import 'package:primobile/util/view/view.dart';
 import 'package:primobile/venda/venda.dart';
 
 import 'cliente/view/view.dart';
@@ -10,6 +11,7 @@ import 'expedicao/expedicao.dart';
 import 'expedicao/view/view.dart';
 import 'menu/view/menu_page.dart';
 import 'rececao/rececao.dart';
+import 'rececao/view/rececao_pagina.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -37,9 +39,18 @@ void main() {
       '/encomenda_lista_confirmacao': (context) =>
           EncomendaListaConfirmacaoPage(),
       '/rececao_editor': (context) => RececaoEditorPage(),
+      '/rececao_lista': (context) => RececaoPage(),
       '/expedicao_editor': (context) => ExpedicaoEditorPage(),
       '/expedicao_lista': (context) => ExpedicaoPage(),
       '/venda_editor': (context) => VendaEditorPage(),
+      '/expedicao_sucesso': (context) => SucessoPage(
+            modulo: "Expedição",
+            mensagemSucesso: "Actualizado com Sucesso",
+          ),
+      '/rececao_sucesso': (context) => SucessoPage(
+            modulo: "Receção",
+            mensagemSucesso: "Actualizado com Sucesso",
+          ),
     },
 
     // home: LoginPage(),
