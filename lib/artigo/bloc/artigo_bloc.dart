@@ -60,9 +60,8 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
         }
 
         if (currentState is ArtigoSucesso) {
-          final artigos = artigoPesquisar(
-              this.query != null ? this.query : 'barra',
-              await _fetchArtigos(0, 20));
+          final artigos =
+              artigoPesquisar(this.query, await _fetchArtigos(0, 20));
           yield ArtigoSucessoPesquisa(
               artigos: artigos, hasReachedMax: true, query: this.query);
           return;
@@ -70,8 +69,7 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
 
         if (currentState is ArtigoSucessoPesquisa) {
           final artigos = artigoPesquisar(
-              this.query != null ? this.query : 'barra',
-              await _fetchArtigos(currentState.artigos.length, 20));
+              this.query, await _fetchArtigos(currentState.artigos.length, 20));
           yield artigos.isEmpty
               ? currentState.copyWith()
               : ArtigoSucessoPesquisa(
@@ -115,9 +113,9 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
           dynamic data = json.decode(response.body);
           data = json.decode(data)["DataSet"]["Table"];
 
-          await data.map((rawArtigo) {
+          for (dynamic rawArtigo in data) {
             lista_artigos.add(Artigo.fromJson(rawArtigo));
-          });
+          }
 
           return lista_artigos;
         } else {
