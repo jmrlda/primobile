@@ -244,7 +244,7 @@ class _MenuPageState extends State<MenuPage> {
                   iconSize: 35,
                   color: Colors.white,
                   onPressed: () {
-                    Navigator.pushNamed(context, '/picking_editor');
+                    Navigator.pushNamed(context, '/rececao_editor');
                   },
                 ),
               ),
@@ -257,7 +257,7 @@ class _MenuPageState extends State<MenuPage> {
             ),
             Center(
               child: Text(
-                "PICKING",
+                "RECEÇÃO",
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ),
             )
@@ -480,15 +480,7 @@ class _MenuPageState extends State<MenuPage> {
                   iconSize: 35,
                   color: Colors.white,
                   onPressed: () async {
-                    Navigator.pushNamed(context, '/encomenda_lista');
-
-                    FlutterBarcodeScanner.getBarcodeStreamReceiver(
-                            "#ff6666", "Cancel", false, ScanMode.DEFAULT)
-                        .listen((barcode) {
-                      print(barcode);
-
-                      /// barcode to be used
-                    });
+                    Navigator.pushNamed(context, '/rececao_lista');
                   },
                 ),
               ),
