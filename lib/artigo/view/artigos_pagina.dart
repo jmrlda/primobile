@@ -12,7 +12,7 @@ class ArtigoPage extends StatelessWidget {
     ArtigoBloc _artigoBloc = ArtigoBloc(httpClient: http.Client())
       ..add(ArtigoFetched());
     return Scaffold(
-      appBar: artigoAppBar(),
+      appBar: artigoAppBar(context),
       body: BlocProvider(
         create: (BuildContext context) => _artigoBloc,
         // ArtigoBloc(httpClient: http.Client())..add(ArtigoFetched()),

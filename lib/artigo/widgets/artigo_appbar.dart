@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:primobile/artigo/util.dart';
 import 'package:primobile/util/util.dart';
 
-dynamic artigoAppBar() {
+dynamic artigoAppBar(BuildContext context) {
   return new AppBar(
     backgroundColor: Colors.blue,
     actions: [
@@ -21,8 +21,9 @@ dynamic artigoAppBar() {
     centerTitle: true,
     title: new Text("Artigos"),
     leading: new IconButton(
-      icon: new Icon(Icons.arrow_back),
-      onPressed: () => null,
-    ),
+        icon: new Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.of(context).pop();
+        }),
   );
 }
