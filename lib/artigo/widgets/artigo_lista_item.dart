@@ -104,21 +104,24 @@ class ArtigoListaItem extends StatelessWidget {
                             TextField(
                               keyboardType: TextInputType.number,
                               controller: txtArtigoQtd,
-                              autofocus: true,
-                              onTap: () => txtArtigoQtd.selection =
-                                  TextSelection(
-                                      baseOffset: 0,
-                                      extentOffset:
-                                          txtArtigoQtd.value.text.length),
+                              autofocus: false,
+                              onTap: () {
+                                txtArtigoQtd.selection = TextSelection(
+                                    baseOffset: 0,
+                                    extentOffset:
+                                        txtArtigoQtd.value.text.length);
+                              },
                             ),
                             SizedBox(
                               height: 10,
                             ),
-                            Text(msgQtd,
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold)),
+                            Text(
+                              msgQtd,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold),
+                            ),
                             Container(
                                 alignment: Alignment.bottomRight,
                                 child: MaterialButton(
