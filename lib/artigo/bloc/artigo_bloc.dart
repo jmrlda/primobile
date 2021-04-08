@@ -93,36 +93,40 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
     try {
       var sessao = await SessaoApiProvider.read();
       var response;
+      List<Artigo> lista_artigos = List<Artigo>();
+
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');
         return List<Artigo>();
       } else {
         String nome_email = sessao["nome"].toString();
+        // 'http://192.168.0.104:2018/WebApi/Plataforma/Listas/CarregaLista/artigo',
 
         Map<String, dynamic> parsed = Map<String, dynamic>();
         String token = sessao['access_token'];
         final response = await httpClient.get(
-            'http://192.168.0.104:2018/WebApi/Plataforma/Listas/CarregaLista/artigo',
+            'http://192.168.0.104:2018/WebApi/ArtigoController/Artigo/lista',
             headers: {
               "Authorization": "Bearer $token",
               "Accept": "application/json"
             });
 
         if (response.statusCode == 200) {
-          final List data = json.decode(response.body)["Data"] as List;
-          return data.map((rawArtigo) {
-            return Artigo.fromJson(rawArtigo);
-          }).toList();
+          dynamic data = json.decode(response.body);
+          data = json.decode(data)["DataSet"]["Table"];
+
+          await data.map((rawArtigo) {
+            lista_artigos.add(Artigo.fromJson(rawArtigo));
+          });
+
+          return lista_artigos;
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);
         }
       }
     } catch (e) {
-      if (e.osError.errorCode == 111) {
-        // return 2;
-        print("sem internet ");
-      }
+      throw e;
 
       // return 3;
     }
