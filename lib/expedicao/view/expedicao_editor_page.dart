@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/expedicao/models/expedicao.dart';
@@ -230,8 +231,8 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
               label: 'Sair',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline, color: Colors.blue),
-              label: 'Adicionar',
+              icon: Icon(Icons.camera, color: Colors.blue),
+              label: 'Camera',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.check_circle_outline, color: Colors.blue),
@@ -269,21 +270,27 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
       }
     }
     if (index == 1) {
-      // final result = await Navigator.pushNamed(
-      //     contexto, '/artigo_selecionar_lista',
-      //     arguments: artigos);
-      // if (result != null) {
-      //   artigos = result;
-      // }
+      // Ler codigo de barra de um artigo e identificar se esta
+      // na lista de ArtigoExpedição, se localizado, alterar as quantidades
+      // a expedir e alterar o estado da linha como processado ou actualizado
 
+      // FlutterBarcodeScanner.getBarcodeStreamReceiver(
+      //         "#ff6666", "Cancelar", true, ScanMode.DEFAULT)
+      //     .listen((codigoBarra) {
+      //   if (codigoBarra != null && codigoBarra != "-1") {
+      //     print(codigoBarra);
+      //     lista_artigo_expedicao.forEach((artigo) {
+      //       if (artigo.codigoBara == codigoBarra) {
+      //         print("Encontrado");
+      //       }
+      //     });
+      //   }
+      // });
       actualizarEstado();
 
       // Terminar
     }
     if (index == 2) {
-      // await Navigator.pushReplacementNamed(contexto, '/encomenda_sucesso');
-
-      // createAlertDialogErroEncomenda
       createAlertDialogEncomendaProcesso(BuildContext context) {
         bool rv = false;
         return showDialog(
@@ -357,27 +364,6 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
       items = getListaArtigo(lista_artigo_expedicao);
     });
   }
-
-  // Slidable artigoExpedicao(ArtigoExpedicao artigo) {
-  //   return Slidable(
-  //     actionPane: SlidableDrawerActionPane(),
-  //     actionExtentRatio: 0.25,
-  //     child: expedicaoItem(artigo),
-  //     secondaryActions: <Widget>[
-  //       IconSlideAction(
-  //         caption: 'Remover',
-  //         color: Colors.red,
-  //         icon: Icons.delete,
-  //         onTap: () {
-  //           // setState(() {
-  //           //   removeEncomenda(artigo);
-  //           //   // actualizarEstado();
-  //           // });
-  //         },
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Card encomendaItemVazio() {
     return Card(
@@ -555,57 +541,15 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
 
   ArtigoExpedicaoCard expedicaoItem(ArtigoExpedicao artigo) {
     var artigoQuantidade;
-    createAlertDialog(BuildContext context) {
-      TextEditingController txtArtigoQtd = new TextEditingController();
-      txtArtigoQtd.text =
-          artigo.quantidadeExpedir.toStringAsFixed(2).toString();
-      var msg_qtd = '';
-      return showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Column(
-                children: [
-                  Center(
-                      child: Text(artigo.descricao,
-                          style: TextStyle(fontSize: 12))),
-                  Center(
-                      child: Text(
-                          'Total Pendente ' +
-                              artigo.quantidadePendente.toString(),
-                          style: TextStyle(fontSize: 12))),
-                  // Center(child: Text('Quantidade em ' + artigo.unidade))
-                ],
-              ),
-              content: TextField(
-                keyboardType: TextInputType.number,
-                controller: txtArtigoQtd,
-              ),
-              actions: <Widget>[
-                Text(msg_qtd,
-                    style: TextStyle(fontSize: 11, color: Colors.red)),
-                MaterialButton(
-                  elevation: 5.0,
-                  child: Text('alterar'),
-                  onPressed: () {
-                    if (double.parse(txtArtigoQtd.text) <=
-                            artigo.quantidadePendente &&
-                        double.parse(txtArtigoQtd.text) > 0) {
-                      Navigator.of(context).pop(txtArtigoQtd.text.toString());
-                    }
-                  },
-                )
-              ],
-            );
-          });
-    }
+    TextEditingController txtArtigoQtd = new TextEditingController();
+    txtArtigoQtd.text = artigo.quantidadeExpedir.toString();
 
     return ArtigoExpedicaoCard(
       artigo: artigo,
       child: Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
+            padding: EdgeInsets.only(top: 15, left: 20, right: 16, bottom: 4),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -614,34 +558,9 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                   style: TextStyle(
                       color: Colors.blue,
                       fontWeight: FontWeight.bold,
-                      fontSize: 15)),
+                      fontSize: 16)),
               Text(artigo.descricao,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15)),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              GestureDetector(
-                onTap: () async {
-                  artigoQuantidade = await createAlertDialog(contexto);
-                  artigo.quantidadeExpedir = double.parse(artigoQuantidade);
-
-                  actualizarEstado();
-                },
-                child: Text(
-                  "Qtd. Expedir: " + artigo.quantidadeExpedir.toString(),
-                  style: TextStyle(color: Colors.blue, fontSize: 16),
-                ),
-              ),
-              Text("Qtd. Pendente: " + artigo.quantidadePendente.toString(),
                   style: TextStyle(
                       color: Colors.blue,
                       fontWeight: FontWeight.bold,
@@ -649,7 +568,79 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
             ],
           ),
           Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
+            padding: EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 4),
+          ),
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 5),
+                child: Text(
+                  "Qtd. Pendente: ",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              Spacer(),
+              Padding(
+                padding: EdgeInsets.only(top: 5, left: 0, right: 20, bottom: 5),
+                child: Text(
+                  artigo.quantidadePendente.toString(),
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            // mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+                child: Text(
+                  "Qtd. Expedir: ",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Spacer(),
+              Padding(
+                padding:
+                    EdgeInsets.only(top: 5, left: 15, right: 20, bottom: 15),
+                child: Container(
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    controller: txtArtigoQtd,
+                    onChanged: (value) {
+                      if (double.parse(txtArtigoQtd.text) > 0) {
+                        artigo.quantidadeExpedir =
+                            double.parse(txtArtigoQtd.text);
+                      }
+                    },
+                    onTap: () {
+                      txtArtigoQtd.selection = TextSelection(
+                          baseOffset: 0,
+                          extentOffset: txtArtigoQtd.value.text.length);
+                    },
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  width: 100,
+                ),
+              ),
+            ],
           ),
         ],
       ),

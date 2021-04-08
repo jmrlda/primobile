@@ -229,7 +229,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.add_circle_outline, color: Colors.blue),
-              label: 'Adicionar',
+              label: 'Camera',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.check_circle_outline, color: Colors.blue),
@@ -356,27 +356,6 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
     });
   }
 
-  // Slidable artigoRececao(ArtigoRececao artigo) {
-  //   return Slidable(
-  //     actionPane: SlidableDrawerActionPane(),
-  //     actionExtentRatio: 0.25,
-  //     child: rececaoItem(artigo),
-  //     secondaryActions: <Widget>[
-  //       IconSlideAction(
-  //         caption: 'Remover',
-  //         color: Colors.red,
-  //         icon: Icons.delete,
-  //         onTap: () {
-  //           // setState(() {
-  //           //   removeEncomenda(artigo);
-  //           //   // actualizarEstado();
-  //           // });
-  //         },
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Card encomendaItemVazio() {
     return Card(
         child: Column(
@@ -430,31 +409,6 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
     //
 
     return rv;
-  }
-
-  createAlertDialogAssinatura(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Center(child: Text('Atenção')),
-            content: Container(
-                height: 40,
-                alignment: Alignment.center,
-                child: Center(
-                    child: Text(
-                        'Encomenda não certificada.\n Por favor Assine antes de gravar'))),
-            actions: [
-              new IconButton(
-                color: Colors.blue,
-                icon: new Icon(Icons.check),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-              )
-            ],
-          );
-        });
   }
 
   Padding espaco() {
@@ -553,6 +507,12 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
 
   ArtigoRececaoCard rececaoItem(ArtigoRececao artigo) {
     var artigoQuantidade;
+    TextEditingController txtArtigoQtdRecebida = new TextEditingController();
+    TextEditingController txtArtigoQtdRejeitada = new TextEditingController();
+
+    txtArtigoQtdRecebida.text = artigo.quantidadeRecebida.toString();
+    txtArtigoQtdRejeitada.text = artigo.quantidadeRejeitada.toString();
+
     createAlertDialog(BuildContext context) {
       TextEditingController txtArtigoQtd = new TextEditingController();
       txtArtigoQtd.text = "0.00";
@@ -603,57 +563,112 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                   style: TextStyle(
                       color: Colors.blue,
                       fontWeight: FontWeight.bold,
-                      fontSize: 15)),
+                      fontSize: 16)),
               Text(artigo.descricao,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       color: Colors.blue,
                       fontWeight: FontWeight.bold,
-                      fontSize: 15)),
+                      fontSize: 16)),
+            ],
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
+          ),
+          //
+          Row(
+            // mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+                child: Text(
+                  "Qtd. Recebida: ",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Spacer(),
+              Padding(
+                padding:
+                    EdgeInsets.only(top: 5, left: 15, right: 20, bottom: 15),
+                child: Container(
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    controller: txtArtigoQtdRecebida,
+                    onChanged: (value) {
+                      if (double.parse(txtArtigoQtdRecebida.text) > 0) {
+                        artigo.quantidadeRecebida =
+                            double.parse(txtArtigoQtdRecebida.text);
+                      }
+                    },
+                    onTap: () {
+                      txtArtigoQtdRecebida.selection = TextSelection(
+                          baseOffset: 0,
+                          extentOffset: txtArtigoQtdRecebida.value.text.length);
+                    },
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  width: 100,
+                ),
+              ),
             ],
           ),
           Padding(
             padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            // mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              GestureDetector(
-                onTap: () async {
-                  artigoQuantidade = await createAlertDialog(contexto);
-                  artigo.quantidadeRecebida = artigoQuantidade == null
-                      ? artigo.quantidadeRecebida
-                      : double.parse(artigoQuantidade);
-
-                  actualizarEstado();
-                },
+              Padding(
+                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
                 child: Text(
-                    "Qtd. Recebida: " + artigo.quantidadeRecebida.toString(),
-                    style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
+                  "Qtd. Rejeitada: ",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              GestureDetector(
-                onTap: () async {
-                  artigoQuantidade = await createAlertDialog(contexto);
-                  artigo.quantidadeRejeitada = artigoQuantidade == null
-                      ? artigo.quantidadeRejeitada
-                      : double.parse(artigoQuantidade);
-
-                  actualizarEstado();
-                },
-                child: Text(
-                    "Qtd. Rejeitada: " + artigo.quantidadeRejeitada.toString(),
+              Spacer(),
+              Padding(
+                padding:
+                    EdgeInsets.only(top: 5, left: 15, right: 20, bottom: 15),
+                child: Container(
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    controller: txtArtigoQtdRejeitada,
+                    onChanged: (value) {
+                      if (double.parse(txtArtigoQtdRejeitada.text) > 0) {
+                        artigo.quantidadeRejeitada =
+                            double.parse(txtArtigoQtdRejeitada.text);
+                      }
+                    },
+                    onTap: () {
+                      txtArtigoQtdRejeitada.selection = TextSelection(
+                          baseOffset: 0,
+                          extentOffset:
+                              txtArtigoQtdRejeitada.value.text.length);
+                    },
+                    textAlign: TextAlign.end,
                     style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  width: 100,
+                ),
               ),
             ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
           ),
         ],
       ),

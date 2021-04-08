@@ -389,7 +389,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
         artigos = result;
       }
 
-      refresh2();
+      actualizarEstado();
 
       // Terminar
     }
@@ -688,10 +688,10 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
 
   ArtigoCard encomendaItem(Artigo artigo) {
     var artigoQuantidade;
+    TextEditingController txtArtigoQtd = new TextEditingController();
+    txtArtigoQtd.text = artigo.quantidade.toStringAsFixed(2).toString();
 
     createAlertDialog(BuildContext context) {
-      TextEditingController txtArtigoQtd = new TextEditingController();
-      txtArtigoQtd.text = artigo.quantidade.toStringAsFixed(2).toString();
       var msg_qtd = '';
 
       return showDialog(
@@ -762,33 +762,94 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
             padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            // mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              GestureDetector(
-                onTap: () async {
-                  artigoQuantidade = await createAlertDialog(contexto);
-                  artigo.quantidade = double.parse(artigoQuantidade);
-
-                  setState(() {
-                    // calcular o custo da encomenda que pode ter preco
-                    // ja incluido iva ou nao.
-                    // Verificar o caso e calcular o custo total.
-                    refresh2();
-                  });
-                },
+              Padding(
+                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
                 child: Text(
-                  "Qtd.: " + artigo.quantidade.toString(),
-                  style: TextStyle(color: Colors.blue),
+                  "Quantidade: ",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              Spacer(),
+              Padding(
+                padding:
+                    EdgeInsets.only(top: 5, left: 15, right: 20, bottom: 15),
+                child: Container(
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    controller: txtArtigoQtd,
+                    onChanged: (value) {
+                      if (value.length > 0) {
+                        if (double.parse(value) > 0 &&
+                            double.parse(value) <= artigo.quantidadeStock) {
+                          artigo.quantidade = double.parse(value);
+                        } else {
+                          alerta_info(contexto,
+                              "Quantidade superior que o Stock disponivel!");
+                        }
+
+                        actualizarEstado();
+                      }
+                    },
+                    onSubmitted: (value) {
+                      print("valor");
+                      print(value);
+                    },
+                    onTap: () {
+                      txtArtigoQtd.selection = TextSelection(
+                          baseOffset: 0,
+                          extentOffset: txtArtigoQtd.value.text.length);
+                    },
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  width: 100,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              // GestureDetector(
+              //   onTap: () async {
+              //     artigoQuantidade = await createAlertDialog(contexto);
+              //     artigo.quantidade = double.parse(artigoQuantidade);
+
+              //     setState(() {
+              //       // calcular o custo da encomenda que pode ter preco
+              //       // ja incluido iva ou nao.
+              //       // Verificar o caso e calcular o custo total.
+              //     });
+              //   },
+              //   child: Text(
+              //     "Qtd.: " + artigo.quantidade.toString(),
+              //     style: TextStyle(color: Colors.blue),
+              //   ),
+              // ),
               Text("Prc.Unit: " + artigo.preco.toStringAsFixed(2).toString(),
-                  style: TextStyle(color: Colors.blue)),
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  )),
               Text(
                   "Subtotal: " +
                       (artigo.preco * artigo.quantidade)
                           .toStringAsFixed(2)
                           .toString(),
-                  style: TextStyle(color: Colors.blue))
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ))
             ],
           ),
           Padding(
@@ -799,7 +860,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
     );
   }
 
-  void refresh2() {
+  void actualizarEstado() {
     /**
            * Se tiver artigos selecionados.
           *   limpar a lista artigos previamente selecionados
@@ -870,7 +931,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
           onTap: () {
             setState(() {
               removeEncomenda(artigo);
-              refresh2();
+              actualizarEstado();
             });
           },
         ),
