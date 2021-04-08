@@ -12,37 +12,41 @@ class ArtigoExpedicao {
   String unidade;
   double quantidadeExpedir;
   double quantidadePendente;
+  String codigoBara;
 
   ArtigoExpedicao(
       {this.artigo,
       this.descricao,
       this.unidade,
       this.quantidadeExpedir,
-      this.quantidadePendente});
+      this.quantidadePendente,
+      this.codigoBara});
 
   factory ArtigoExpedicao.fromMap(Map<String, dynamic> json) =>
       new ArtigoExpedicao(
           artigo: json['artigo'],
           descricao: json['descricao'],
           quantidadeExpedir: json['quantidade_expedir'],
-          quantidadePendente: json['quantidade_pendente']);
+          quantidadePendente: json['quantidade_pendente'],
+          codigoBara: json['codigo_barra']);
 
   Map<String, dynamic> toMap() => {
         'artigo': artigo,
         'descricao': descricao,
         'quantidade_expedir': quantidadeExpedir,
         'quantidade_pendente': quantidadePendente,
+        'codigo_barra': codigoBara
       };
 
   factory ArtigoExpedicao.fromJson(Map<String, dynamic> json) {
     // String numContrib = json['numContrib'] == "" ? "0" : data['numContrib'];
     // numContrib = numContrib.replaceAll(" ", "");
     return ArtigoExpedicao(
-      artigo: json['artigo'],
-      descricao: json['descricao'],
-      quantidadeExpedir: json['quantidade_expedir'],
-      quantidadePendente: json['quantidade_pendente'],
-    );
+        artigo: json['artigo'],
+        descricao: json['descricao'],
+        quantidadeExpedir: json['quantidade_expedir'],
+        quantidadePendente: json['quantidade_pendente'],
+        codigoBara: json['codigo_barra']);
     // data['imagemBuffer'] == null ? null : data['imagemBuffer']);
   }
 
