@@ -25,6 +25,7 @@ class Artigo {
   bool pvp6Iva;
   Uint8List imagemBuffer;
   String imagemBufferStr;
+  String codigoBarra;
 
   Artigo(
       {this.artigo,
@@ -48,31 +49,32 @@ class Artigo {
       this.pvp6,
       this.pvp6Iva,
       this.imagemBuffer,
-      this.imagemBufferStr});
+      this.imagemBufferStr,
+      this.codigoBarra});
 
   factory Artigo.fromMap(Map<String, dynamic> data) => new Artigo(
-        artigo: data['Artigo'],
-        descricao: data['Descricao'],
-        preco: data['PVP1'],
-        quantidade: 1,
-        quantidadeStock: 1,
-        civa: 1.0,
-        iva: 1.0,
-        unidade: data['Unidade Base'],
-        pvp1: data['PVP1'],
-        pvp1Iva: true,
-        pvp2: data['PVP2'],
-        pvp2Iva: true,
-        pvp3: data['PVP3'],
-        pvp3Iva: true,
-        pvp4: 1.0,
-        pvp4Iva: true,
-        pvp5: 1.0,
-        pvp5Iva: true,
-        pvp6: 2,
-        pvp6Iva: true,
-        imagemBuffer: null,
-      );
+      artigo: data['Artigo'],
+      descricao: data['Descricao'],
+      preco: data['PVP1'],
+      quantidade: 1,
+      quantidadeStock: 1,
+      civa: 1.0,
+      iva: 1.0,
+      unidade: data['Unidade Base'],
+      pvp1: data['PVP1'],
+      pvp1Iva: true,
+      pvp2: data['PVP2'],
+      pvp2Iva: true,
+      pvp3: data['PVP3'],
+      pvp3Iva: true,
+      pvp4: 1.0,
+      pvp4Iva: true,
+      pvp5: 1.0,
+      pvp5Iva: true,
+      pvp6: 2,
+      pvp6Iva: true,
+      imagemBuffer: null,
+      codigoBarra: data['codigoBarra']);
 
   Map<String, dynamic> toMap() => {
         'artigo': artigo,
@@ -96,6 +98,7 @@ class Artigo {
         'pvp5Iva': pvp5Iva == true ? 1 : 0,
         'pvp6': pvp6,
         'pvp6Iva': pvp6Iva == true ? 1 : 0,
+        'codigoBarra': codigoBarra
       };
 
   Map<String, dynamic> imagemToMap() =>
@@ -122,30 +125,32 @@ class Artigo {
         // 'pvp5Iva': pvp5Iva == true ? 1 : 0,
         // 'pvp6': pvp6,
         // 'pvp6Iva': pvp6Iva == true ? 1 : 0,
+        'codigoBarra': codigoBarra
       };
   factory Artigo.fromJson(Map<String, dynamic> data) {
     return Artigo(
       artigo: data['Artigo'],
-      descricao: data['Descrição'],
-      preco: data['PVP1'],
-      quantidade: 1,
+      descricao: data['Descricao'],
+      preco: data['pvp1'],
+      quantidade: data['STKActual'],
       quantidadeStock: 1,
       civa: 1.0,
       iva: 1.0,
-      unidade: data['Unidade Base'],
-      pvp1: data['PVP1'],
+      unidade: data['UnidadeBase'],
+      pvp1: data['pvp2'],
       pvp1Iva: true,
-      pvp2: data['PVP2'],
+      pvp2: data['pvp2'],
       pvp2Iva: true,
-      pvp3: data['PVP3'],
+      pvp3: data['pvp3'],
       pvp3Iva: true,
-      pvp4: 1.0,
+      pvp4: data['pvp4'],
       pvp4Iva: true,
-      pvp5: 1.0,
+      pvp5: data['pvp5'],
       pvp5Iva: true,
-      pvp6: 2,
+      pvp6: data['pvp6'],
       pvp6Iva: true,
       imagemBuffer: null,
+      codigoBarra: data['CodBarras'],
     );
   }
 
@@ -156,13 +161,12 @@ class Artigo {
 
   @override
   String toString() => 'Artigo { id: $artigo }';
-//   static Future<List<Artigo>> fetchArtigos(url) async {
-//     final response = await http.get(url);
 
-//     if (response.statusCode == 200) {
-//       return Artigo.parseArtigos(response.body);
-//     } else {
-//       throw Exception('Nao foi possivel obter artigos do REST API');
-//     }
-//   }
+  // verificar se o artigo currente possui o mesmo codigo de barra que o do parametro
+  bool existeArtigoByCodigoBarra(String codigoBarra) {
+    if (this.codigoBarra != null || this.codigoBarra == codigoBarra)
+      return true;
+    else
+      return false;
+  }
 }
