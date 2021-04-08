@@ -1,26 +1,44 @@
 class Filial {
   String nome;
-  String ip;
-  String empresa;  
+  String ipGlobal;
+  String ipLocal;
+  String porta;
+  String company;
+  String grantType;
+  String line;
+  String instance;
 
-  Filial({this.nome, this.ip, this.empresa});
+  Filial(
+      {this.nome,
+      this.ipGlobal,
+      this.ipLocal,
+      this.company,
+      this.grantType,
+      this.line,
+      this.instance,
+      this.porta});
 
   Map<String, dynamic> toMap() => {
         'nome': nome,
-        'ip': ip,
-        'empresa': empresa,
+        'ip_global': ipGlobal,
+        'ip_local': ipLocal,
+        'company': company,
+        'grant_type': grantType,
+        'line': line,
+        'instance': instance,
+        'porta': porta,
       };
 
-
-factory Filial.fromJson(Map<String, dynamic> data) {
-  
-   return Filial(
+  factory Filial.fromJson(Map<String, dynamic> data) {
+    return Filial(
       nome: data['nome'],
-      ip: data['ip'], 
-      empresa : data['empresa'],
-
-   );
-}
-
-
+      ipGlobal: data['ip_global'],
+      ipLocal: data['ip_local'],
+      company: data['company'],
+      grantType: data['grant_type'],
+      line: data['line'],
+      instance: data['instance'],
+      porta: data['porta'],
+    );
+  }
 }
