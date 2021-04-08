@@ -30,6 +30,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' show get;
 import 'package:http_parser/http_parser.dart';
 import 'package:primobile/expedicao/models/expedicao.dart';
+import 'package:primobile/rececao/models/models.dart';
 
 class Opcoes {
   static const String Sincronizar = 'sincronizar';
@@ -178,50 +179,50 @@ class Conexao {
 //   return rv;
 // }
 
-class SucessoPage extends StatelessWidget {
-  const SucessoPage({Key key}) : super(key: key);
+// class SucessoPage extends StatelessWidget {
+//   const SucessoPage({Key key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        color: Colors.blue[50],
-        child: Container(
-          child: Card(
-            margin: EdgeInsets.only(top: 120, bottom: 120, left: 50, right: 50),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.blue,
-                  size: 200,
-                ),
-                Text(
-                  "Sucesso",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 20,
-                  ),
-                ),
-                MaterialButton(
-                  height: 56,
-                  color: Colors.blue[50],
-                  shape: CircleBorder(),
-                  child: Text(
-                    'Ok',
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/');
-                  },
-                )
-              ],
-            ),
-          ),
-        ));
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//         color: Colors.blue[50],
+//         child: Container(
+//           child: Card(
+//             margin: EdgeInsets.only(top: 120, bottom: 120, left: 50, right: 50),
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//               crossAxisAlignment: CrossAxisAlignment.center,
+//               children: <Widget>[
+//                 Icon(
+//                   Icons.check_circle,
+//                   color: Colors.blue,
+//                   size: 200,
+//                 ),
+//                 Text(
+//                   "Sucesso",
+//                   style: TextStyle(
+//                     color: Colors.blue,
+//                     fontSize: 20,
+//                   ),
+//                 ),
+//                 MaterialButton(
+//                   height: 56,
+//                   color: Colors.blue[50],
+//                   shape: CircleBorder(),
+//                   child: Text(
+//                     'Ok',
+//                     style: TextStyle(color: Colors.blue),
+//                   ),
+//                   onPressed: () {
+//                     Navigator.pushNamed(context, '/');
+//                   },
+//                 )
+//               ],
+//             ),
+//           ),
+//         ));
+//   }
+// }
 
 void fileRename(String caminho, String nome) {
   String dir = path.dirname(caminho);
@@ -555,6 +556,31 @@ bool existeExpedicaoSelecionado(
 
   for (var i = 0; i < listaExpedicaoSelecionado.length; i++) {
     if (listaExpedicaoSelecionado[i].expedicao == e.expedicao) {
+      existe = true;
+    }
+  }
+  return existe;
+}
+
+List<Rececao> rececaoPesquisar(String query, List<Rececao> listaRececao) {
+  List<Rececao> resultado = new List<Rececao>();
+
+  if (query.trim().isNotEmpty) {
+    listaRececao.forEach((item) {
+      if (item.rececao.toString().contains(query.toString().toLowerCase()) ||
+          item.usuario.toLowerCase().contains(query.toString().toLowerCase())) {
+        resultado.add(item);
+      }
+    });
+  }
+  return resultado;
+}
+
+bool existeRececaoSelecionado(Rececao e, List<Rececao> listaRececaoelecionado) {
+  bool existe = false;
+
+  for (var i = 0; i < listaRececaoelecionado.length; i++) {
+    if (listaRececaoelecionado[i].rececao == e.rececao) {
       existe = true;
     }
   }
