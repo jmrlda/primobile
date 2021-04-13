@@ -10,6 +10,7 @@ import 'cliente/view/view.dart';
 import 'encomenda/encomenda.dart';
 import 'expedicao/expedicao.dart';
 import 'expedicao/view/view.dart';
+import 'inventario/view/view.dart';
 import 'menu/view/menu_page.dart';
 import 'rececao/rececao.dart';
 import 'rececao/view/rececao_pagina.dart';
@@ -56,6 +57,7 @@ void main() {
       '/config_instancia': (context) {
         return ConfigPage();
       },
+      '/inventario_lista': (context) => InventarioPage(),
     },
 
     // home: LoginPage(),
