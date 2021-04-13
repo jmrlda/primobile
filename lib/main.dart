@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:primobile/artigo/view/view.dart';
 import 'package:primobile/encomenda/view/encomenda_editor_page.dart';
+import 'package:primobile/inventario/inventario.dart';
 import 'package:primobile/sessao/configPage.dart';
 import 'package:primobile/sessao/loginPage.dart';
 import 'package:primobile/util/view/view.dart';
@@ -14,7 +15,6 @@ import 'inventario/view/view.dart';
 import 'menu/view/menu_page.dart';
 import 'rececao/rececao.dart';
 import 'rececao/view/rececao_pagina.dart';
-import 'sessao/sessao_api_provider.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -58,6 +58,7 @@ void main() {
         return ConfigPage();
       },
       '/inventario_lista': (context) => InventarioPage(),
+      '/inventario_editor': (context) => InventarioEditorPage(),
     },
 
     // home: LoginPage(),
