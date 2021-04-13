@@ -105,13 +105,14 @@ class InventarioListaItem extends StatelessWidget {
                 );
               }),
           title: Text(
-            inventario.documentoNumero + "   " + inventario.descricao,
+            inventario.descricao,
             style: TextStyle(
                 color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16),
           ),
           subtitle: Text(
-            "Responsavel " + inventario.responsavel,
-            style: TextStyle(color: Colors.blue, fontSize: 14),
+            "Responsavel: " + inventario.responsavel,
+            style: TextStyle(
+                color: Colors.blue, fontSize: 15, fontWeight: FontWeight.bold),
           ),
           data: inventario.documentoNumero.toString(),
         ));
