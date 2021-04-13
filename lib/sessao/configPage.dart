@@ -2,9 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:primobile/sessao/empresaFilial_modelo.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:primobile/usuario/models/models.dart';
+
 // import 'package:primobile/sessao/sessao_api_provider.dart';
 // import 'package:connectivity/connectivity.dart';
 // import 'package:primobile/util.dart';
+//
+//
+TextEditingController txtNomeEmpresa = new TextEditingController();
+TextEditingController txtIpGlobal = new TextEditingController();
+TextEditingController txtIpLocal = new TextEditingController();
+
+TextEditingController txtCompany = new TextEditingController();
+TextEditingController txtGrantType = new TextEditingController();
+TextEditingController txtLine = new TextEditingController();
+TextEditingController txtInstance = new TextEditingController();
+
+TextEditingController txtAdmin = new TextEditingController();
+TextEditingController txtAdminSenha = new TextEditingController();
+TextEditingController txtPorta = new TextEditingController();
 
 class ConfigPage extends StatefulWidget {
   ConfigPage({Key key}) : super(key: key);
@@ -15,19 +30,6 @@ class ConfigPage extends StatefulWidget {
 
 class _ConfigPageState extends State<ConfigPage> {
   var isLoading = false;
-  TextEditingController txtNomeEmpresa = new TextEditingController();
-  TextEditingController txtIpGlobal = new TextEditingController();
-  TextEditingController txtIpLocal = new TextEditingController();
-
-  TextEditingController txtCompany = new TextEditingController();
-  TextEditingController txtGrantType = new TextEditingController();
-  TextEditingController txtLine = new TextEditingController();
-  TextEditingController txtInstance = new TextEditingController();
-
-  TextEditingController txtAdmin = new TextEditingController();
-  TextEditingController txtAdminSenha = new TextEditingController();
-  TextEditingController txtPorta = new TextEditingController();
-  var sessaoProvider = SessaoApiProvider.read();
 
   BoxDecoration boxDecoration = BoxDecoration(
       borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -37,16 +39,26 @@ class _ConfigPageState extends State<ConfigPage> {
 
   @override
   Widget build(BuildContext context) {
-    sessaoProvider.then((value) {
-      txtNomeEmpresa.text = value['nome_empresa'];
-      txtIpGlobal.text = value['ip_global'];
-      txtIpLocal.text = value['ip_local'];
-      txtCompany.text = value['company'];
-      txtGrantType.text = value['grant_type'];
-      txtLine.text = value['line'];
-      txtInstance.text = value['instance'];
-      txtPorta.text = value['porta'];
-    });
+    try {
+      var sessaoProvider = SessaoApiProvider.read();
+      if (sessaoProvider != null) {
+        sessaoProvider.then((value) {
+          if (value != null) {
+            txtNomeEmpresa.text = value['nome_empresa'];
+            txtIpGlobal.text = value['ip_global'];
+            txtIpLocal.text = value['ip_local'];
+            txtCompany.text = value['company'];
+            txtGrantType.text = value['grant_type'];
+            txtLine.text = value['line'];
+            txtInstance.text = value['instance'];
+            txtPorta.text = value['porta'];
+          }
+        });
+      }
+    } catch (e) {
+      print(e);
+      throw e;
+    }
 
     return Scaffold(
         body: SingleChildScrollView(
