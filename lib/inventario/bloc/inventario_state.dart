@@ -1,63 +1,63 @@
-part of 'expedicao_bloc.dart';
+part of 'inventario_bloc.dart';
 
-abstract class ExpedicaoState extends Equatable {
-  const ExpedicaoState();
+abstract class InventarioState extends Equatable {
+  const InventarioState();
 
   @override
   List<Object> get props => [];
 }
 
-class ExpedicaoInicial extends ExpedicaoState {}
+class InventarioInicial extends InventarioState {}
 
-class ExpedicaoFalha extends ExpedicaoState {}
+class InventarioFalha extends InventarioState {}
 
-class ExpedicaoSucesso extends ExpedicaoState {
-  final List<Expedicao> expedicao;
+class InventarioSucesso extends InventarioState {
+  final List<Inventario> inventario;
   final bool hasReachedMax;
 
-  const ExpedicaoSucesso({this.expedicao, this.hasReachedMax});
+  const InventarioSucesso({this.inventario, this.hasReachedMax});
 
-  ExpedicaoSucesso copyWith({
-    List<Expedicao> expedicao,
+  InventarioSucesso copyWith({
+    List<Inventario> inventario,
     bool hasReachedMax,
   }) {
-    return ExpedicaoSucesso(
-      expedicao: expedicao ?? this.expedicao,
+    return InventarioSucesso(
+      inventario: inventario ?? this.inventario,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
     );
   }
 
   @override
-  List<Object> get props => [expedicao, hasReachedMax];
+  List<Object> get props => [inventario, hasReachedMax];
 
   @override
   String toString() =>
-      'ExpedicaoSucesso { expedicao: ${expedicao.length}, hasReachedMax: $hasReachedMax }';
+      'InventarioSucesso { inventario: ${inventario.length}, hasReachedMax: $hasReachedMax }';
 }
 
-class ExpedicaoSucessoPesquisa extends ExpedicaoState {
-  final List<Expedicao> expedicao;
+class InventarioSucessoPesquisa extends InventarioState {
+  final List<Inventario> inventario;
   final bool hasReachedMax;
   final String query;
-  const ExpedicaoSucessoPesquisa(
-      {this.expedicao, this.query, this.hasReachedMax});
+  const InventarioSucessoPesquisa(
+      {this.inventario, this.query, this.hasReachedMax});
 
-  ExpedicaoSucessoPesquisa copyWith({
-    List<Expedicao> artigos,
+  InventarioSucessoPesquisa copyWith({
+    List<Inventario> artigos,
     String query,
     bool hasReachedMax,
   }) {
-    return ExpedicaoSucessoPesquisa(
-      expedicao: expedicao ?? this.expedicao,
+    return InventarioSucessoPesquisa(
+      inventario: inventario ?? this.inventario,
       query: this.query,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
     );
   }
 
   @override
-  List<Object> get props => [expedicao, hasReachedMax, query];
+  List<Object> get props => [inventario, hasReachedMax, query];
 
   @override
   String toString() =>
-      'ExpedicaoSucessoPesquisa { expedicao: ${expedicao.length}, query: $query},  hasReachedMax: $hasReachedMax}';
+      'InventarioSucessoPesquisa { inventario: ${inventario.length}, query: $query},  hasReachedMax: $hasReachedMax}';
 }
