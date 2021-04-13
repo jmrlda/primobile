@@ -30,6 +30,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' show get;
 import 'package:http_parser/http_parser.dart';
 import 'package:primobile/expedicao/models/expedicao.dart';
+import 'package:primobile/inventario/models/models.dart';
 import 'package:primobile/rececao/models/models.dart';
 
 class Opcoes {
@@ -581,6 +582,37 @@ bool existeRececaoSelecionado(Rececao e, List<Rececao> listaRececaoelecionado) {
 
   for (var i = 0; i < listaRececaoelecionado.length; i++) {
     if (listaRececaoelecionado[i].rececao == e.rececao) {
+      existe = true;
+    }
+  }
+  return existe;
+}
+
+List<Inventario> inventarioPesquisar(
+    String query, List<Inventario> listaInventario) {
+  List<Inventario> resultado = new List<Inventario>();
+
+  if (query.trim().isNotEmpty) {
+    listaInventario.forEach((item) {
+      if (item.documentoNumero
+              .toString()
+              .contains(query.toString().toLowerCase()) ||
+          item.responsavel
+              .toLowerCase()
+              .contains(query.toString().toLowerCase())) {
+        resultado.add(item);
+      }
+    });
+  }
+  return resultado;
+}
+
+bool existeInventarioSelecionado(
+    Inventario e, List<Inventario> listaInventarioSelecionado) {
+  bool existe = false;
+
+  for (var i = 0; i < listaInventarioSelecionado.length; i++) {
+    if (listaInventarioSelecionado[i].documentoNumero == e.documentoNumero) {
       existe = true;
     }
   }
