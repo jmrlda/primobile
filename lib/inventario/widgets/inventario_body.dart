@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:primobile/inventario/bloc/bloc.dart';
+import 'package:primobile/inventario/view/view.dart';
 
 Widget inventarioBody(
     BuildContext context, InventarioBloc _inventarioBloc, bool isSelected) {

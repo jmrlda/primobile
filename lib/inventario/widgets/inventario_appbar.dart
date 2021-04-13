@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:primobile/cliente/util.dart';
 import 'package:primobile/util/util.dart';
 
-dynamic expedicaoAppBar(BuildContext contexto) {
+dynamic inventarioAppBar(BuildContext contexto) {
   // BuildContext contexto;
   return new AppBar(
     backgroundColor: Colors.blue,
