@@ -23,7 +23,7 @@ void main() {
     theme:
         ThemeData(primaryColor: Colors.red, accentColor: Colors.yellowAccent),
     debugShowCheckedModeBanner: false,
-    initialRoute: '/config_instancia',
+    initialRoute: '/',
     routes: {
       '/': (context) => LoginPage(),
       '/menu': (context) => MenuPage(),
