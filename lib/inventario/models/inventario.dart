@@ -31,7 +31,7 @@ class Inventario {
 
   factory Inventario.fromJson(Map<String, dynamic> json) {
     return Inventario(
-      documentoNumero: json['documento_numero'],
+      documentoNumero: json['documento_numero'].toString(),
       descricao: json['descricao'],
       responsavel: json['responsavel'],
       //  imagemBuffer:  data['imagemBuffer'] ,
