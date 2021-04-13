@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
+import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/inventario/models/models.dart';
 
 import 'package:primobile/sessao/sessao_api_provider.dart';
@@ -96,6 +97,8 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
     try {
       var sessao = await SessaoApiProvider.read();
       var response;
+      List<Inventario> lista_inventario = List<Inventario>();
+
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessão não existe');
         return List<Inventario>();
@@ -109,10 +112,15 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
             });
 
         if (response.statusCode == 200) {
-          final List data = json.decode(response.body)["Data"] as List;
-          return data.map((inventario) {
-            return Inventario.fromJson(inventario);
-          }).toList();
+          // final List data = json.decode(response.body)["Data"] as List;
+          dynamic data = json.decode(response.body);
+          data = json.decode(data)["DataSet"]["Table"];
+
+          for (dynamic rawArtigo in data) {
+            lista_inventario.add(Inventario.fromJson(rawArtigo));
+          }
+
+          return lista_inventario;
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);
