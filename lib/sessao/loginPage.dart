@@ -23,6 +23,15 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Ler o arquivo de configuracao
+    // Se for nulo redirecionar para pagina de configuracao.
+    var sessaoProvider = SessaoApiProvider.read();
+    sessaoProvider.then((value) {
+      if (value == null) {
+        Navigator.pushNamed(context, '/config_instancia');
+      }
+    });
+
     return Scaffold(
         body: SingleChildScrollView(
             child: Column(
@@ -190,6 +199,19 @@ class _LoginPageState extends State<LoginPage> {
             ],
           );
         },
+      );
+    } else if (rv == 4) {
+      AlertDialog(
+        title: Text("atenção"),
+        content: Text(descricao),
+        actions: <Widget>[
+          new FlatButton(
+            child: new Text("Configurar"),
+            onPressed: () {
+              Navigator.pushNamed(context, '/config_instancia');
+            },
+          ),
+        ],
       );
     } else if (rv == 0) {
       txtNomeEmail.clear();
