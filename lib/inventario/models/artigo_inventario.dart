@@ -50,7 +50,7 @@ class ArtigoInventario {
     return ArtigoInventario(
       artigo: json['artigo'],
       descricao: json['descricao'],
-      quantidadeStock: json['quantidade_stock'],
+      quantidadeStock: double.parse(json['quantidade_stock']),
       codigoBara: json['codigo_barra'],
       lote: json['lote'],
       localizacao: json['localizacao'],
