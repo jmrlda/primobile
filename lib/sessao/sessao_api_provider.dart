@@ -135,6 +135,8 @@ class SessaoApiProvider {
     } catch (e) {
       // print('nao foi possivel ler o ficheiro');
       // return null;
+      parsed = null;
+
       throw e;
     }
 
