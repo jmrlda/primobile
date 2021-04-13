@@ -534,6 +534,39 @@ class _MenuPageState extends State<MenuPage> {
           ],
         ),
       ),
+      Material(
+        color: Colors.white,
+        child: Column(
+          children: [
+            Center(
+              child: Ink(
+                width: 65,
+                height: 65,
+                decoration: const ShapeDecoration(
+                  color: Colors.lightBlue,
+                  shape: CircleBorder(),
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.camera,
+                  ),
+                  iconSize: 35,
+                  color: Colors.white,
+                  onPressed: () async {
+                    Navigator.pushNamed(context, '/inventario_lista');        
+                  },
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
+                "INVENTARIO",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            )
+          ],
+        ),
+      ),
     ];
   }
 
