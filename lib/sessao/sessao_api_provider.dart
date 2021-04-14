@@ -7,27 +7,20 @@ import 'package:primobile/sessao/empresaFilial_modelo.dart';
 import 'package:primobile/usuario/models/models.dart';
 
 class SessaoApiProvider {
-  static String base_url = '192.168.0.104:2018';
+  static String base_url = '';
   static String protocolo = 'http://';
 
-  /// @login  - Metodo para controlo de entrada e sessão dos usuarios
-
-  /// @Retorno : inteiro
-
-  ///            0 - sucesso
-
-  ///            1 - falha na autenticação
-
-  ///            2 - falha de acesso a internet
-  ///            3 - Erro desconhecido
-  ///   ///            4 - Ficheiro de configuração não encontrado
-
-  ///            TODO:
-  ///             instancia desconhecida
-  ///             empresa desconhecida
-  ///             line nao encontrada
-  ///             grant_type nao suportado
-  ///
+  // ignore: slash_for_doc_comments
+  /**
+   * @login  - Metodo para controlo de entrada e sessão dos usuarios
+   * @Retorno : inteiro
+   *            0 - sucesso
+   *            1 - falha na autenticação
+   *            2 - falha de acesso a internet
+   *            3 - Erro desconhecido
+   *            4 - Ficheiro de configuração não encontrado
+   *
+   */
 
   static Future<Map<String, dynamic>> login(
       String nome_email, String senha, bool online) async {
@@ -292,5 +285,18 @@ class SessaoApiProvider {
     }
 
     return rv;
+  }
+
+  static Future<String> getHostUrl() async {
+    var sessao = await SessaoApiProvider.read();
+    base_url = "";
+    if (sessao != null && sessao.length > 0) {
+      base_url = sessao['ip_local'] + ":" + sessao['porta'];
+    }
+    return base_url;
+  }
+
+  static String getProtocolo() {
+    return protocolo;
   }
 }

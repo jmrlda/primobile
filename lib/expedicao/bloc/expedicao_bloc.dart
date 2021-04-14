@@ -99,8 +99,15 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
         return List<Expedicao>();
       } else {
         String token = sessao['access_token'];
+        String ip = sessao['ip_local'];
+        String porta = sessao['porta'];
+        String baseUrl = await SessaoApiProvider.getBaseUrl();
+        String protocolo = await SessaoApiProvider.getProtocolo();
+
         final response = await httpClient.get(
-            'http://192.168.0.104:2018/WebApi/Plataforma/Listas/CarregaLista/inv_cabecexpedicoes',
+            protocolo +
+                baseUrl +
+                '/WebApi/Plataforma/Listas/CarregaLista/inv_cabecexpedicoes',
             headers: {
               "Authorization": "Bearer $token",
               "Accept": "application/json"

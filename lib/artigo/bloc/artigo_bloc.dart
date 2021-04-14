@@ -98,12 +98,15 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
         return List<Artigo>();
       } else {
         String nome_email = sessao["nome"].toString();
-        // 'http://192.168.0.104:2018/WebApi/Plataforma/Listas/CarregaLista/artigo',
-
         Map<String, dynamic> parsed = Map<String, dynamic>();
         String token = sessao['access_token'];
+        String ip = sessao['ip_local'];
+        String porta = sessao['porta'];
+        String baseUrl = await SessaoApiProvider.getBaseUrl();
+        String protocolo = await SessaoApiProvider.getProtocolo();
+
         final response = await httpClient.get(
-            'http://192.168.0.104:2018/WebApi/ArtigoController/Artigo/lista',
+            protocolo + baseUrl + '/WebApi/ArtigoController/Artigo/lista',
             headers: {
               "Authorization": "Bearer $token",
               "Accept": "application/json"

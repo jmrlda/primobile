@@ -104,8 +104,14 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
         return List<Inventario>();
       } else {
         String token = sessao['access_token'];
+        String ip = sessao['ip_local'];
+        String porta = sessao['porta'];
+        String baseUrl = await SessaoApiProvider.getBaseUrl();
+        String protocolo = await SessaoApiProvider.getProtocolo();
         final response = await httpClient.get(
-            'http://192.168.0.104:2018/WebApi/InventarioStockController/Inventario/lista',
+            protocolo +
+                baseUrl +
+                '/WebApi/InventarioStockController/Inventario/lista',
             headers: {
               "Authorization": "Bearer $token",
               "Accept": "application/json"

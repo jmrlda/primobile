@@ -503,8 +503,15 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
         return <ArtigoExpedicao>[];
       } else {
         String token = sessao['access_token'];
+        String ip = sessao['ip_local'];
+        String porta = sessao['porta'];
+        String baseUrl = await SessaoApiProvider.getBaseUrl();
+        String protocolo = await SessaoApiProvider.getProtocolo();
+
         final response = await httpClient.get(
-            'http://192.168.0.104:2018/WebApi/ExpedicaoController/Expedicao/lista/' +
+            protocolo +
+                baseUrl +
+                '/WebApi/ExpedicaoController/Expedicao/lista/' +
                 numDoc.toString(),
             headers: {
               "Authorization": "Bearer $token",

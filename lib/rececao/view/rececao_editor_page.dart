@@ -469,8 +469,15 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
         return <ArtigoRececao>[];
       } else {
         String token = sessao['access_token'];
+        String ip = sessao['ip_local'];
+        String porta = sessao['porta'];
+        String baseUrl = await SessaoApiProvider.getBaseUrl();
+        String protocolo = await SessaoApiProvider.getProtocolo();
+
         final response = await httpClient.get(
-            'http://192.168.0.104:2018/WebApi/RececaoController/Rececao/lista/' +
+            protocolo +
+                baseUrl +
+                '/WebApi/RececaoController/Rececao/lista/' +
                 numDoc.toString(),
             headers: {
               "Authorization": "Bearer $token",

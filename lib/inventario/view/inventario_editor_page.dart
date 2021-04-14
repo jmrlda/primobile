@@ -506,8 +506,15 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         return <ArtigoInventario>[];
       } else {
         String token = sessao['access_token'];
+        String ip = sessao['ip_local'];
+        String porta = sessao['porta'];
+        String baseUrl = await SessaoApiProvider.getBaseUrl();
+        String protocolo = await SessaoApiProvider.getProtocolo();
+
         final response = await httpClient.get(
-            'http://192.168.0.104:2018/WebApi/InventarioStockController/Inventario/lista/' +
+            protocolo +
+                baseUrl +
+                '/WebApi/InventarioStockController/Inventario/lista/' +
                 numDoc.toString(),
             headers: {
               "Authorization": "Bearer $token",
@@ -554,17 +561,16 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
           Padding(
             padding: EdgeInsets.only(top: 15, left: 20, right: 16, bottom: 4),
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Padding(
                 padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-                child:    Text("ARTIGO: " + artigo.artigo,
-                  style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
+                child: Text("ARTIGO: " + artigo.artigo,
+                    style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16)),
               ),
             ],
           ),
@@ -605,9 +611,13 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                     keyboardType: TextInputType.number,
                     controller: txtArtigoQtd,
                     onChanged: (value) {
-                      if (double.parse(txtArtigoQtd.text) > 0) {
-                        artigo.quantidadeStock =
-                            double.parse(txtArtigoQtd.text);
+                      try {
+                        if (double.parse(txtArtigoQtd.text) > 0) {
+                          artigo.quantidadeStock =
+                              double.parse(txtArtigoQtd.text);
+                        }
+                      } catch (e) {
+                        print(e);
                       }
                     },
                     onTap: () {
