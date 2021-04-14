@@ -53,6 +53,7 @@ class Inventario {
 
   List toMapApi() {
     int i = 0;
+    _artigosJson.clear();
     if (listaArtigo != null) {
       listaArtigo.forEach((element) {
         _artigosJson.add(element.toMap());
