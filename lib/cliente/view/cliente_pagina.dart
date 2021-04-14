@@ -13,7 +13,7 @@ class ClientePage extends StatelessWidget {
     ClienteBloc _clienteBloc = ClienteBloc(httpClient: http.Client())
       ..add(ClienteFetched());
     return Scaffold(
-      appBar: clienteAppBar(),
+      appBar: clienteAppBar(context),
       body: BlocProvider(
         create: (BuildContext context) => _clienteBloc,
         // ArtigoBloc(httpClient: http.Client())..add(ArtigoFetched()),
