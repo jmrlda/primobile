@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
+import 'package:primobile/util/util.dart';
 // import 'package:primobile/sessao/sessao_api_provider.dart';
 // import 'package:connectivity/connectivity.dart';
 // import 'package:primobile/util.dart';
+
+BuildContext contexto;
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -26,6 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     // Ler o arquivo de configuracao
     // Se for nulo redirecionar para pagina de configuracao.
     var sessaoProvider = SessaoApiProvider.read();
+    contexto = context;
     sessaoProvider.then((value) {
       if (value == null) {
         Navigator.pushNamed(context, '/config_instancia');
@@ -33,104 +37,105 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     return Scaffold(
+        appBar: loginAppBar(),
         body: SingleChildScrollView(
             child: Column(
-      children: <Widget>[
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height / 2.9,
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  // begin: ``
-                  colors: [Colors.blue, Colors.blueAccent]),
-              borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(50),
-                  bottomRight: Radius.circular(50))),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              CircleAvatar(
-                backgroundColor: Colors.white,
-                radius: 50.0,
-                child: Image.asset('assets/images/logo.png'),
-              )
-            ],
-          ),
-        ),
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height / 2.9,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      // begin: ``
+                      colors: [Colors.blue, Colors.blueAccent]),
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(50),
+                      bottomRight: Radius.circular(50))),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 50.0,
+                    child: Image.asset('assets/images/logo.png'),
+                  )
+                ],
+              ),
+            ),
 
-        // campo email
-        Container(
-          width: MediaQuery.of(context).size.width / 1.1,
-          margin: EdgeInsets.only(top: 64),
-          padding: EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
-          decoration: boxDecoration,
-          child: TextField(
-            controller: txtNomeEmail,
-            decoration: InputDecoration(
-                border: InputBorder.none,
-                icon: Icon(
-                  Icons.person,
-                  color: Colors.grey,
-                ),
-                hintText: 'Utilizador'),
-          ),
-        ),
+            // campo email
+            Container(
+              width: MediaQuery.of(context).size.width / 1.1,
+              margin: EdgeInsets.only(top: 64),
+              padding: EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
+              decoration: boxDecoration,
+              child: TextField(
+                controller: txtNomeEmail,
+                decoration: InputDecoration(
+                    border: InputBorder.none,
+                    icon: Icon(
+                      Icons.person,
+                      color: Colors.grey,
+                    ),
+                    hintText: 'Utilizador'),
+              ),
+            ),
 
-        // campo senha
-        Container(
-          width: MediaQuery.of(context).size.width / 1.1,
-          // height: 45,
-          margin: EdgeInsets.only(top: 32, bottom: 20),
-          padding: EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
-          decoration: boxDecoration,
-          child: TextField(
-            obscureText: true,
-            obscuringCharacter: '*',
-            controller: txtSenha,
-            decoration: InputDecoration(
-                border: InputBorder.none,
-                icon: Icon(
-                  Icons.vpn_key,
-                  color: Colors.grey,
-                ),
-                hintText: 'Senha'),
-          ),
-        ),
+            // campo senha
+            Container(
+              width: MediaQuery.of(context).size.width / 1.1,
+              // height: 45,
+              margin: EdgeInsets.only(top: 32, bottom: 20),
+              padding: EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
+              decoration: boxDecoration,
+              child: TextField(
+                obscureText: true,
+                obscuringCharacter: '*',
+                controller: txtSenha,
+                decoration: InputDecoration(
+                    border: InputBorder.none,
+                    icon: Icon(
+                      Icons.vpn_key,
+                      color: Colors.grey,
+                    ),
+                    hintText: 'Senha'),
+              ),
+            ),
 
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: EdgeInsets.only(left: 30.0, right: 30.0, bottom: 60),
-            child: MaterialButton(
-                minWidth: double.infinity,
-                shape: StadiumBorder(),
-                color: Colors.blue,
-                child: Text(
-                  "Entrar",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                onPressed: () async {
-                  // Navigator.pushNamed(context, '/menu');
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(left: 30.0, right: 30.0, bottom: 60),
+                child: MaterialButton(
+                    minWidth: double.infinity,
+                    shape: StadiumBorder(),
+                    color: Colors.blue,
+                    child: Text(
+                      "Entrar",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    onPressed: () async {
+                      // Navigator.pushNamed(context, '/menu');
 
-                  String nome = txtNomeEmail.text.trim();
-                  String senha = txtSenha.text.trim();
+                      String nome = txtNomeEmail.text.trim();
+                      String senha = txtSenha.text.trim();
 
-                  // if (true) {
-                  //       // bool rv = await checkAcessoInternet();
-                  autenticar(nome, senha, true);
-                  // }
+                      // if (true) {
+                      //       // bool rv = await checkAcessoInternet();
+                      autenticar(nome, senha, true);
+                      // }
 
-                  // else {
-                  //   autenticar(nome, senha, false);
+                      // else {
+                      //   autenticar(nome, senha, false);
 
-                  // }
+                      // }
 
-                  // Usuario usuario = await DBProvider.db.login(nome, senha);
-                }),
-          ),
-        ),
-      ],
-    )));
+                      // Usuario usuario = await DBProvider.db.login(nome, senha);
+                    }),
+              ),
+            ),
+          ],
+        )));
   }
 
   void autenticar(String nome, String senha, bool online) async {
@@ -218,5 +223,33 @@ class _LoginPageState extends State<LoginPage> {
       txtSenha.clear();
       Navigator.pushNamed(context, '/menu');
     }
+  }
+}
+
+AppBar loginAppBar() {
+  return new AppBar(
+    title: new Center(
+      child: Text('Login'),
+    ),
+    backgroundColor: Colors.blue,
+    actions: <Widget>[
+      PopupMenuButton<String>(
+        onSelected: opcaoAcao,
+        itemBuilder: (BuildContext context) {
+          return Opcoes.escolhaLogin.map((String escolha) {
+            return PopupMenuItem<String>(
+              value: escolha,
+              child: Text(escolha),
+            );
+          }).toList();
+        },
+      )
+    ],
+  );
+}
+
+void opcaoAcao(String opcao) async {
+  if (opcao == Opcoes.Configurar) {
+    Navigator.pushNamed(contexto, '/config_instancia');
   }
 }
