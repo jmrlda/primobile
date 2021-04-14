@@ -106,7 +106,7 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
         String token = sessao['access_token'];
         String ip = sessao['ip_local'];
         String porta = sessao['porta'];
-        String baseUrl = await SessaoApiProvider.getBaseUrl();
+        String baseUrl = await SessaoApiProvider.getHostUrl();
         String protocolo = await SessaoApiProvider.getProtocolo();
         final response = await httpClient.get(
             protocolo +
