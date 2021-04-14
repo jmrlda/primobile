@@ -59,6 +59,10 @@ void main() {
       },
       '/inventario_lista': (context) => InventarioPage(),
       '/inventario_editor': (context) => InventarioEditorPage(),
+      '/inventario_sucesso': (context) => SucessoPage(
+            modulo: "Inventario",
+            mensagemSucesso: "Actualizado com Sucesso",
+          ),
     },
 
     // home: LoginPage(),
