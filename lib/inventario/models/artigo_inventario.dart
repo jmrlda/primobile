@@ -11,30 +11,32 @@ class ArtigoInventario {
   String descricao;
   String unidade;
   double quantidadeStock;
+  double quantidadeStockReserva;
+
   String codigoBara;
   String localizacao;
   String lote;
 
-  ArtigoInventario({
-    this.artigo,
-    this.descricao,
-    this.unidade,
-    this.quantidadeStock,
-    this.codigoBara,
-    this.lote,
-    this.localizacao,
-  });
+  ArtigoInventario(
+      {this.artigo,
+      this.descricao,
+      this.unidade,
+      this.quantidadeStock,
+      this.codigoBara,
+      this.lote,
+      this.localizacao,
+      this.quantidadeStockReserva});
 
   factory ArtigoInventario.fromMap(Map<String, dynamic> map) =>
       new ArtigoInventario(
-        artigo: map['artigo'],
-        descricao: map['descricao'],
-        quantidadeStock: map['quantidade_stock'],
-        codigoBara: map['codigo_barra'],
-        lote: map['lote'],
-        localizacao: map['localizacao'],
-        unidade: map['unidade'],
-      );
+          artigo: map['artigo'],
+          descricao: map['descricao'],
+          quantidadeStock: double.parse(map['quantidade_stock']),
+          codigoBara: map['codigo_barra'],
+          lote: map['lote'],
+          localizacao: map['localizacao'],
+          unidade: map['unidade'],
+          quantidadeStockReserva: double.parse(map['quantidade_reserva']));
 
   Map<String, dynamic> toMap() => {
         'artigo': artigo,
@@ -44,18 +46,19 @@ class ArtigoInventario {
         'lote': lote,
         'localizacao': localizacao,
         'unidade': unidade,
+        'quantidade_reserva': quantidadeStockReserva
       };
 
   factory ArtigoInventario.fromJson(Map<String, dynamic> json) {
     return ArtigoInventario(
-      artigo: json['artigo'],
-      descricao: json['descricao'],
-      quantidadeStock: double.parse(json['quantidade_stock']),
-      codigoBara: json['codigo_barra'],
-      lote: json['lote'],
-      localizacao: json['localizacao'],
-      unidade: json['unidade'],
-    );
+        artigo: json['artigo'],
+        descricao: json['descricao'],
+        quantidadeStock: double.parse(json['quantidade_stock']),
+        codigoBara: json['codigo_barra'],
+        lote: json['lote'],
+        localizacao: json['localizacao'],
+        unidade: json['unidade'],
+        quantidadeStockReserva: double.parse(json['quantidade_reserva']));
   }
 
   List<ArtigoInventario> parseInventario(String response) {
