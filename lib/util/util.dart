@@ -35,10 +35,12 @@ import 'package:primobile/rececao/models/models.dart';
 
 class Opcoes {
   static const String Sincronizar = 'sincronizar';
+  static const String Configurar = 'configurar';
+  static const String Login = 'login';
 
-  static const List<String> escolha = <String>[
-    Sincronizar,
-  ];
+  static const List<String> escolha = <String>[Sincronizar, Login, Configurar];
+  static const List<String> escolhaLogin = <String>[Configurar];
+  static const List<String> escolhaConfig = <String>[Login];
 }
 
 Widget networkIconImage(url) {
