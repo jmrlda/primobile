@@ -46,7 +46,7 @@ class ArtigoInventario {
         'lote': lote,
         'localizacao': localizacao,
         'unidade': unidade,
-        'quantidade_reserva': quantidadeStockReserva
+        'quantidade_reserva': quantidadeStockReserva,
       };
 
   factory ArtigoInventario.fromJson(Map<String, dynamic> json) {
