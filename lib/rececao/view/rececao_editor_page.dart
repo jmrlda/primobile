@@ -606,9 +606,13 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                     keyboardType: TextInputType.number,
                     controller: txtArtigoQtdRecebida,
                     onChanged: (value) {
-                      if (double.parse(txtArtigoQtdRecebida.text) > 0) {
-                        artigo.quantidadeRecebida =
-                            double.parse(txtArtigoQtdRecebida.text);
+                      try {
+                        if (double.parse(txtArtigoQtdRecebida.text) > 0) {
+                          artigo.quantidadeRecebida =
+                              double.parse(txtArtigoQtdRecebida.text);
+                        }
+                      } catch (e) {
+                        print(e);
                       }
                     },
                     onTap: () {
