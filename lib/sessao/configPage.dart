@@ -43,27 +43,6 @@ class _ConfigPageState extends State<ConfigPage> {
   Widget build(BuildContext context) {
     contexto = context;
 
-    try {
-      var sessaoProvider = SessaoApiProvider.read();
-      if (sessaoProvider != null) {
-        sessaoProvider.then((value) {
-          if (value != null) {
-            txtNomeEmpresa.text = value['nome_empresa'];
-            txtIpGlobal.text = value['ip_global'];
-            txtIpLocal.text = value['ip_local'];
-            txtCompany.text = value['company'];
-            txtGrantType.text = value['grant_type'];
-            txtLine.text = value['line'];
-            txtInstance.text = value['instance'];
-            txtPorta.text = value['porta'];
-          }
-        });
-      }
-    } catch (e) {
-      print(e);
-      throw e;
-    }
-
     return Scaffold(
         appBar: configAppBar(),
         body: SingleChildScrollView(
