@@ -272,7 +272,7 @@ class _EncomendaPageState extends State<EncomendaListaPage> {
 
   Widget listarEncomenda() {
     List<Widget> children = List<Widget>();
-    if (encomendas != null && encomendas.length <= 0) {
+    if (encomendas != null && encomendas.length > 0) {
       getEncomenda().then((value) {
         if (this.mounted == true) {
           setState(() {
@@ -290,11 +290,11 @@ class _EncomendaPageState extends State<EncomendaListaPage> {
       });
     }
 
-    if (encomendas == null) {
-      return Container(
+    if (encomendas == null || encomendas.length <= 0) {
+      return Center(
         child: Text(
-          "Nenhuma encomenda encontrada. Sincronize os Dados",
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          "Nenhuma encomenda encontrada.\n Sincronize os Dados",
+          style: TextStyle(fontSize: 15, color: Colors.black),
         ),
       );
     } else if (encomendas.length <= 0) {
@@ -499,17 +499,19 @@ class _EncomendaPageState extends State<EncomendaListaPage> {
   }
 
   Future<List<Encomenda>> getEncomenda() async {
-    List<Encomenda> res;
-    try {
-      res = await DBProvider.db.getTodasEncomendas();
-      for (int i = 0; i < res.length; i++) {
-        res[i].regrasPreco = await getEncomendaRegra(res[i].encomenda_id);
-      }
-    } catch (err) {
-      res = null;
-    }
+    // List<Encomenda> res;
+    // try {
+    //   res = await DBProvider.db.getTodasEncomendas();
+    //   for (int i = 0; i < res.length; i++) {
+    //     res[i].regrasPreco = await getEncomendaRegra(res[i].encomenda_id);
+    //   }
+    // } catch (err) {
+    //   res = null;
+    // }
 
-    return res;
+    // return res;
+    //
+    return null;
   }
 
   Future<List<EncomendaItem>> getEncomendaItem() async {
