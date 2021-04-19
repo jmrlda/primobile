@@ -163,7 +163,7 @@ class _MenuPageState extends State<MenuPage> {
                     shape: CircleBorder(),
                   ),
                   child: IconButton(
-                    icon: Icon(Icons.add_shopping_cart),
+                    icon: Icon(Icons.local_mall),
                     iconSize: 35,
                     color: Colors.white,
                     onPressed: () {
@@ -200,7 +200,7 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 child: IconButton(
                   icon: Icon(
-                    Icons.person,
+                    Icons.add_business_rounded,
                   ),
                   iconSize: 35,
                   color: Colors.white,
@@ -239,7 +239,7 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 child: IconButton(
                   icon: Icon(
-                    Icons.person,
+                    Icons.book_online_rounded,
                   ),
                   iconSize: 35,
                   color: Colors.white,
@@ -761,7 +761,7 @@ class SnackBarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: RaisedButton(
+      child: ElevatedButton(
         onPressed: () {
           final snackBar = SnackBar(
             content: Text('Voilá! Um SnackBar!'),
