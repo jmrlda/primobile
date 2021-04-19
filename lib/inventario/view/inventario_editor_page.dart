@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/inventario/models/inventario.dart';
@@ -13,6 +14,8 @@ BuildContext contexto;
 http.Client httpClient = http.Client();
 List<ArtigoInventario> linhaInventario = List<ArtigoInventario>();
 List<ArtigoInventario> lista_artigo_inventario = List<ArtigoInventario>();
+ScrollController _scrollController = new ScrollController();
+int index = 0;
 
 class InventarioEditorPage extends StatefulWidget {
   InventarioEditorPage({Key key, this.title}) : super(key: key);
@@ -26,10 +29,11 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
   TextEditingController txtClienteController = TextEditingController();
   TextEditingController txtQtdArtigoController = TextEditingController();
   BuildContext context;
-  var items = List<dynamic>();
+  List<Widget> items = List<Widget>();
   final List<dynamic> encomendaItens = <dynamic>[
     // encomendaItemVazio(),
   ];
+  List<bool> posicao = List.filled(31, false);
 
   double mercadServicValor = 0.0;
   double noIva = 0.0;
@@ -83,8 +87,11 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         });
   }
 
+  GlobalKey stickyKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
+    index = 0;
     contexto = context;
     temConexao(
         'Dispositivo sem conexão WIFI ou Dados Moveis. Por Favor Active para criação da expedição!');
@@ -95,7 +102,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         appBar: new AppBar(
           backgroundColor: Colors.blue[900],
           centerTitle: true,
-          title: new Text("Expedição"),
+          title: new Text("Inventario"),
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back),
             onPressed: () {
@@ -117,7 +124,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
             children: <Widget>[
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 285,
+                height: 250,
                 decoration: BoxDecoration(
                   color: Colors.blue[900], // fromRGBO(7, 89, 250, 100)
                   // gradient: LinearGradient(
@@ -130,7 +137,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                     espaco(),
                     Container(
                       width: MediaQuery.of(context).size.width - 30,
-                      height: 200,
+                      height: 150,
                       padding: EdgeInsets.only(
                           top: 5, left: 16, right: 16, bottom: 20),
                       decoration: BoxDecoration(
@@ -172,6 +179,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                                                 inventario.documentoNumero),
                                             0,
                                             0);
+                                    index = 0;
 
                                     actualizarEstado();
                                   });
@@ -214,10 +222,14 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
               ),
               Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
+                  // reverse: true,
                   shrinkWrap: true,
                   itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    return items[index];
+
+                  itemBuilder: (context, i) {
+                    index = i;
+                    return items[i];
                     // ListTile(
                     //   title: Text('${items[index]}'),
                     // );
@@ -261,6 +273,41 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
 
   int _selectedIndex = 0;
 
+  void scanBarCode() {
+    // dynamic codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
+    //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+
+    String codigoBarra = '5449000045478';
+
+    try {
+      if (codigoBarra != null) {
+        print(codigoBarra);
+        int i = 0;
+        lista_artigo_inventario.forEach((artigo) async {
+          i++;
+          if (artigo.codigoBara == codigoBarra) {
+            // print("Encontrado");
+
+            // print("ARtigo " + artigo.artigo);
+            // print("descricao " + artigo.descricao);
+
+            await _scrollController.animateTo(
+              (101.0 * 5),
+              curve: Curves.decelerate,
+              duration: const Duration(milliseconds: 300),
+            );
+
+            setState(() {
+              posicao[5] = true;
+            });
+          }
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   void _onItemTapped(int index) async {
     // Sair
     if (index == 0) {
@@ -277,18 +324,9 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
       // na lista de ArtigoExpedição, se localizado, alterar as quantidades
       // a expedir e alterar o estado da linha como processado ou actualizado
 
-      // FlutterBarcodeScanner.getBarcodeStreamReceiver(
-      //         "#ff6666", "Cancelar", true, ScanMode.DEFAULT)
-      //     .listen((codigoBarra) {
-      //   if (codigoBarra != null && codigoBarra != "-1") {
-      //     print(codigoBarra);
-      //     lista_artigo_inventario.forEach((artigo) {
-      //       if (artigo.codigoBara == codigoBarra) {
-      //         print("Encontrado");
-      //       }
-      //     });
-      //   }
-      // });
+      //
+      scanBarCode();
+      // _scrollController.jumpTo(_scrollController.);
       actualizarEstado();
 
       // Terminar
@@ -457,7 +495,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
   // Retornar lista de artigos por expedir convertidos em widgets
   List<Widget> getListaArtigo(List<ArtigoInventario> artigos) {
     List<Widget> lista_widget = List<Widget>();
-
+    lista_widget.clear();
     if (artigos != null || artigos.length > 0) {
       int i = 0;
       artigos.forEach((artigo) {
@@ -475,7 +513,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
 
   // Widget representado cada Artigo de uma expedição
   Widget artigoInventario(ArtigoInventario artigo) {
-    return Slidable(
+    Slidable slide = Slidable(
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: 0.25,
       child: inventarioItem(artigo),
@@ -493,6 +531,8 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
       //   ),
       // ],
     );
+    // slide.
+    return slide;
   }
 
   // buscar as linhas de uma determinada Expedição identificado pelo 'Numero de documento'
@@ -523,7 +563,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
 
         if (response.statusCode == 200) {
           dynamic data = json.decode(response.body);
-
+          lista_artigo_inventario.clear();
           await data.map((inventario) {
             lista_artigo_inventario
                 .add(ArtigoInventario.fromJson(json.decode(inventario)));
@@ -553,90 +593,194 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
     var artigoQuantidade;
     TextEditingController txtArtigoQtd = new TextEditingController();
     txtArtigoQtd.text = artigo.quantidadeStock.toString();
-
+    Color ArtigoEstadoCor = Colors.blue;
+    if (artigo.quantidadeStockReserva > 0) {
+      ArtigoEstadoCor = Colors.red;
+    } else {
+      ArtigoEstadoCor = Colors.white;
+    }
+    posicao[index] = false;
     return ArtigoInventarioCard(
+      color: ArtigoEstadoCor,
       artigo: artigo,
       child: Column(
         children: <Widget>[
           Padding(
             padding: EdgeInsets.only(top: 15, left: 20, right: 16, bottom: 4),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-                child: Text("ARTIGO: " + artigo.artigo,
-                    style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-                child: Text(artigo.descricao,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
-              ),
-            ],
-          ),
-          Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-                child: Text(
-                  "Quantidade: ",
-                  style: TextStyle(
+
+          ExpansionTile(
+            initiallyExpanded: posicao[index],
+            title: Text(artigo.descricao,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
                     color: Colors.blue,
-                    fontSize: 18,
                     fontWeight: FontWeight.bold,
-                  ),
+                    fontSize: 16)),
+            subtitle: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(
+                          top: 5, left: 15, right: 5, bottom: 0),
+                      child: Text(
+                          "Artigo:" +
+                              artigo.artigo +
+                              "--- Lote: " +
+                              artigo.lote,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16)),
+                    ),
+                  ],
                 ),
-              ),
-              Spacer(),
-              Padding(
-                padding:
-                    EdgeInsets.only(top: 5, left: 15, right: 20, bottom: 15),
-                child: Container(
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    controller: txtArtigoQtd,
-                    onChanged: (value) {
-                      try {
-                        if (double.parse(txtArtigoQtd.text) > 0) {
-                          artigo.quantidadeStock =
-                              double.parse(txtArtigoQtd.text);
-                        }
-                      } catch (e) {
-                        print(e);
-                      }
-                    },
-                    onTap: () {
-                      txtArtigoQtd.selection = TextSelection(
-                          baseOffset: 0,
-                          extentOffset: txtArtigoQtd.value.text.length);
-                    },
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+              ],
+            ),
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+                    child: Text(
+                      "Localização: ",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                      ),
                     ),
                   ),
-                  width: 100,
-                ),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+                    child: Text(
+                      artigo.localizacao,
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+                    child: Text(
+                      "Lote: ",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+                    child: Text(
+                      artigo.lote,
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+                    child: Text(
+                      "Quantidade: ",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 5, left: 15, right: 20, bottom: 15),
+                    child: Container(
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        controller: txtArtigoQtd,
+                        onChanged: (value) {
+                          try {
+                            if (double.parse(txtArtigoQtd.text) > 0) {
+                              artigo.quantidadeStock =
+                                  double.parse(txtArtigoQtd.text);
+                            }
+                          } catch (e) {
+                            print(e);
+                          }
+                        },
+                        onTap: () {
+                          txtArtigoQtd.selection = TextSelection(
+                              baseOffset: 0,
+                              extentOffset: txtArtigoQtd.value.text.length);
+                        },
+                        textAlign: TextAlign.end,
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      width: 100,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: <Widget>[
+          //     Padding(
+          //       padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+          //       child: Text(artigo.descricao,
+          //           overflow: TextOverflow.ellipsis,
+          //           style: TextStyle(
+          //               color: Colors.blue,
+          //               fontWeight: FontWeight.bold,
+          //               fontSize: 16)),
+          //     ),
+          //   ],
+          // ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.start,
+          //   children: <Widget>[
+          //     Padding(
+          //       padding:
+          //           EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+          //       child: Text("Artigo: ",
+          //           style: TextStyle(color: Colors.blue, fontSize: 16)),
+          //     ),
+          //     Padding(
+          //       padding:
+          //           EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+          //       child: Text(artigo.artigo,
+          //           style: TextStyle(
+          //               color: Colors.blue,
+          //               fontWeight: FontWeight.bold,
+          //               fontSize: 16)),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );
