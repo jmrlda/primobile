@@ -16,6 +16,7 @@ List<ArtigoInventario> linhaInventario = List<ArtigoInventario>();
 List<ArtigoInventario> lista_artigo_inventario = List<ArtigoInventario>();
 ScrollController _scrollController = new ScrollController();
 int index = 0;
+int idx = 0;
 
 class InventarioEditorPage extends StatefulWidget {
   InventarioEditorPage({Key key, this.title}) : super(key: key);
@@ -92,6 +93,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
   @override
   Widget build(BuildContext context) {
     index = 0;
+    idx = 0;
     contexto = context;
     temConexao(
         'Dispositivo sem conexão WIFI ou Dados Moveis. Por Favor Active para criação da expedição!');
@@ -170,18 +172,23 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                                       context, '/inventario_lista');
 
                                   result.then((value) async {
-                                    inventario = value;
-                                    lista_artigo_inventario =
-                                        new List<ArtigoInventario>();
-                                    lista_artigo_inventario =
-                                        await _fetchLinhaInventario(
-                                            int.parse(
-                                                inventario.documentoNumero),
-                                            0,
-                                            0);
-                                    index = 0;
+                                    try {
+                                      inventario = value;
+                                      lista_artigo_inventario =
+                                          new List<ArtigoInventario>();
+                                      lista_artigo_inventario =
+                                          await _fetchLinhaInventario(
+                                              int.parse(
+                                                  inventario.documentoNumero),
+                                              0,
+                                              0);
+                                      index = 0;
 
-                                    actualizarEstado();
+                                      actualizarEstado();
+                                    } catch (e) {
+                                      print("Exception");
+                                      print(e);
+                                    }
                                   });
                                 },
                                 child: Text(
@@ -228,7 +235,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                   itemCount: items.length,
 
                   itemBuilder: (context, i) {
-                    index = i;
+                    // index = i;
                     return items[i];
                     // ListTile(
                     //   title: Text('${items[index]}'),
@@ -284,23 +291,27 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         print(codigoBarra);
         int i = 0;
         lista_artigo_inventario.forEach((artigo) async {
-          i++;
           if (artigo.codigoBara == codigoBarra) {
             // print("Encontrado");
 
-            // print("ARtigo " + artigo.artigo);
+            print("ARtigo " + artigo.artigo);
             // print("descricao " + artigo.descricao);
-
-            await _scrollController.animateTo(
-              (101.0 * 5),
-              curve: Curves.decelerate,
-              duration: const Duration(milliseconds: 300),
-            );
-
             setState(() {
-              posicao[5] = true;
+              posicao[i] = true;
+
+              // items = getListaArtigo(lista_artigo_inventario);
+            });
+            _scrollController
+                .animateTo(
+              (94.0 * i),
+              curve: Curves.easeInToLinear,
+              duration: const Duration(milliseconds: 600),
+            )
+                .then((value) {
+              print('scroll');
             });
           }
+          i++;
         });
       }
     } catch (e) {
@@ -595,11 +606,15 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
     txtArtigoQtd.text = artigo.quantidadeStock.toString();
     Color ArtigoEstadoCor = Colors.blue;
     if (artigo.quantidadeStockReserva > 0) {
-      ArtigoEstadoCor = Colors.red;
+      ArtigoEstadoCor = Colors.red[200];
     } else {
       ArtigoEstadoCor = Colors.white;
     }
-    posicao[index] = false;
+    // posicao[index] = false;
+    if (posicao[idx] == true) {
+      txtArtigoQtd.selection = TextSelection(
+          baseOffset: 0, extentOffset: txtArtigoQtd.value.text.length);
+    }
     return ArtigoInventarioCard(
       color: ArtigoEstadoCor,
       artigo: artigo,
@@ -610,7 +625,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
           ),
 
           ExpansionTile(
-            initiallyExpanded: posicao[index],
+            initiallyExpanded: posicao[idx++],
             title: Text(artigo.descricao,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -621,20 +636,22 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: 5, left: 15, right: 5, bottom: 0),
-                      child: Text(
-                          "Artigo:" +
-                              artigo.artigo +
-                              "--- Lote: " +
-                              artigo.lote,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16)),
-                    ),
+                    Text("Artigo:" + artigo.artigo,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16)),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Text("Lote: " + artigo.lote,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16)),
                   ],
                 ),
               ],
@@ -669,34 +686,6 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                 ],
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
-                    child: Text(
-                      "Lote: ",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
-                    child: Text(
-                      artigo.lote,
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              Row(
                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   Padding(
@@ -713,9 +702,10 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                   Spacer(),
                   Padding(
                     padding: EdgeInsets.only(
-                        top: 5, left: 15, right: 20, bottom: 15),
+                        top: 1, left: 15, right: 20, bottom: 10),
                     child: Container(
                       child: TextField(
+                        autofocus: true,
                         keyboardType: TextInputType.number,
                         controller: txtArtigoQtd,
                         onChanged: (value) {
