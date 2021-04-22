@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:primobile/sessao/empresaFilial_modelo.dart';
 import 'package:primobile/usuario/models/models.dart';
+import 'package:flutter_session/flutter_session.dart';
 
 class SessaoApiProvider {
   static String base_url = '';
@@ -60,7 +61,7 @@ class SessaoApiProvider {
           rv['status'] = 1;
           rv['descricao'] = "Sem arquivo da sessão";
         } else {
-          if (sessao["nome"].toString().toLowerCase() ==
+          if (sessao["usuario"].toString().toLowerCase() ==
                   nome_email.toLowerCase() &&
               sessao["senha"] == senha) {
             rv['status'] = 0;
@@ -76,20 +77,11 @@ class SessaoApiProvider {
           sessao['access_token'] = parsed['access_token'];
           sessao['token_type'] = parsed['token_type'];
           sessao['expires_in'] = parsed['expires_in'];
+          sessao['usuario'] = nome_email;
+          sessao['senha'] = senha;
+
           _save(jsonEncode(sessao));
 
-          // _save(jsonEncode({
-          //   "nome": nome_email,
-          //   "senha": senha,
-          //   "access_token": parsed['access_token'],
-          //   "token_type": parsed['token_type'],
-          //   "expires_in": parsed['expires_in'],
-          //   "company": "DEMO",
-          //   "grant_type": "password",
-          //   "line": "professional",
-          //   "instance": "default"
-          // }));
-          // sessao = await read();
           rv['status'] = 0;
           rv['descricao'] = "login sucesso";
         } else {
@@ -119,6 +111,8 @@ class SessaoApiProvider {
       final file = File('${directorio.path}/sessao.json');
       if (file.existsSync() == true) {
         String text = await file.readAsString();
+        await FlutterSession().set('sessao', text);
+
         parsed = jsonDecode(text);
       } else {
         print('[sessao read] Atenção Ficheiro não existe!');
@@ -136,33 +130,30 @@ class SessaoApiProvider {
     return parsed;
   }
 
-  static Future<Map<String, dynamic>> readConfig() async {
-    Map<String, dynamic> parsed = Map<String, dynamic>();
+  static Future<Map<String, dynamic>> readSession() async {
+    Map<String, dynamic> sessaoParsed = Map<String, dynamic>();
 
     try {
-      final directorio = await getApplicationDocumentsDirectory();
-      final file = File('${directorio.path}/sessao.json');
-      if (file.existsSync() == true) {
-        String text = await file.readAsString();
-        parsed = jsonDecode(text);
-      } else {
-        print('[sessao read] Atenção Ficheiro não existe!');
-
-        return Map();
+      dynamic sessaoParsed = await FlutterSession().get('sessao');
+      if (sessaoParsed != null) {
+        return sessaoParsed;
       }
-    } catch (e) {
-      print('nao foi possivel ler o ficheiro');
-      return Map();
-    }
 
-    return parsed;
+      // }
+    } catch (e) {
+      print('não foi possivel ler a sessão');
+      return null;
+    }
+    // se chegou a este ponte é porque não houve sucesso no carregamento ou leitura da sessão
+    return null;
   }
 
-  ///  Salvar dados da sessao em um ficheiro para seu uso posterior
-
+  ///  Salvar dados da sessao em um ficheiro e em memoria para seu uso posterior
   static _save(String data) async {
     final directorio = await getApplicationDocumentsDirectory();
     final file = File('${directorio.path}/sessao.json');
+    // salvar em memoria e partilhar em todas pagina da aplicação
+    await FlutterSession().set('sessao', data);
     await file.writeAsString(data);
   }
 
@@ -183,12 +174,12 @@ class SessaoApiProvider {
     try {
       var sessao = await read();
       var response;
-      String nome_email = sessao["nome"].toString();
+      String nome_email = sessao["usuario"].toString();
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');
       } else {
         response = await http.post(base_url + novasenha_url, body: {
-          "nome": nome_email,
+          "usuario": nome_email,
           "senha_actual": senha_actual,
           "senha_nova": senha_nova,
           "senha_confirmar": senha_confirmar
@@ -238,7 +229,7 @@ class SessaoApiProvider {
       //     rv['status'] = 1;
       //     rv['descricao'] = "Sem arquivo da sessão";
       //   } else {
-      //     if (sessao["nome"].toString().toLowerCase() ==
+      //     if (sessao["usuario"].toString().toLowerCase() ==
       //             nome_email.toLowerCase() &&
       //         sessao["senha"] == senha) {
       //       rv['status'] = 0;
@@ -253,8 +244,6 @@ class SessaoApiProvider {
           parsed = jsonDecode(response.body);
 
           _save(jsonEncode({
-            "nome": usuario.nome,
-            "senha": usuario.senha,
             "access_token": parsed['access_token'],
             "token_type": parsed['token_type'],
             "expires_in": parsed['expires_in'],
@@ -298,5 +287,91 @@ class SessaoApiProvider {
 
   static String getProtocolo() {
     return protocolo;
+  }
+
+  static Future<Map<String, dynamic>> refreshToken() async {
+    Map<String, dynamic> rv = Map<String, dynamic>();
+    rv = {'status': -1, 'descricao': ""};
+
+    var login_url = '/WebApi/token';
+    try {
+      // #TODO: Desencriptar dados antes de carregar para memoria;
+      var sessao = await readSession();
+
+      if (sessao == null || sessao.length == 0) {
+        print('Ficheiro sessao nao existe');
+        return rv = {
+          'status': 4,
+          'descricao': "Ficheiro de configuração não encontrado"
+        };
+      }
+
+      var response;
+
+      String nomeEmail = sessao['usuario'].toString().trim();
+      String senha = sessao['senha'];
+
+      // if (online == true) {
+      response = await http.post(
+          protocolo + sessao["ip_local"] + ":" + sessao["porta"] + login_url,
+          body: {
+            "username": nomeEmail,
+            "password": senha,
+            "company": sessao['company'],
+            "grant_type": sessao['grant_type'],
+            "line": sessao['line'],
+            "instance": sessao['instance']
+          });
+
+      rv['status'] = 0;
+      rv['descricao'] = "login sucesso";
+      // } else {
+      //   if (sessao == null || sessao.length == 0) {
+      //     rv['status'] = 1;
+      //     rv['descricao'] = "Sem arquivo da sessão";
+      //   } else {
+      //     if (sessao["usuario"].toString().toLowerCase() ==
+      //             nome_email.toLowerCase() &&
+      //         sessao["senha"] == senha) {
+      //       rv['status'] = 0;
+      //       rv['descricao'] = "login da sessão sucesso";
+      //     }
+      //   }
+      // }
+
+      Map<String, dynamic> parsed = Map<String, dynamic>();
+      if (response != null) {
+        parsed = jsonDecode(response.body);
+        if (response.statusCode == 200) {
+          sessao['access_token'] = parsed['access_token'];
+          sessao['token_type'] = parsed['token_type'];
+          sessao['expires_in'] = parsed['expires_in'];
+          sessao['usuario'] = nomeEmail;
+          sessao['senha'] = senha;
+
+          _save(jsonEncode(sessao));
+
+          rv['status'] = 0;
+          rv['descricao'] = "login sucesso";
+          print(parsed['access_token']);
+          print("refrescando token");
+
+          print("refrescando token");
+          print(DateTime.now());
+        } else {
+          rv['status'] = 1;
+          rv['descricao'] = parsed['error'];
+        }
+      }
+    } catch (e) {
+      // if (e.osError.errorCode == 111) {
+      //   rv =  2;
+      // }
+
+      rv['status'] = 3;
+      rv['descricao'] = e;
+    }
+
+    return rv;
   }
 }
