@@ -676,10 +676,12 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                         keyboardType: TextInputType.number,
                         controller: txtArtigoQtd,
                         onChanged: (value) {
-                          if (double.parse(txtArtigoQtd.text) > 0) {
-                            artigo.quantidadeExpedir =
-                                double.parse(txtArtigoQtd.text);
-                          }
+                          try {
+                            if (double.parse(txtArtigoQtd.text) > 0) {
+                              artigo.quantidadeExpedir =
+                                  double.parse(txtArtigoQtd.text);
+                            }
+                          } catch (e) {}
                         },
                         onTap: () {
                           txtArtigoQtd.selection = TextSelection(
