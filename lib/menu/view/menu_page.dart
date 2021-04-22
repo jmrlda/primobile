@@ -10,6 +10,7 @@ import 'package:primobile/menu/util.dart';
 // import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'dart:async';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:primobile/sessao/sessao_api_provider.dart';
 
 // import 'package:primobile/util.dart';
 
@@ -33,6 +34,30 @@ class _MenuPageState extends State<MenuPage> {
   String estadoSyncNum = "";
   BuildContext menuContexto;
   String baseUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    print("menu");
+    // Map<String, dynamic> sessao = Map<String, dynamic>();
+
+    SessaoApiProvider.readSession().then((sessao) {
+      if (sessao != null) {
+        timer = Timer.periodic(
+            Duration(seconds: int.parse(sessao['expires_in'].toString()) - 15),
+            (Timer t) => SessaoApiProvider.refreshToken());
+      }
+    });
+
+    // int.parse(sessao['expires_in']) - 15
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+    print("disponse?");
+  }
 
   @override
   Widget build(BuildContext context) {
