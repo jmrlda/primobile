@@ -10,6 +10,7 @@ class ArtigoRececao {
   String artigo;
   String descricao;
   String unidade;
+  String codigoBarra;
   double quantidadeRecebida;
   double quantidadeRejeitada;
 
@@ -17,6 +18,7 @@ class ArtigoRececao {
       {this.artigo,
       this.descricao,
       this.unidade,
+      this.codigoBarra,
       this.quantidadeRecebida,
       this.quantidadeRejeitada});
 
@@ -26,6 +28,7 @@ class ArtigoRececao {
         unidade: json['unidade'],
         quantidadeRecebida: json['quantidade_recebida'],
         quantidadeRejeitada: json['quantidade_rejeitada'],
+        codigoBarra: json['codigo_barra'],
       );
 
   Map<String, dynamic> toMap() => {
@@ -33,6 +36,7 @@ class ArtigoRececao {
         'descricao': descricao,
         'quantidade_recebida': quantidadeRecebida,
         'quantidade_rejeitada': quantidadeRejeitada,
+        'codigo_barra': codigoBarra,
       };
 
   factory ArtigoRececao.fromJson(Map<String, dynamic> json) {
@@ -41,6 +45,7 @@ class ArtigoRececao {
     return ArtigoRececao(
       artigo: json['artigo'],
       descricao: json['descricao'],
+      codigoBarra: json['codigo_barra'],
       quantidadeRecebida: double.parse(json['quantidade_recebida']),
       quantidadeRejeitada: double.parse(json['quantidade_rejeitada']),
     );
@@ -75,7 +80,7 @@ class ArtigoRececao {
 
       var sessao = await SessaoApiProvider.read();
       if (sessao == null || sessao.length == 0) {
-        print('Ficheiro sessao nao existe');
+        print('Ficheiro sessão não existe');
         return null;
       } else {
         String token = sessao['access_token'];
