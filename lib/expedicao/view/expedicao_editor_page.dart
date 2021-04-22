@@ -6,6 +6,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/expedicao/models/expedicao.dart';
 import 'package:primobile/expedicao/models/models.dart';
+import 'package:primobile/inventario/inventario.dart';
+import 'package:primobile/inventario/models/artigo_inventario.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/util/util.dart';
@@ -14,6 +16,9 @@ BuildContext contexto;
 http.Client httpClient = http.Client();
 List<ArtigoExpedicao> linhaExpedicao = List<ArtigoExpedicao>();
 List<ArtigoExpedicao> lista_artigo_expedicao = List<ArtigoExpedicao>();
+ScrollController _scrollController = new ScrollController();
+List<bool> posicao;
+int idx = 0;
 
 class ExpedicaoEditorPage extends StatefulWidget {
   ExpedicaoEditorPage({Key key, this.title}) : super(key: key);
@@ -24,8 +29,8 @@ class ExpedicaoEditorPage extends StatefulWidget {
 }
 
 class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
-  TextEditingController txtClienteController = TextEditingController();
-  TextEditingController txtQtdArtigoController = TextEditingController();
+  TextEditingController txtArtigoQtd = new TextEditingController();
+
   BuildContext context;
   var items = List<dynamic>();
   final List<dynamic> encomendaItens = <dynamic>[
@@ -90,6 +95,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
     temConexao(
         'Dispositivo sem conexão WIFI ou Dados Moveis. Por Favor Active para criação da expedição!');
     temLocalizacao();
+    idx = 0;
 
     return WillPopScope(
       child: new Scaffold(
@@ -169,6 +175,8 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                                     lista_artigo_expedicao =
                                         await _fetchLinhaExpedicao(
                                             expedicao.expedicao, 0, 0);
+                                    posicao = List.filled(
+                                        lista_artigo_expedicao.length, false);
 
                                     actualizarEstado();
                                   });
@@ -211,6 +219,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
               ),
               Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
                   shrinkWrap: true,
                   itemCount: items.length,
                   itemBuilder: (context, index) {
@@ -280,12 +289,14 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
       //   if (codigoBarra != null && codigoBarra != "-1") {
       //     print(codigoBarra);
       //     lista_artigo_expedicao.forEach((artigo) {
-      //       if (artigo.codigoBara == codigoBarra) {
+      //       if (artigo.codigoBarra == codigoBarra) {
       //         print("Encontrado");
       //       }
       //     });
       //   }
       // });
+      scanBarCode();
+
       actualizarEstado();
 
       // Terminar
@@ -356,11 +367,13 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
           *   limpar a lista artigos previamente selecionados
           **/
 
-    encomendaItens.clear();
-    items.clear();
+    // items.clear();
 
     setState(() {
+      items.clear();
+      encomendaItens.clear();
       expedicaoNumDoc = expedicao.expedicao.toString();
+
       items = getListaArtigo(lista_artigo_expedicao);
     });
   }
@@ -373,7 +386,6 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
         RaisedButton(
           color: Colors.blue,
           onPressed: () async {
-            // Navigator.pushNamed(contexto, '/artigo_selecionar_lista');
             await Navigator.pushNamed(contexto, '/artigo_selecionar_lista');
           },
           child: const Text('Adicionar ',
@@ -458,7 +470,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
     if (artigos != null || artigos.length > 0) {
       int i = 0;
       artigos.forEach((artigo) {
-        lista_widget.add(artigoExpedicao(artigo));
+        lista_widget.add(expedicaoItem(artigo));
       });
     } else {
       lista_widget.add(Text(
@@ -470,27 +482,39 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
     return lista_widget;
   }
 
-  // Widget representado cada Artigo de uma expedição
-  Widget artigoExpedicao(ArtigoExpedicao artigo) {
-    return Slidable(
-      actionPane: SlidableDrawerActionPane(),
-      actionExtentRatio: 0.25,
-      child: expedicaoItem(artigo),
-      // secondaryActions: <Widget>[
-      //   IconSlideAction(
-      //     caption: 'Remover',
-      //     color: Colors.red,
-      //     icon: Icons.delete,
-      //     onTap: () {
-      //       // setState(() {
-      //       //   removeEncomenda(artigo);
-      //       //   // actualizarEstado();
-      //       // });
-      //     },
-      //   ),
-      // ],
-    );
+  Widget buildArtigoExpedicao(List<ArtigoExpedicao> artigos, int index) {
+    List<Widget> lista_widget = List<Widget>();
+    if (artigos != null || artigos.length > 0) {
+      return (expedicaoItem(artigos[index]));
+    }
+
+    return Text("Sem Artigo",
+        style: TextStyle(color: Colors.blue, fontSize: 14));
   }
+
+  // Widget representado cada Artigo de uma expedição
+  // Widget artigoExpedicao(ArtigoExpedicao artigo) {
+  //   // return Slidable(
+  //   //   actionPane: SlidableDrawerActionPane(),
+  //   //   actionExtentRatio: 0.25,
+  //   //   child:,
+  //   //   // secondaryActions: <Widget>[
+  //   //   //   IconSlideAction(
+  //   //   //     caption: 'Remover',
+  //   //   //     color: Colors.red,
+  //   //   //     icon: Icons.delete,
+  //   //   //     onTap: () {
+  //   //   //       // setState(() {
+  //   //   //       //   removeEncomenda(artigo);
+  //   //   //       //   // actualizarEstado();
+  //   //   //       // });
+  //   //   //     },
+  //   //   //   ),
+  //   //   // ],
+  //   // );
+  //   //
+  // return expedicaoItem(artigo);
+  // }
 
   // buscar as linhas de uma determinada Expedição identificado pelo 'Numero de documento'
   Future<List<ArtigoExpedicao>> _fetchLinhaExpedicao(
@@ -547,10 +571,24 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
   }
 
   ArtigoExpedicaoCard expedicaoItem(ArtigoExpedicao artigo) {
-    var artigoQuantidade;
-    TextEditingController txtArtigoQtd = new TextEditingController();
     txtArtigoQtd.text = artigo.quantidadeExpedir.toString();
+    ArtigoExpedicaoCard artigoInventario;
+    final GlobalKey expansionTileKey = GlobalKey();
 
+    if (posicao[idx] == true) {
+      txtArtigoQtd.selection = TextSelection(
+          baseOffset: 0, extentOffset: txtArtigoQtd.value.text.length);
+      artigoInventario = buildExpedicaoItem(artigo, true, expansionTileKey);
+    } else {
+      artigoInventario = buildExpedicaoItem(artigo, false, expansionTileKey);
+    }
+    idx++;
+
+    return artigoInventario;
+  }
+
+  ArtigoExpedicaoCard buildExpedicaoItem(
+      ArtigoExpedicao artigo, bool state, GlobalKey key) {
     return ArtigoExpedicaoCard(
       artigo: artigo,
       child: Column(
@@ -558,100 +596,189 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
           Padding(
             padding: EdgeInsets.only(top: 15, left: 20, right: 16, bottom: 4),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Text("ARTIGO: " + artigo.artigo,
-                  style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
-              Text(artigo.descricao,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 4),
-          ),
-          Row(
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 5),
-                child: Text(
-                  "Qtd. Pendente: ",
-                  style: TextStyle(
+
+          ExpansionTile(
+            key: key,
+            maintainState: state,
+            initiallyExpanded: state,
+            title: Text(artigo.descricao,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
                     color: Colors.blue,
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                    fontSize: 16)),
+            subtitle: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Text("Artigo:    " + artigo.artigo,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16)),
+                  ],
                 ),
-              ),
-              Spacer(),
-              Padding(
-                padding: EdgeInsets.only(top: 5, left: 0, right: 20, bottom: 5),
-                child: Text(
-                  artigo.quantidadePendente.toString(),
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-                child: Text(
-                  "Qtd. Expedir: ",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Spacer(),
-              Padding(
-                padding:
-                    EdgeInsets.only(top: 5, left: 15, right: 20, bottom: 15),
-                child: Container(
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    controller: txtArtigoQtd,
-                    onChanged: (value) {
-                      if (double.parse(txtArtigoQtd.text) > 0) {
-                        artigo.quantidadeExpedir =
-                            double.parse(txtArtigoQtd.text);
-                      }
-                    },
-                    onTap: () {
-                      txtArtigoQtd.selection = TextSelection(
-                          baseOffset: 0,
-                          extentOffset: txtArtigoQtd.value.text.length);
-                    },
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+              ],
+            ),
+            children: [
+              Row(
+                children: <Widget>[
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 5),
+                    child: Text(
+                      "Qtd. Pendente: ",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
                   ),
-                  width: 100,
-                ),
+                  Spacer(),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 5, left: 0, right: 20, bottom: 5),
+                    child: Text(
+                      artigo.quantidadePendente.toString(),
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+                    child: Text(
+                      "Qtd. Expedir: ",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 5, left: 15, right: 20, bottom: 15),
+                    child: Container(
+                      child: TextField(
+                        autofocus: true,
+                        keyboardType: TextInputType.number,
+                        controller: txtArtigoQtd,
+                        onChanged: (value) {
+                          if (double.parse(txtArtigoQtd.text) > 0) {
+                            artigo.quantidadeExpedir =
+                                double.parse(txtArtigoQtd.text);
+                          }
+                        },
+                        onTap: () {
+                          txtArtigoQtd.selection = TextSelection(
+                              baseOffset: 0,
+                              extentOffset: txtArtigoQtd.value.text.length);
+                        },
+                        textAlign: TextAlign.end,
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      width: 100,
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
+
+          // Padding(
+          //   padding: EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 4),
+          // ),
         ],
       ),
     );
+  }
+
+//   void scanBarCode() {
+//     // dynamic codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
+//     //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+
+//     String codigoBarra = '6935364092313';
+
+//     try {
+//       if (codigoBarra != null) {
+//         print(codigoBarra);
+//         int i = 0;
+//         lista_artigo_expedicao.forEach((artigo) async {
+//           if (artigo.codigoBarra == codigoBarra) {
+//             // print("Encontrado");
+
+//             print("ARtigo " + artigo.artigo);
+//             // print("descricao " + artigo.descricao);
+
+//             _scrollController
+//                 .animateTo(
+//               (94.0 * i),
+//               curve: Curves.easeInToLinear,
+//               duration: const Duration(milliseconds: 300),
+//             )
+//                 .then((value) {
+//               print('scroll');
+//             });
+//           }
+//           i++;
+//         });
+
+//         posicao[i] = true;
+//       }
+//     } catch (e) {
+//       print(e);
+//     }
+//   }
+// }
+//
+//
+//
+  void scanBarCode() {
+    // dynamic codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
+    //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+
+    String codigoBarra = '6935364092313';
+
+    try {
+      if (codigoBarra != null) {
+        print(codigoBarra);
+        int i = 0;
+        lista_artigo_expedicao.forEach((artigo) async {
+          if (artigo.codigoBarra == codigoBarra) {
+            print("ARtigo " + artigo.artigo);
+            posicao[i] = true;
+            _scrollController
+                .animateTo(
+              (94.0 * i),
+              curve: Curves.easeInToLinear,
+              duration: const Duration(milliseconds: 100),
+            )
+                .then((value) {
+              print('scroll');
+            });
+          }
+          i++;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }
 
