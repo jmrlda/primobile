@@ -13,7 +13,7 @@ class ArtigoInventario {
   double quantidadeStock;
   double quantidadeStockReserva;
 
-  String codigoBara;
+  String codigoBarra;
   String localizacao;
   String lote;
 
@@ -22,7 +22,7 @@ class ArtigoInventario {
       this.descricao,
       this.unidade,
       this.quantidadeStock,
-      this.codigoBara,
+      this.codigoBarra,
       this.lote,
       this.localizacao,
       this.quantidadeStockReserva});
@@ -32,7 +32,7 @@ class ArtigoInventario {
           artigo: map['artigo'],
           descricao: map['descricao'],
           quantidadeStock: double.parse(map['quantidade_stock']),
-          codigoBara: map['codigo_barra'],
+          codigoBarra: map['codigo_barra'],
           lote: map['lote'],
           localizacao: map['localizacao'],
           unidade: map['unidade'],
@@ -42,7 +42,7 @@ class ArtigoInventario {
         'artigo': artigo,
         'descricao': descricao,
         'quantidade_stock': quantidadeStock,
-        'codigo_barra': codigoBara,
+        'codigo_barra': codigoBarra,
         'lote': lote,
         'localizacao': localizacao,
         'unidade': unidade,
@@ -54,7 +54,7 @@ class ArtigoInventario {
         artigo: json['artigo'],
         descricao: json['descricao'],
         quantidadeStock: double.parse(json['quantidade_stock']),
-        codigoBara: json['codigo_barra'],
+        codigoBarra: json['codigo_barra'],
         lote: json['lote'],
         localizacao: json['localizacao'],
         unidade: json['unidade'],

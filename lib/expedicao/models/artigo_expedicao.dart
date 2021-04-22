@@ -12,7 +12,7 @@ class ArtigoExpedicao {
   String unidade;
   double quantidadeExpedir;
   double quantidadePendente;
-  String codigoBara;
+  String codigoBarra;
 
   ArtigoExpedicao(
       {this.artigo,
@@ -20,7 +20,7 @@ class ArtigoExpedicao {
       this.unidade,
       this.quantidadeExpedir,
       this.quantidadePendente,
-      this.codigoBara});
+      this.codigoBarra});
 
   factory ArtigoExpedicao.fromMap(Map<String, dynamic> json) =>
       new ArtigoExpedicao(
@@ -28,14 +28,14 @@ class ArtigoExpedicao {
           descricao: json['descricao'],
           quantidadeExpedir: json['quantidade_expedir'],
           quantidadePendente: json['quantidade_pendente'],
-          codigoBara: json['codigo_barra']);
+          codigoBarra: json['codigo_barra']);
 
   Map<String, dynamic> toMap() => {
         'artigo': artigo,
         'descricao': descricao,
         'quantidade_expedir': quantidadeExpedir,
         'quantidade_pendente': quantidadePendente,
-        'codigo_barra': codigoBara
+        'codigo_barra': codigoBarra
       };
 
   factory ArtigoExpedicao.fromJson(Map<String, dynamic> json) {
@@ -46,7 +46,7 @@ class ArtigoExpedicao {
         descricao: json['descricao'],
         quantidadeExpedir: json['quantidade_expedir'],
         quantidadePendente: json['quantidade_pendente'],
-        codigoBara: json['codigo_barra']);
+        codigoBarra: json['codigo_barra']);
     // data['imagemBuffer'] == null ? null : data['imagemBuffer']);
   }
 
