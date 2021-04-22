@@ -34,7 +34,8 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
   final List<dynamic> encomendaItens = <dynamic>[
     // encomendaItemVazio(),
   ];
-  List<bool> posicao = List.filled(31, false);
+  // List<GlobalKey> posicao;
+  List<bool> posicao;
 
   double mercadServicValor = 0.0;
   double noIva = 0.0;
@@ -291,21 +292,26 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         print(codigoBarra);
         int i = 0;
         lista_artigo_inventario.forEach((artigo) async {
-          if (artigo.codigoBara == codigoBarra) {
+          if (artigo.codigoBarra == codigoBarra) {
             // print("Encontrado");
 
             print("ARtigo " + artigo.artigo);
             // print("descricao " + artigo.descricao);
-            setState(() {
-              posicao[i] = true;
+            // BuildContext contexto = posicao[i].currentContext;
+            // posicao[i].currentState.setState(() {
 
+            //             });
+            // contexto.
+
+            setState(() {
               // items = getListaArtigo(lista_artigo_inventario);
+              posicao[i] = true;
             });
             _scrollController
                 .animateTo(
               (94.0 * i),
               curve: Curves.easeInToLinear,
-              duration: const Duration(milliseconds: 600),
+              duration: const Duration(milliseconds: 100),
             )
                 .then((value) {
               print('scroll');
@@ -579,6 +585,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
             lista_artigo_inventario
                 .add(ArtigoInventario.fromJson(json.decode(inventario)));
           }).toList();
+          posicao = List<bool>.filled(lista_artigo_inventario.length, false);
 
           return lista_artigo_inventario;
         } else {
@@ -611,10 +618,15 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
       ArtigoEstadoCor = Colors.white;
     }
     // posicao[index] = false;
+    bool state = false;
     if (posicao[idx] == true) {
       txtArtigoQtd.selection = TextSelection(
           baseOffset: 0, extentOffset: txtArtigoQtd.value.text.length);
+      state = true;
     }
+    final GlobalKey expansionTileKey = GlobalKey();
+    // posicao[idx++] = expansionTileKey;
+    idx++;
     return ArtigoInventarioCard(
       color: ArtigoEstadoCor,
       artigo: artigo,
@@ -625,7 +637,8 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
           ),
 
           ExpansionTile(
-            initiallyExpanded: posicao[idx++],
+            initiallyExpanded: state,
+            key: expansionTileKey,
             title: Text(artigo.descricao,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(

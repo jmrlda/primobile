@@ -11,6 +11,8 @@ BuildContext contexto;
 http.Client httpClient = http.Client();
 List<ArtigoRececao> linhaRececao = List<ArtigoRececao>();
 List<ArtigoRececao> lista_artigo_rececao = List<ArtigoRececao>();
+ScrollController _scrollController = new ScrollController();
+int idx = 0;
 
 class RececaoEditorPage extends StatefulWidget {
   RececaoEditorPage({Key key, this.title}) : super(key: key);
@@ -23,6 +25,10 @@ class RececaoEditorPage extends StatefulWidget {
 class _RececaoEditorPageState extends State<RececaoEditorPage> {
   TextEditingController txtClienteController = TextEditingController();
   TextEditingController txtQtdArtigoController = TextEditingController();
+
+  TextEditingController txtArtigoQtdRecebida = new TextEditingController();
+  TextEditingController txtArtigoQtdRejeitada = new TextEditingController();
+
   BuildContext context;
   var items = List<dynamic>();
   final List<dynamic> encomendaItens = <dynamic>[
@@ -40,6 +46,8 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
   List artigoJson = List();
   bool erroEncomenda = false;
   String rececaoNumDoc = "Selecionar";
+  List<bool> posicao;
+
   @override
   void initState() {
     // encomendaItens.add(encomendaItemVazio());
@@ -83,6 +91,8 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
 
   @override
   Widget build(BuildContext context) {
+    idx = 0;
+
     contexto = context;
     temConexao(
         'Dispositivo sem conexão WIFI ou Dados Moveis. Por Favor Active para actualização da Receção!');
@@ -166,6 +176,8 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                                     lista_artigo_rececao =
                                         await _fetchLinhaRececao(
                                             rececao.rececao, 0, 0);
+                                    posicao = List<bool>.filled(
+                                        lista_artigo_rececao.length, false);
 
                                     actualizarEstado();
                                   });
@@ -208,6 +220,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
               ),
               Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
                   shrinkWrap: true,
                   itemCount: items.length,
                   itemBuilder: (context, index) {
@@ -267,13 +280,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
       }
     }
     if (index == 1) {
-      // final result = await Navigator.pushNamed(
-      //     contexto, '/artigo_selecionar_lista',
-      //     arguments: artigos);
-      // if (result != null) {
-      //   artigos = result;
-      // }
-
+      scanBarCode();
       actualizarEstado();
 
       // Terminar
@@ -347,32 +354,13 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
           *   limpar a lista artigos previamente selecionados
           **/
 
-    encomendaItens.clear();
-    items.clear();
-
     setState(() {
+      encomendaItens.clear();
+      items.clear();
+
       rececaoNumDoc = rececao.rececao.toString();
       items = getListaArtigo(lista_artigo_rececao);
     });
-  }
-
-  Card encomendaItemVazio() {
-    return Card(
-        child: Column(
-      children: <Widget>[
-        const SizedBox(height: 50),
-        RaisedButton(
-          color: Colors.blue,
-          onPressed: () async {
-            // Navigator.pushNamed(contexto, '/artigo_selecionar_lista');
-            await Navigator.pushNamed(contexto, '/artigo_selecionar_lista');
-          },
-          child: const Text('Adicionar ',
-              style: TextStyle(fontSize: 15, color: Colors.white)),
-        ),
-        const SizedBox(height: 50),
-      ],
-    ));
   }
 
   void removeEncomenda(Artigo a) {
@@ -424,7 +412,9 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
     if (artigos != null || artigos.length > 0) {
       int i = 0;
       artigos.forEach((artigo) {
-        lista_widget.add(artigoRececao(artigo));
+        setState(() {
+          lista_widget.add(artigoRececao(artigo));
+        });
       });
     } else {
       lista_widget.add(Text(
@@ -438,24 +428,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
 
   // Widget representado cada Artigo de uma expedição
   Widget artigoRececao(ArtigoRececao artigo) {
-    return Slidable(
-      actionPane: SlidableDrawerActionPane(),
-      actionExtentRatio: 0.25,
-      child: rececaoItem(artigo),
-      // secondaryActions: <Widget>[
-      //   IconSlideAction(
-      //     caption: 'Remover',
-      //     color: Colors.red,
-      //     icon: Icons.delete,
-      //     onTap: () {
-      //       // setState(() {
-      //       //   removeEncomenda(artigo);
-      //       //   // actualizarEstado();
-      //       // });
-      //     },
-      //   ),
-      // ],
-    );
+    return rececaoItem(artigo);
   }
 
   // buscar as linhas de uma determinada Receção identificado pelo 'Numero de documento'
@@ -513,177 +486,201 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
   }
 
   ArtigoRececaoCard rececaoItem(ArtigoRececao artigo) {
-    var artigoQuantidade;
-    TextEditingController txtArtigoQtdRecebida = new TextEditingController();
-    TextEditingController txtArtigoQtdRejeitada = new TextEditingController();
-
     txtArtigoQtdRecebida.text = artigo.quantidadeRecebida.toString();
     txtArtigoQtdRejeitada.text = artigo.quantidadeRejeitada.toString();
+    ArtigoRececaoCard artigoRececao = ArtigoRececaoCard();
+    final GlobalKey expansionTileKey = GlobalKey();
 
-    createAlertDialog(BuildContext context) {
-      TextEditingController txtArtigoQtd = new TextEditingController();
-      txtArtigoQtd.text = "0.00";
-      var msg_qtd = '';
-      return showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Column(
-                children: [
-                  Center(
-                      child: Text(artigo.descricao,
-                          style: TextStyle(fontSize: 12))),
-                ],
-              ),
-              content: TextField(
-                keyboardType: TextInputType.number,
-                controller: txtArtigoQtd,
-              ),
-              actions: <Widget>[
-                Text(msg_qtd,
-                    style: TextStyle(fontSize: 11, color: Colors.red)),
-                MaterialButton(
-                  elevation: 5.0,
-                  child: Text('alterar'),
-                  onPressed: () {
-                    if (double.parse(txtArtigoQtd.text) > 0) {
-                      Navigator.of(context).pop(txtArtigoQtd.text.toString());
-                    }
-                  },
-                )
-              ],
-            );
-          });
+    if (posicao[idx] == true) {
+      txtArtigoQtdRecebida.selection = TextSelection(
+          baseOffset: 0, extentOffset: txtArtigoQtdRecebida.value.text.length);
+      artigoRececao = buildRececaoItem(artigo, true, expansionTileKey);
+    } else {
+      artigoRececao = buildRececaoItem(artigo, false, expansionTileKey);
     }
+    idx++;
 
+    return artigoRececao;
+  }
+
+  ArtigoRececaoCard buildRececaoItem(
+      ArtigoRececao artigo, bool state, GlobalKey key) {
     return ArtigoRececaoCard(
       artigo: artigo,
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Text("ARTIGO: " + artigo.artigo,
-                  style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
-              Text(artigo.descricao,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
+          ExpansionTile(
+            key: key,
+            maintainState: state,
+            initiallyExpanded: state,
+
+            // initiallyExpanded: state,
+            title: Text(artigo.descricao,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16)),
+            subtitle: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Text("Artigo:" + artigo.artigo,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16)),
+                  ],
+                ),
+              ],
+            ),
+            children: [
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+                    child: Text(
+                      "Qtd. Recebida: ",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 5, left: 15, right: 20, bottom: 15),
+                    child: Container(
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        controller: txtArtigoQtdRecebida,
+                        onChanged: (value) {
+                          try {
+                            if (double.parse(txtArtigoQtdRecebida.text) > 0) {
+                              artigo.quantidadeRecebida =
+                                  double.parse(txtArtigoQtdRecebida.text);
+                            }
+                          } catch (e) {
+                            print(e);
+                          }
+                        },
+                        onTap: () {
+                          txtArtigoQtdRecebida.selection = TextSelection(
+                              baseOffset: 0,
+                              extentOffset:
+                                  txtArtigoQtdRecebida.value.text.length);
+                        },
+                        textAlign: TextAlign.end,
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      width: 100,
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding:
+                    EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
+              ),
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+                    child: Text(
+                      "Qtd. Rejeitada: ",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 5, left: 15, right: 20, bottom: 15),
+                    child: Container(
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        controller: txtArtigoQtdRejeitada,
+                        onChanged: (value) {
+                          if (double.parse(txtArtigoQtdRejeitada.text) > 0) {
+                            artigo.quantidadeRejeitada =
+                                double.parse(txtArtigoQtdRejeitada.text);
+                          }
+                        },
+                        onTap: () {
+                          txtArtigoQtdRejeitada.selection = TextSelection(
+                              baseOffset: 0,
+                              extentOffset:
+                                  txtArtigoQtdRejeitada.value.text.length);
+                        },
+                        textAlign: TextAlign.end,
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      width: 100,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
+
           Padding(
             padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
           ),
           //
-          Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-                child: Text(
-                  "Qtd. Recebida: ",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Spacer(),
-              Padding(
-                padding:
-                    EdgeInsets.only(top: 5, left: 15, right: 20, bottom: 15),
-                child: Container(
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    controller: txtArtigoQtdRecebida,
-                    onChanged: (value) {
-                      try {
-                        if (double.parse(txtArtigoQtdRecebida.text) > 0) {
-                          artigo.quantidadeRecebida =
-                              double.parse(txtArtigoQtdRecebida.text);
-                        }
-                      } catch (e) {
-                        print(e);
-                      }
-                    },
-                    onTap: () {
-                      txtArtigoQtdRecebida.selection = TextSelection(
-                          baseOffset: 0,
-                          extentOffset: txtArtigoQtdRecebida.value.text.length);
-                    },
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  width: 100,
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
-          ),
-          Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-                child: Text(
-                  "Qtd. Rejeitada: ",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Spacer(),
-              Padding(
-                padding:
-                    EdgeInsets.only(top: 5, left: 15, right: 20, bottom: 15),
-                child: Container(
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    controller: txtArtigoQtdRejeitada,
-                    onChanged: (value) {
-                      if (double.parse(txtArtigoQtdRejeitada.text) > 0) {
-                        artigo.quantidadeRejeitada =
-                            double.parse(txtArtigoQtdRejeitada.text);
-                      }
-                    },
-                    onTap: () {
-                      txtArtigoQtdRejeitada.selection = TextSelection(
-                          baseOffset: 0,
-                          extentOffset:
-                              txtArtigoQtdRejeitada.value.text.length);
-                    },
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  width: 100,
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
+  }
+
+  // escanear codigo de barra e pesquisar na lista dos artigos do editor
+  void scanBarCode() {
+    // dynamic codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
+    //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+
+    String codigoBarra = '6935364092313';
+
+    try {
+      if (codigoBarra != null) {
+        print(codigoBarra);
+        int i = 0;
+        lista_artigo_rececao.forEach((artigo) async {
+          if (artigo.codigoBarra == codigoBarra) {
+            print("ARtigo " + artigo.artigo);
+            posicao[i] = true;
+            _scrollController
+                .animateTo(
+              (94.0 * i),
+              curve: Curves.easeInToLinear,
+              duration: const Duration(milliseconds: 100),
+            )
+                .then((value) {
+              print('scroll');
+            });
+          }
+          i++;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }
 
