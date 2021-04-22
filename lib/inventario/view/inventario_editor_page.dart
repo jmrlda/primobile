@@ -174,22 +174,27 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
 
                                   result.then((value) async {
                                     try {
-                                      inventario = value;
-                                      lista_artigo_inventario =
-                                          new List<ArtigoInventario>();
-                                      lista_artigo_inventario =
-                                          await _fetchLinhaInventario(
-                                              int.parse(
-                                                  inventario.documentoNumero),
-                                              0,
-                                              0);
-                                      index = 0;
+                                      if (value != null) {
+                                        inventario = value;
+                                        lista_artigo_inventario =
+                                            new List<ArtigoInventario>();
+                                        lista_artigo_inventario =
+                                            await _fetchLinhaInventario(
+                                                int.parse(
+                                                    inventario.documentoNumero),
+                                                0,
+                                                0);
+                                        index = 0;
 
-                                      actualizarEstado();
+                                        actualizarEstado();
+                                      }
                                     } catch (e) {
                                       print("Exception");
                                       print(e);
                                     }
+                                  }).catchError((e) {
+                                    print("exception catch");
+                                    print(e);
                                   });
                                 },
                                 child: Text(
@@ -388,9 +393,17 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
           .then((value) async {
         if (value.statusCode == 200) {
           await Navigator.pushReplacementNamed(contexto, '/inventario_sucesso');
+        } else if (value.statusCode == 500) { 
+          //  #TODO informar ao usuario sobre a renovação da sessão
+          // mostrando mensagem e um widget de LOADING
+          alerta_info(contexto,
+              'Aguarde a sua sessão esta a ser renovada');
+        }
+          await SessaoApiProvider.refreshToken();
+          
         } else {
           alerta_info(contexto,
-              'Servidor não respondeu com sucesso o envio da expedição! Por favor tente novamente');
+              'Servidor não respondeu com sucesso o envio da inventario! Por favor tente novamente');
         }
       }).catchError((err) {
         print('[postInventario] ERRO');
