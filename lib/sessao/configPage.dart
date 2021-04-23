@@ -367,8 +367,6 @@ class _ConfigPageState extends State<ConfigPage> {
         },
       );
     } else if (rv == 0) {
-      txtNomeEmpresa.clear();
-      txtCompany.clear();
       Navigator.pushNamed(context, '/');
     }
   }
