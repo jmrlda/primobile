@@ -790,7 +790,9 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                     keyboardType: TextInputType.number,
                     controller: txtArtigoQtd,
                     onChanged: (value) {
-                      if (value.length > 0) {
+
+                      try {
+                        if (value.length > 0) {
                         if (double.parse(value) > 0 &&
                             double.parse(value) <= artigo.quantidadeStock) {
                           artigo.quantidade = double.parse(value);
@@ -801,6 +803,9 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
 
                         actualizarEstado();
                       }
+                      } catch (e) {
+                      }
+                      
                     },
                     onSubmitted: (value) {
                       print("valor");
