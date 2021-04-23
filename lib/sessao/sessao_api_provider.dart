@@ -153,7 +153,7 @@ class SessaoApiProvider {
     final directorio = await getApplicationDocumentsDirectory();
     final file = File('${directorio.path}/sessao.json');
     // salvar em memoria e partilhar em todas pagina da aplicação
-    // await FlutterSession().set('sessao', data);
+    await FlutterSession().set('sessao', data);
     await file.writeAsString(data);
   }
 
