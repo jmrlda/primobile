@@ -175,6 +175,16 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                                     lista_artigo_expedicao =
                                         await _fetchLinhaExpedicao(
                                             expedicao.expedicao, 0, 0);
+
+                                    if (lista_artigo_expedicao == null) {
+                                      SessaoApiProvider.refreshToken();
+                                      lista_artigo_expedicao =
+                                          await _fetchLinhaExpedicao(
+                                              int.parse(expedicao.expedicao
+                                                  .toString()),
+                                              0,
+                                              0);
+                                    }
                                     posicao = List.filled(
                                         lista_artigo_expedicao.length, false);
 
@@ -341,6 +351,11 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
           .then((value) async {
         if (value.statusCode == 200) {
           await Navigator.pushReplacementNamed(contexto, '/expedicao_sucesso');
+        } else if (value.statusCode == 401 || value.statusCode == 500) {
+          //  #TODO informar ao usuario sobre a renovação da sessão
+          // mostrando mensagem e um widget de LOADING
+          alerta_info(contexto, 'Aguarde a sua sessão esta a ser renovada');
+          await SessaoApiProvider.refreshToken();
         } else {
           alerta_info(contexto,
               'Servidor não respondeu com sucesso o envio da expedição! Por favor tente novamente');
@@ -551,23 +566,14 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
           }).toList();
 
           return lista_artigo_expedicao;
-        } else {
-          final msg = json.decode(response.body);
-          print("Ocorreu um erro" + msg["Message"]);
         }
+        final msg = json.decode(response.body);
+        print("Ocorreu um erro" + msg["Message"]);
       }
     } catch (e) {
-      if (e.osError.errorCode == 111) {
-        // return 2;
-        print("sem internet ");
-      }
-
-      // return 3;
+      throw e;
     }
-
-    // } else {
-    //   throw Exception('Erro na busca por artigos');
-    // }
+    return null;
   }
 
   ArtigoExpedicaoCard expedicaoItem(ArtigoExpedicao artigo) {

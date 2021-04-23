@@ -26,7 +26,16 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
     if (event is ArtigoFetched) {
       try {
         if (currentState is ArtigoInicial) {
-          final artigos = await _fetchArtigos(0, 20);
+          List<Artigo> artigos = await _fetchArtigos(0, 20);
+
+          if (artigos != null && artigos.length == 0) {
+            await SessaoApiProvider.refreshToken();
+            artigos = await _fetchArtigos(0, 20);
+          } else if (artigos == null) {
+            yield ArtigoFalha();
+            return;
+          }
+
           yield ArtigoSucesso(artigos: artigos, hasReachedMax: true);
           return;
         }
@@ -119,6 +128,12 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
           for (dynamic rawArtigo in data) {
             lista_artigos.add(Artigo.fromJson(rawArtigo));
           }
+
+          return lista_artigos;
+        } else if (response.statusCode == 401 || response.statusCode == 500) {
+          //  #TODO informar ao usuario sobre a renovação da sessão
+          // mostrando mensagem e um widget de LOADING
+          lista_artigos = List<Artigo>();
 
           return lista_artigos;
         } else {

@@ -27,7 +27,15 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
     if (event is ExpedicaoFetched) {
       try {
         if (currentState is ExpedicaoInicial) {
-          final expedicao = await _fetchExpedicao(0, 20);
+          List<Expedicao> expedicao = await _fetchExpedicao(0, 20);
+          if (expedicao != null && expedicao.length == 0) {
+            await SessaoApiProvider.refreshToken();
+            expedicao = await _fetchExpedicao(0, 20);
+          } else if (expedicao == null) {
+            yield ExpedicaoFalha();
+            return;
+          }
+
           yield ExpedicaoSucesso(expedicao: expedicao, hasReachedMax: true);
           return;
         }
@@ -118,18 +126,18 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
           return data.map((expedicao) {
             return Expedicao.fromJson(expedicao);
           }).toList();
+        } else if (response.statusCode == 401 || response.statusCode == 500) {
+          //  #TODO informar ao usuario sobre a renovação da sessão
+          // mostrando mensagem e um widget de LOADING
+
+          return List<Expedicao>();
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);
         }
       }
     } catch (e) {
-      if (e.osError.errorCode == 111) {
-        // return 2;
-        print("sem internet ");
-      }
-
-      // return 3;
+      throw e;
     }
 
     // } else {

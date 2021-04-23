@@ -28,7 +28,16 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
     if (event is InventarioFetched) {
       try {
         if (currentState is InventarioInicial) {
-          final inventario = await _fetchInventario(0, 20);
+          List<Inventario> inventario = await _fetchInventario(0, 20);
+
+          if (inventario != null && inventario.length == 0) {
+            await SessaoApiProvider.refreshToken();
+            inventario = await _fetchInventario(0, 20);
+          } else if (inventario == null) {
+            yield InventarioFalha();
+            return;
+          }
+
           yield InventarioSucesso(inventario: inventario, hasReachedMax: true);
           return;
         }
@@ -127,9 +136,16 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
           }
 
           return lista_inventario;
+        } else if (response.statusCode == 401 || response.statusCode == 500) {
+          //  #TODO informar ao usuario sobre a renovação da sessão
+          // mostrando mensagem e um widget de LOADING
+          lista_inventario = List<Inventario>();
+
+          return lista_inventario;
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);
+          return null;
         }
       }
     } catch (e) {

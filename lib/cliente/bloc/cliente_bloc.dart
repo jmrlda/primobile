@@ -27,7 +27,15 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
     if (event is ClienteFetched) {
       try {
         if (currentState is ClienteInicial) {
-          final clientes = await _fetchClientes(0, 20);
+          List<Cliente> clientes = await _fetchClientes(0, 20);
+          if (clientes != null && clientes.length == 0) {
+            await SessaoApiProvider.refreshToken();
+            clientes = await _fetchClientes(0, 20);
+          } else if (clientes == null) {
+            yield ClienteFalha();
+            return;
+          }
+
           yield ClienteSucesso(clientes: clientes, hasReachedMax: true);
           return;
         }
@@ -117,22 +125,18 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
           return data.map((cliente) {
             return Cliente.fromJson(cliente);
           }).toList();
+        } else if (response.statusCode == 401 || response.statusCode == 500) {
+          //  #TODO informar ao usuario sobre a renovação da sessão
+          // mostrando mensagem e um widget de LOADING
+
+          return List<Cliente>();
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);
         }
       }
     } catch (e) {
-      if (e.osError.errorCode == 111) {
-        // return 2;
-        print("sem internet ");
-      }
-
-      // return 3;
+      throw e;
     }
-
-    // } else {
-    //   throw Exception('Erro na busca por artigos');
-    // }
   }
 }

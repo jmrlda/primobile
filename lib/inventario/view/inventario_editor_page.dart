@@ -184,6 +184,16 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                                                     inventario.documentoNumero),
                                                 0,
                                                 0);
+
+                                        if (lista_artigo_inventario == null) {
+                                          SessaoApiProvider.refreshToken();
+                                          lista_artigo_inventario =
+                                              await _fetchLinhaInventario(
+                                                  int.parse(inventario
+                                                      .documentoNumero),
+                                                  0,
+                                                  0);
+                                        }
                                         index = 0;
 
                                         actualizarEstado();
@@ -393,14 +403,11 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
           .then((value) async {
         if (value.statusCode == 200) {
           await Navigator.pushReplacementNamed(contexto, '/inventario_sucesso');
-        } else if (value.statusCode == 500) { 
+        } else if (value.statusCode == 401 || value.statusCode == 500) {
           //  #TODO informar ao usuario sobre a renovação da sessão
           // mostrando mensagem e um widget de LOADING
-          alerta_info(contexto,
-              'Aguarde a sua sessão esta a ser renovada');
-        }
+          alerta_info(contexto, 'Aguarde a sua sessão esta a ser renovada');
           await SessaoApiProvider.refreshToken();
-          
         } else {
           alerta_info(contexto,
               'Servidor não respondeu com sucesso o envio da inventario! Por favor tente novamente');
@@ -601,23 +608,15 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
           posicao = List<bool>.filled(lista_artigo_inventario.length, false);
 
           return lista_artigo_inventario;
-        } else {
-          final msg = json.decode(response.body);
-          print("Ocorreu um erro" + msg["Message"]);
         }
+        final msg = json.decode(response.body);
+        print("Ocorreu um erro" + msg["Message"]);
       }
     } catch (e) {
-      if (e.osError.errorCode == 111) {
-        // return 2;
-        print("sem internet ");
-      }
-
-      // return 3;
+      throw e;
     }
 
-    // } else {
-    //   throw Exception('Erro na busca por artigos');
-    // }
+    return null;
   }
 
   ArtigoInventarioCard inventarioItem(ArtigoInventario artigo) {

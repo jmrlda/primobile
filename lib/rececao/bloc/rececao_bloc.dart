@@ -27,7 +27,15 @@ class RececaoBloc extends Bloc<RececaoEvent, RececaoState> {
     if (event is RececaoFetched) {
       try {
         if (currentState is RececaoInicial) {
-          final rececao = await _fetchRececao(0, 20);
+          List<Rececao> rececao = await _fetchRececao(0, 20);
+
+          if (rececao != null && rececao.length == 0) {
+            await SessaoApiProvider.refreshToken();
+            rececao = await _fetchRececao(0, 20);
+          } else if (rececao == null) {
+            yield RececaoFalha();
+            return;
+          }
           yield RececaoSucesso(rececao: rececao, hasReachedMax: true);
           return;
         }
@@ -118,22 +126,17 @@ class RececaoBloc extends Bloc<RececaoEvent, RececaoState> {
           return data.map((rececao) {
             return Rececao.fromJson(rececao);
           }).toList();
+        } else if (response.statusCode == 401 || response.statusCode == 500) {
+          //  #TODO informar ao usuario sobre a renovação da sessão
+          // mostrando mensagem e um widget de LOADING
+          return List<Rececao>();
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);
         }
       }
     } catch (e) {
-      if (e.osError.errorCode == 111) {
-        // return 2;
-        print("sem internet ");
-      }
-
-      // return 3;
+      throw e;
     }
-
-    // } else {
-    //   throw Exception('Erro na busca por artigos');
-    // }
   }
 }

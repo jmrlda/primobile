@@ -571,6 +571,12 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                 if (value.statusCode == 200) {
                   await Navigator.pushReplacementNamed(
                       contexto, '/encomenda_sucesso');
+                } else if (value.statusCode == 401 || value.statusCode == 500) {
+                  //  #TODO informar ao usuario sobre a renovação da sessão
+                  // mostrando mensagem e um widget de LOADING
+                  alerta_info(
+                      contexto, 'Aguarde a sua sessão esta a ser renovada');
+                  await SessaoApiProvider.refreshToken();
                 } else {
                   // remover encomenda em caso de erro no envio da encomenda.
                   // TODO: armazenar temporariamente ate haver sucesso. Se estiver tudo bem com a encomenda.

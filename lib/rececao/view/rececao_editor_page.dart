@@ -176,6 +176,17 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                                     lista_artigo_rececao =
                                         await _fetchLinhaRececao(
                                             rececao.rececao, 0, 0);
+
+                                    if (lista_artigo_rececao == null) {
+                                      SessaoApiProvider.refreshToken();
+                                      lista_artigo_rececao =
+                                          await _fetchLinhaRececao(
+                                              int.parse(
+                                                  rececao.rececao.toString()),
+                                              0,
+                                              0);
+                                    }
+
                                     posicao = List<bool>.filled(
                                         lista_artigo_rececao.length, false);
 
@@ -328,6 +339,11 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
           .then((value) async {
         if (value.statusCode == 200) {
           await Navigator.pushReplacementNamed(contexto, '/rececao_sucesso');
+        } else if (value.statusCode == 401 || value.statusCode == 500) {
+          //  #TODO informar ao usuario sobre a renovação da sessão
+          // mostrando mensagem e um widget de LOADING
+          alerta_info(contexto, 'Aguarde a sua sessão esta a ser renovada');
+          await SessaoApiProvider.refreshToken();
         } else {
           alerta_info(contexto,
               'Servidor não respondeu com sucesso o envio da Receção! Por favor tente novamente');
@@ -466,23 +482,14 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
           }).toList();
 
           return lista_artigo_rececao;
-        } else {
-          final msg = json.decode(response.body);
-          print("Ocorreu um erro" + msg["Message"]);
         }
+        final msg = json.decode(response.body);
+        print("Ocorreu um erro " + msg["Message"]);
       }
     } catch (e) {
-      if (e.osError.errorCode == 111) {
-        // return 2;
-        print("sem internet ");
-      }
-
-      // return 3;
+      throw e;
     }
-
-    // } else {
-    //   throw Exception('Erro na busca por artigos');
-    // }
+    return null;
   }
 
   ArtigoRececaoCard rececaoItem(ArtigoRececao artigo) {
