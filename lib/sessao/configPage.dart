@@ -294,7 +294,7 @@ class _ConfigPageState extends State<ConfigPage> {
         ipGlobal: ipGlobal,
         ipLocal: ipLocal,
         line: line,
-        nome: admin,
+        nome: nomeEmpresa,
         porta: porta);
 
     Usuario usuario = new Usuario(nome: admin, senha: senha);
