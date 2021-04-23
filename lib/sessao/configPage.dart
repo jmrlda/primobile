@@ -40,6 +40,31 @@ class _ConfigPageState extends State<ConfigPage> {
   Dialog dialog = new Dialog();
 
   @override
+  void initState() {
+    super.initState();
+
+    try {
+      var sessaoProvider = SessaoApiProvider.readSession();
+      if (sessaoProvider != null) {
+        sessaoProvider.then((value) {
+          txtNomeEmpresa.text = value['nome_empresa'];
+          txtIpGlobal.text = value['ip_global'];
+          txtIpLocal.text = value['ip_local'];
+
+          txtCompany.text = value['company'];
+          txtGrantType.text = value['grant_type'];
+          txtLine.text = value['line'];
+          txtInstance.text = value['instance'];
+          txtPorta.text = value['porta'];
+
+          txtAdmin.text = "";
+          txtAdminSenha.text = "";
+        });
+      }
+    } catch (e) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
     contexto = context;
 
@@ -382,7 +407,7 @@ AppBar configAppBar() {
       PopupMenuButton<String>(
         onSelected: opcaoAcao,
         itemBuilder: (BuildContext context) {
-          return Opcoes.escolhaLogin.map((String escolha) {
+          return Opcoes.escolhaConfig.map((String escolha) {
             return PopupMenuItem<String>(
               value: escolha,
               child: Text(escolha),
@@ -395,7 +420,7 @@ AppBar configAppBar() {
 }
 
 void opcaoAcao(String opcao) async {
-  if (opcao == Opcoes.Configurar) {
-    Navigator.pushNamed(contexto, '/');
+  if (opcao == Opcoes.Login) {
+    Navigator.pushReplacementNamed(contexto, '/');
   }
 }
