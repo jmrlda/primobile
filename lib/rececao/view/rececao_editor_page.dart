@@ -191,6 +191,9 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                                         lista_artigo_rececao.length, false);
 
                                     actualizarEstado();
+                                  }).catchError((e) {
+                                    print('lista rececao erro');
+                                    print(e);
                                   });
                                 },
                                 child: Text(
