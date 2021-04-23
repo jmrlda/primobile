@@ -38,23 +38,23 @@ class _MenuPageState extends State<MenuPage> {
   @override
   void initState() {
     super.initState();
-    print("menu");
-    // Map<String, dynamic> sessao = Map<String, dynamic>();
+    // print("menu");
+    // // Map<String, dynamic> sessao = Map<String, dynamic>();
 
-    SessaoApiProvider.readSession().then((sessao) {
-      if (sessao != null) {
-        timer = Timer.periodic(
-            Duration(seconds: int.parse(sessao['expires_in'].toString()) - 15),
-            (Timer t) => SessaoApiProvider.refreshToken());
-      }
-    });
+    // SessaoApiProvider.readSession().then((sessao) {
+    //   if (sessao != null) {
+    //     timer = Timer.periodic(
+    //         Duration(seconds: int.parse(sessao['expires_in'].toString()) - 15),
+    //         (Timer t) => SessaoApiProvider.refreshToken());
+    //   }
+    // });
 
-    // int.parse(sessao['expires_in']) - 15
+    // // int.parse(sessao['expires_in']) - 15
   }
 
   @override
   void dispose() {
-    timer?.cancel();
+    // timer?.cancel();
     super.dispose();
     print("disponse?");
   }
