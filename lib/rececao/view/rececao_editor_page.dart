@@ -451,7 +451,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
   Future<List<ArtigoRececao>> _fetchLinhaRececao(
       int numDoc, int startIndex, int limit) async {
     try {
-      var sessao = await SessaoApiProvider.read();
+      var sessao = await SessaoApiProvider.readSession();
       var response;
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');

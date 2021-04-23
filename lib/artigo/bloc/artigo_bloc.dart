@@ -98,7 +98,7 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
 
   Future<List<Artigo>> _fetchArtigos(int startIndex, int limit) async {
     try {
-      var sessao = await SessaoApiProvider.read();
+      var sessao = await SessaoApiProvider.readSession();
       var response;
       List<Artigo> lista_artigos = List<Artigo>();
 

@@ -31,7 +31,7 @@ class SessaoApiProvider {
     var login_url = '/WebApi/token';
     nome_email = nome_email.trim();
     try {
-      var sessao = await read();
+      var sessao = await readSession();
 
       if (sessao != null && sessao.length == 0) {
         print('Ficheiro sessao nao existe');
@@ -153,7 +153,7 @@ class SessaoApiProvider {
     final directorio = await getApplicationDocumentsDirectory();
     final file = File('${directorio.path}/sessao.json');
     // salvar em memoria e partilhar em todas pagina da aplicação
-    await FlutterSession().set('sessao', data);
+    // await FlutterSession().set('sessao', data);
     await file.writeAsString(data);
   }
 
@@ -172,7 +172,7 @@ class SessaoApiProvider {
     var novasenha_url = '/usuarios/alterarsenha';
 
     try {
-      var sessao = await read();
+      var sessao = await readSession();
       var response;
       String nome_email = sessao["usuario"].toString();
       if (sessao == null || sessao.length == 0) {
@@ -208,7 +208,7 @@ class SessaoApiProvider {
 
     var login_url = '/WebApi/token';
     try {
-      // var sessao = await read();
+      // var sessao = await readSession();
       var response;
       response = await http.post(
           protocolo + config.ipLocal + ":" + config.porta + login_url,
@@ -256,7 +256,7 @@ class SessaoApiProvider {
             "ip_local": config.ipLocal,
             "ip_global": config.ipGlobal,
           }));
-          // sessao = await read();
+          // sessao = await readSession();
           rv['status'] = 0;
           rv['descricao'] = "conectado com sucesso";
         } else {
@@ -277,7 +277,7 @@ class SessaoApiProvider {
   }
 
   static Future<String> getHostUrl() async {
-    var sessao = await SessaoApiProvider.read();
+    var sessao = await SessaoApiProvider.readSession();
     base_url = "";
     if (sessao != null && sessao.length > 0) {
       base_url = sessao['ip_local'] + ":" + sessao['porta'];

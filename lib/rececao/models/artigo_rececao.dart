@@ -61,7 +61,7 @@ class ArtigoRececao {
 
   static Future<http.Response> postRececao(
       Rececao rececao, List<ArtigoRececao> lista_artigo) async {
-    Map<String, dynamic> parsed = await SessaoApiProvider.read();
+    Map<String, dynamic> parsed = await SessaoApiProvider.readSession();
     String protocolo = 'http://';
     String host = SessaoApiProvider.base_url;
     String rota =
@@ -78,7 +78,7 @@ class ArtigoRececao {
     try {
       String body = json.encode(rececao.toMapApi());
 
-      var sessao = await SessaoApiProvider.read();
+      var sessao = await SessaoApiProvider.readSession();
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessão não existe');
         return null;

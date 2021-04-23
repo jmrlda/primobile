@@ -304,7 +304,7 @@ class _EncomendaPageState extends State<EncomendaListaPage> {
       );
     } else {
       // List encDB = encomendas;
-      // SessaoApiProvider.read().then((parsed) async {
+      // SessaoApiProvider.readSession().then((parsed) async {
       //   Map<String, dynamic> filial = parsed['resultado'];
       //   String protocolo = 'http://';
       //   String host = filial['empresa_filial']['ip'];

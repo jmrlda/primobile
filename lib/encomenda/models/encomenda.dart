@@ -52,7 +52,7 @@ class Encomenda {
     // senha: 'rere');
 
     Cliente cliente = Cliente(cliente: json['cliente']);
-    Future<Map<String, dynamic>> sessao = null; //SessaoApiProvider.read();
+    Future<Map<String, dynamic>> sessao = null;
     sessao.then((value) => {});
     return new Encomenda(
         id: json['encomenda'],
@@ -212,7 +212,7 @@ class Encomenda {
   }
 
   static Future<http.Response> postEncomenda(Encomenda encomenda) async {
-    Map<String, dynamic> parsed = await SessaoApiProvider.read();
+    Map<String, dynamic> parsed = await SessaoApiProvider.readSession();
     String protocolo = 'http://';
     String host = SessaoApiProvider.base_url;
     String rota = '/WebApi/EncomendaController/Encomenda/ecl/2021/' +
@@ -226,7 +226,7 @@ class Encomenda {
     //     headers: {"Content-Type": "application/json"}, body: body);
 
     try {
-      var sessao = await SessaoApiProvider.read();
+      var sessao = await SessaoApiProvider.readSession();
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');
         return null;
@@ -264,7 +264,7 @@ class Encomenda {
 
   static Future<int> postEncomendaAssinatura(Encomenda encomenda,
       String filename, dynamic assinatura, File file) async {
-    Map<String, dynamic> parsed = await SessaoApiProvider.read();
+    Map<String, dynamic> parsed = await SessaoApiProvider.readSession();
     Map<String, dynamic> filial = parsed['resultado'];
     String protocolo = 'http://';
     String host = filial['empresa_filial']['ip'];
@@ -297,7 +297,7 @@ class Encomenda {
   }
 
   static Future<http.Response> postBuscarDesconto(Encomenda encomenda) async {
-    Map<String, dynamic> parsed = await SessaoApiProvider.read();
+    Map<String, dynamic> parsed = await SessaoApiProvider.readSession();
     Map<String, dynamic> filial = parsed['resultado'];
     String protocolo = 'http://';
     String host = filial['empresa_filial']['ip'];

@@ -443,7 +443,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
             this.cliente != null &&
             this.cliente.cliente != null) {
           // EncomendaApiProvider encomendaApi = EncomendaApiProvider();
-          Map<String, dynamic> rv = await SessaoApiProvider.read();
+          Map<String, dynamic> rv = await SessaoApiProvider.readSession();
           Map<String, dynamic> _usuario = rv['resultado'];
 
           Usuario usuario = Usuario(

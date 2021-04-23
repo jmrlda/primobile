@@ -435,8 +435,6 @@ class _VendaEditorPageState extends State<VendaEditorPage> {
             artigos.length > 0 &&
             this.cliente != null &&
             this.cliente.cliente != null) {
-          // EncomendaApiProvider encomendaApi = EncomendaApiProvider();
-          // Map<String, dynamic> rv = await SessaoApiProvider.read();
           Map<String, dynamic> _usuario = null; //rv['resultado'];
 
           Usuario usuario = Usuario(

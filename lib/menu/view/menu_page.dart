@@ -78,7 +78,7 @@ class _MenuPageState extends State<MenuPage> {
     //   }
     // });
 
-    // SessaoApiProvider.read().then((parsed) async {
+    // SessaoApiProvider.readSession().then((parsed) async {
     //   Map<String, dynamic> filial = parsed['resultado'];
     //   String protocolo = 'http://';
     //   String host = filial['empresa_filial']['ip'];

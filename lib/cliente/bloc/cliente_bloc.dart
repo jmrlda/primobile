@@ -100,7 +100,7 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
 
   Future<List<Cliente>> _fetchClientes(int startIndex, int limit) async {
     try {
-      var sessao = await SessaoApiProvider.read();
+      var sessao = await SessaoApiProvider.readSession();
       var response;
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');

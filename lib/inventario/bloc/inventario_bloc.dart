@@ -104,7 +104,7 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
 
   Future<List<Inventario>> _fetchInventario(int startIndex, int limit) async {
     try {
-      var sessao = await SessaoApiProvider.read();
+      var sessao = await SessaoApiProvider.readSession();
       var response;
       List<Inventario> lista_inventario = List<Inventario>();
 

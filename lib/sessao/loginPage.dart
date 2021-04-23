@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     // Ler o arquivo de configuracao
     // Se for nulo redirecionar para pagina de configuracao.
-    var sessaoProvider = SessaoApiProvider.read();
+    var sessaoProvider = SessaoApiProvider.readSession();
     contexto = context;
     sessaoProvider.then((value) {
       if (value == null) {
