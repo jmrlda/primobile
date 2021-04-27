@@ -5,7 +5,7 @@ import 'package:primobile/util/util.dart';
 dynamic inventarioAppBar(BuildContext contexto) {
   // BuildContext contexto;
   return new AppBar(
-    backgroundColor: Colors.blue,
+    backgroundColor: PRIMARY_COLOR,
     actions: [
       PopupMenuButton<String>(
         onSelected: opcaoAcao,
@@ -21,7 +21,7 @@ dynamic inventarioAppBar(BuildContext contexto) {
       )
     ],
     centerTitle: true,
-    title: new Text("Inventario"),
+    title: new Text("Inventarios"),
     leading: new IconButton(
       icon: new Icon(Icons.arrow_back),
       onPressed: () => Navigator.pop(contexto),

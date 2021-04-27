@@ -26,7 +26,11 @@ import 'package:primobile/rececao/models/models.dart';
 // final Connectivity connectivity = Connectivity();
 
 dynamic conexaoListener;
-MaterialColor primaryColor = Colors.red;
+MaterialColor PRIMARY_COLOR = Colors.blue;
+MaterialColor CONEXAO_ON_COLOR = Colors.blue;
+// MaterialColor CONEXAO_ON_EDITOR_COLOR = Colors.blue[900];
+
+MaterialColor CONEXAO_OFF_COLOR = Colors.blueGrey;
 
 class Opcoes {
   static const String Sincronizar = 'sincronizar';
@@ -677,12 +681,32 @@ Future<void> updateConnectionStatus(BuildContext context) async {
       switch (status) {
         case DataConnectionStatus.connected:
           print('Data connection is available.');
-          primaryColor = Colors.blue;
+          // PRIMARY_COLOR = CONEXAO_ON_COLOR;
 
           break;
         case DataConnectionStatus.disconnected:
           print('You are disconnected from the internet.');
-          primaryColor = Colors.red;
+          // PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+
+          break;
+      }
+    });
+  } catch (e) {}
+}
+
+Future<void> updateConnection(
+    dynamic callbackOnline, dynamic callbackOffline) async {
+  try {
+    conexaoListener = DataConnectionChecker().onStatusChange.listen((status) {
+      switch (status) {
+        case DataConnectionStatus.connected:
+          print('Data connection is available.');
+          callbackOnline();
+
+          break;
+        case DataConnectionStatus.disconnected:
+          print('You are disconnected from the internet.');
+          callbackOffline();
 
           break;
       }

@@ -8,6 +8,7 @@ import 'package:primobile/menu/widgets/menu_appbar.dart';
 // import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'dart:async';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:primobile/util/util.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // import 'package:primobile/util.dart';
@@ -42,6 +43,21 @@ class _MenuPageState extends State<MenuPage> {
     // var initializationsSettings = new InitializationSettings(
     //     android: androidInitialize, iOS: IOSinitialize);
     // fltrNotification = new FlutterLocalNotificationsPlugin();
+    //
+    //
+    try {
+      updateConnection(() {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_ON_COLOR;
+          });
+      }, () {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+          });
+      });
+    } catch (e) {}
   }
 
   @override

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:primobile/artigo/widgets/bottom_loader.dart';
 import 'package:primobile/cliente/bloc/bloc.dart';
 import 'package:primobile/cliente/cliente.dart';
+import 'package:primobile/util/util.dart';
 
 class ClienteLista extends StatefulWidget {
   ClienteLista({Key key, this.title, this.isSelected = false})
@@ -26,6 +27,18 @@ class _ClienteLista extends State<ClienteLista> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _clienteBloc = BlocProvider.of<ClienteBloc>(context);
+
+      try {
+      updateConnection(() {
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_ON_COLOR;
+          });
+      }, () {
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+          });
+      });
+    } catch (e) {}
   }
 
   @override

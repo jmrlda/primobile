@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:primobile/artigo/util.dart';
 import 'package:primobile/util/util.dart';
 
-dynamic artigoAppBar() {
+dynamic fornecedorAppBar() {
   return new AppBar(
-    backgroundColor: Colors.blue,
+    backgroundColor: PRIMARY_COLOR,
     actions: [
       PopupMenuButton<String>(
         onSelected: opcaoAcao,
@@ -19,7 +19,7 @@ dynamic artigoAppBar() {
       )
     ],
     centerTitle: true,
-    title: new Text("Artigos"),
+    title: new Text("Fornecedor"),
     leading: new IconButton(
       icon: new Icon(Icons.arrow_back),
       onPressed: () => null,

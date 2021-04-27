@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:primobile/artigo/bloc/artigo_bloc.dart';
 import 'package:primobile/artigo/widgets/artigo_lista_item.dart';
 import 'package:primobile/artigo/widgets/bottom_loader.dart';
+import 'package:primobile/util/util.dart';
 
 class ArtigoLista extends StatefulWidget {
   ArtigoLista({Key key, this.title}) : super(key: key);
@@ -23,6 +24,20 @@ class _ArtigoLista extends State<ArtigoLista> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _artigoBloc = BlocProvider.of<ArtigoBloc>(context);
+
+    try {
+      updateConnection(() {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_ON_COLOR;
+          });
+      }, () {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+          });
+      });
+    } catch (e) {}
   }
 
   @override

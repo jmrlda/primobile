@@ -39,22 +39,29 @@ class _LoginPageState extends State<LoginPage> {
     //
     //
     //\
-    temConexao().then((conexao) {
-      if (conexao == true) {
-        try {
-          var sessaoProvider = SessaoApiProvider.readSession();
-          sessaoProvider.then((value) {
-            if (value == null) {
-              Navigator.pushReplacementNamed(contexto, '/config_instancia');
-            }
-          });
-        } catch (e) {}
-      }
-    }).catchError((e) {
-      throw e;
-    });
 
-    updateConnectionStatus(contexto);
+    // updateConnectionStatus(contexto);
+    try {
+      updateConnection(() {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_ON_COLOR;
+          });
+      }, () {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+          });
+      });
+    } catch (e) {}
+    try {
+      var sessaoProvider = SessaoApiProvider.readSession();
+      sessaoProvider.then((value) {
+        if (value == null) {
+          Navigator.pushReplacementNamed(contexto, '/config_instancia');
+        }
+      });
+    } catch (e) {}
   }
 
   @override
@@ -149,13 +156,19 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     onPressed: () async {
                       // Navigator.pushNamed(context, '/menu');
+                      //
+                      bool conexao = await temConexao();
+                      if (conexao == true) {
+                        String nome = txtNomeEmail.text.trim();
+                        String senha = txtSenha.text.trim();
 
-                      String nome = txtNomeEmail.text.trim();
-                      String senha = txtSenha.text.trim();
+                        // if (true) {
+                        //       // bool rv = await checkAcessoInternet();
+                        autenticar(nome, senha, true);
+                      } else {
+                        alerta_info(context, "Verifique sua conexão.");
+                      }
 
-                      // if (true) {
-                      //       // bool rv = await checkAcessoInternet();
-                      autenticar(nome, senha, true);
                       // }
 
                       // else {
@@ -263,7 +276,7 @@ class _LoginPageState extends State<LoginPage> {
       title: new Center(
         child: Text('Login '),
       ),
-      backgroundColor: primaryColor,
+      backgroundColor: PRIMARY_COLOR,
       actions: <Widget>[
         PopupMenuButton<String>(
           onSelected: opcaoAcao,

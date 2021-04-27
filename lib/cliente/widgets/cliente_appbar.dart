@@ -4,7 +4,7 @@ import 'package:primobile/util/util.dart';
 
 dynamic clienteAppBar(BuildContext contexto) {
   return new AppBar(
-    backgroundColor: Colors.blue,
+    backgroundColor: PRIMARY_COLOR,
     actions: [
       PopupMenuButton<String>(
         onSelected: opcaoAcao,

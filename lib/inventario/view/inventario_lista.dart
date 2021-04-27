@@ -6,6 +6,7 @@ import 'package:primobile/inventario/bloc/bloc.dart';
 import 'package:primobile/inventario/models/models.dart';
 import 'package:primobile/inventario/widgets/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:primobile/util/util.dart';
 
 class InventarioLista extends StatefulWidget {
   InventarioLista({Key key, this.title, this.isSelected = false})
@@ -33,6 +34,20 @@ class _InventarioLista extends State<InventarioLista> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _inventarioBloc = BlocProvider.of<InventarioBloc>(context);
+
+    try {
+      updateConnection(() {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_ON_COLOR;
+          });
+      }, () {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+          });
+      });
+    } catch (e) {}
   }
 
   @override

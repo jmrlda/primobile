@@ -48,6 +48,18 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
     // items.addAll(encomendaItens);
 
     super.initState();
+
+    try {
+      updateConnection(() {
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_ON_COLOR;
+        });
+      }, () {
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+        });
+      });
+    } catch (e) {}
   }
 
   void update(cb) {
@@ -93,7 +105,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
     return WillPopScope(
       child: new Scaffold(
         appBar: new AppBar(
-          backgroundColor: Colors.blue[900],
+          backgroundColor: PRIMARY_COLOR,
           centerTitle: true,
           title: new Text("Encomenda"),
           leading: new IconButton(
@@ -431,11 +443,11 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
             });
       }
 
-      bool conexao = true;
-      ; //await temConexao(
+      //await temConexao(
       // 'Sem conexão WIFI ou Dados Moveis. Por Favor Active para criar encomenda');
       bool dado = true; //await temDados('Sem acesso a internet!', contexto);
       bool localizacao = true; //await temLocalizacao();
+      bool conexao = await temConexao();
 
       if (conexao == true && dado == true && localizacao == true) {
         if (artigos != null &&
@@ -687,6 +699,8 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
           //                       'Ocorreu um erro ao inserir encomenda na Base de dados. Por favor Tente novamente!');
 
         }
+      } else {
+        alerta_info(contexto, "Verifique sua conexão.");
       }
     }
     _selectedIndex = index;
@@ -955,25 +969,6 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
       }
     }
   }
-}
-
-Future<bool> temConexao(String mensagem) async {
-  // var conexaoResultado = await (Connectivity().checkConnectivity());
-  bool rv;
-  if (true) {
-    rv = false;
-    // Flushbar(
-    //   title: "Atenção",
-    //   messageText: Text(mensagem,
-    //       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-    //   duration: Duration(seconds: 4),
-    //   backgroundColor: Colors.red,
-    // )..show(contexto);
-  } else {
-    rv = true;
-  }
-
-  return rv;
 }
 
 Future<bool> temLocalizacao() async {

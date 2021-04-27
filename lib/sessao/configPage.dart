@@ -43,6 +43,15 @@ class _ConfigPageState extends State<ConfigPage> {
     super.initState();
 
     try {
+      updateConnection(() {
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_ON_COLOR;
+        });
+      }, () {
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+        });
+      });
       var sessaoProvider = SessaoApiProvider.readSession();
       if (sessaoProvider != null) {
         sessaoProvider.then((value) {
@@ -271,24 +280,27 @@ class _ConfigPageState extends State<ConfigPage> {
                     ),
                     onPressed: () async {
                       // Navigator.pushNamed(context, '/menu');
+                      bool conexao = await temConexao();
+                      if (conexao == true) {
+                        String nome = txtAdmin.text.trim();
+                        String senha = txtAdminSenha.text.trim();
+                        String nomeEmpresa = txtNomeEmpresa.text.trim();
+                        String company = txtCompany.text.trim();
+                        String line = txtLine.text.trim();
+                        String instance = txtInstance.text.trim();
+                        String grantType = txtGrantType.text.trim();
+                        String ipGlobal = txtIpGlobal.text.trim();
+                        String ipLocal = txtIpLocal.text.trim();
+                        String porta = txtPorta.text.trim();
 
-                      String nome = txtAdmin.text.trim();
-                      String senha = txtAdminSenha.text.trim();
-                      String nomeEmpresa = txtNomeEmpresa.text.trim();
-                      String company = txtCompany.text.trim();
-                      String line = txtLine.text.trim();
-                      String instance = txtInstance.text.trim();
-                      String grantType = txtGrantType.text.trim();
-                      String ipGlobal = txtIpGlobal.text.trim();
-                      String ipLocal = txtIpLocal.text.trim();
-                      String porta = txtPorta.text.trim();
-
-                      // if (true) {
-                      //       // bool rv = await checkAcessoInternet();
-                      conectar(nome, senha, nomeEmpresa, company, line,
-                          instance, grantType, ipGlobal, ipLocal, porta);
-                      // }
-
+                        // if (true) {
+                        //       // bool rv = await checkAcessoInternet();
+                        conectar(nome, senha, nomeEmpresa, company, line,
+                            instance, grantType, ipGlobal, ipLocal, porta);
+                        // }
+                      } else {
+                        alerta_info(context, "Verifique sua conexão.");
+                      }
                       // else {
                       //   conectar(nome, senha, false);
 
@@ -403,7 +415,7 @@ AppBar configAppBar() {
     title: new Center(
       child: Text('Configuração'),
     ),
-    backgroundColor: Colors.blue,
+    backgroundColor: PRIMARY_COLOR,
     actions: <Widget>[
       PopupMenuButton<String>(
         onSelected: opcaoAcao,

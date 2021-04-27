@@ -6,13 +6,13 @@ import 'package:primobile/fornecedor/util.dart';
 import 'package:primobile/fornecedor/widgets/fornecedor_appbar.dart';
 import 'package:primobile/fornecedor/widgets/fornecedor_body.dart';
 
-class ArtigoPage extends StatelessWidget {
+class FornecedorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ArtigoBloc _artigoBloc = ArtigoBloc(httpClient: http.Client())
       ..add(ArtigoFetched());
     return Scaffold(
-      appBar: artigoAppBar(),
+      appBar: fornecedorAppBar(),
       body: BlocProvider(
         create: (BuildContext context) => _artigoBloc,
         // ArtigoBloc(httpClient: http.Client())..add(ArtigoFetched()),

@@ -40,21 +40,38 @@ class _EncomendaPageState extends State<EncomendaListaPage> {
     super.initState();
     sort = true;
 
-    getEncomenda().then((value) {
-      if (this.mounted == true)
-        setState(() {
-          //  artigos = value;
-          if (value != null && value.length > 0)
-            encomendas = encomendaDuplicado = value;
-          else
-            encomendas = null;
+    try {
+      updateConnection(() {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_ON_COLOR;
+          });
+      }, () {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+          });
+      });
+    } catch (e) {}
+    temConexao().then((conexao) {
+      if (conexao = true) {
+        getEncomenda().then((value) {
+          if (this.mounted == true)
+            setState(() {
+              //  artigos = value;
+              if (value != null && value.length > 0)
+                encomendas = encomendaDuplicado = value;
+              else
+                encomendas = null;
+            });
         });
-    });
-    getEncomendaItem().then((value) {
-      if (this.mounted == true)
-        setState(() {
-          encomendaItens = value;
+        getEncomendaItem().then((value) {
+          if (this.mounted == true)
+            setState(() {
+              encomendaItens = value;
+            });
         });
+      }
     });
   }
 
@@ -102,7 +119,7 @@ class _EncomendaPageState extends State<EncomendaListaPage> {
     return new Scaffold(
       floatingActionButton: listarArtigo(),
       appBar: new AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: PRIMARY_COLOR,
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: opcaoAcao,

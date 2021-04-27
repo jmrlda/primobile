@@ -60,3 +60,5 @@ class RececaoSucessoPesquisa extends RececaoState {
   String toString() =>
       'RececaoSucessoPesquisa { rececao: ${rececao.length}, query: $query},  hasReachedMax: $hasReachedMax}';
 }
+
+class RececaoSemConexao extends RececaoState {}

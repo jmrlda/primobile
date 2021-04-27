@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:primobile/artigo/bloc/artigo_bloc.dart';
 import 'package:primobile/artigo/widgets/bottom_loader.dart';
 import 'package:primobile/fornecedor/widgets/fornecedor_lista_item.dart';
+import 'package:primobile/util/util.dart';
 
 class FornecedorLista extends StatefulWidget {
   FornecedorLista({Key key, this.title}) : super(key: key);
@@ -23,6 +24,20 @@ class _FornecedorLista extends State<FornecedorLista> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _artigoBloc = BlocProvider.of<ArtigoBloc>(context);
+
+    try {
+      updateConnection(() {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_ON_COLOR;
+          });
+      }, () {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+          });
+      });
+    } catch (e) {}
   }
 
   @override
@@ -37,13 +52,13 @@ class _FornecedorLista extends State<FornecedorLista> {
         }
         if (state is ArtigoFalha) {
           return Center(
-            child: Text('falha na busca por artigos'),
+            child: Text('falha na busca por fornecedor'),
           );
         }
         if (state is ArtigoSucesso) {
           if (state.artigos.isEmpty) {
             return Center(
-              child: Text('Sem artigos'),
+              child: Text('Sem fornecedor'),
             );
           }
           return ListView.builder(
@@ -65,7 +80,7 @@ class _FornecedorLista extends State<FornecedorLista> {
         if (state is ArtigoSucessoPesquisa) {
           if (state.artigos.isEmpty) {
             return Center(
-              child: Text('Nenhum artigo encontrado'),
+              child: Text('Nenhum fornecedor encontrado'),
             );
           }
           return ListView.builder(

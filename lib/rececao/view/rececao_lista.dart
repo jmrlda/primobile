@@ -6,6 +6,7 @@ import 'package:primobile/rececao/bloc/bloc.dart';
 import 'package:primobile/rececao/models/models.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/rececao/widgets/widgets.dart';
+import 'package:primobile/util/util.dart';
 
 class RececaoLista extends StatefulWidget {
   RececaoLista({Key key, this.title, this.isSelected = false})
@@ -33,6 +34,20 @@ class _RececaoLista extends State<RececaoLista> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _rececaoBloc = BlocProvider.of<RececaoBloc>(context);
+
+    try {
+      updateConnection(() {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_ON_COLOR;
+          });
+      }, () {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+          });
+      });
+    } catch (e) {}
   }
 
   @override
@@ -48,6 +63,12 @@ class _RececaoLista extends State<RececaoLista> {
         if (state is RececaoFalha) {
           return Center(
             child: Text('falha na busca por Rececao'),
+          );
+        }
+
+        if (state is RececaoSemConexao) {
+          return Center(
+            child: Text('Verifique sua conexão ou aguarde!'),
           );
         }
         if (state is RececaoSucesso) {

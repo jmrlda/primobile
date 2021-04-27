@@ -9,7 +9,7 @@ AppBar menuAppBar() {
     title: new Center(
       child: Text('Menu'),
     ),
-    backgroundColor: Colors.blue,
+    backgroundColor: PRIMARY_COLOR,
     actions: <Widget>[
       PopupMenuButton<String>(
         onSelected: opcaoAcao,

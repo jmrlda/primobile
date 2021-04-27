@@ -6,6 +6,7 @@ import 'package:primobile/expedicao/bloc/bloc.dart';
 import 'package:primobile/expedicao/models/models.dart';
 import 'package:primobile/expedicao/widgets/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:primobile/util/util.dart';
 
 class ExpedicaoLista extends StatefulWidget {
   ExpedicaoLista({Key key, this.title, this.isSelected = false})
@@ -33,6 +34,20 @@ class _ExpedicaoLista extends State<ExpedicaoLista> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _expedicaoBloc = BlocProvider.of<ExpedicaoBloc>(context);
+
+    try {
+      updateConnection(() {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_ON_COLOR;
+          });
+      }, () {
+        if (this.mounted)
+          setState(() {
+            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+          });
+      });
+    } catch (e) {}
   }
 
   @override

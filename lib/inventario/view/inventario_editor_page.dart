@@ -54,6 +54,18 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
     // items.addAll(encomendaItens);
 
     super.initState();
+
+    try {
+      updateConnection(() {
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_ON_COLOR;
+        });
+      }, () {
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+        });
+      });
+    } catch (e) {}
   }
 
   void update(cb) {
@@ -96,14 +108,11 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
     index = 0;
     idx = 0;
     contexto = context;
-    temConexao(
-        'Dispositivo sem conexão WIFI ou Dados Moveis. Por Favor Active para criação da expedição!');
-    temLocalizacao();
 
     return WillPopScope(
       child: new Scaffold(
         appBar: new AppBar(
-          backgroundColor: Colors.blue[900],
+          backgroundColor: PRIMARY_COLOR,
           centerTitle: true,
           title: new Text("Inventario"),
           leading: new IconButton(
@@ -394,36 +403,39 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
             });
       }
 
-      bool conexao = await temConexao(
-          'Sem conexão WIFI ou Dados Moveis. Por Favor Active para criar encomenda');
       bool dado = false; //await temDados('Sem acesso a internet!', contexto);
       bool localizacao = false; //await temLocalizacao();
+      bool conexao = await temConexao();
+      if (conexao == true) {
+        ArtigoInventario.postInventario(inventario, lista_artigo_inventario)
+            .then((value) async {
+          if (value.statusCode == 200) {
+            await Navigator.pushReplacementNamed(
+                contexto, '/inventario_sucesso');
+          } else if (value.statusCode == 401 || value.statusCode == 500) {
+            //  #TODO informar ao usuario sobre a renovação da sessão
+            // mostrando mensagem e um widget de LOADING
+            alerta_info(contexto, 'Aguarde a sua sessão esta a ser renovada');
+            await SessaoApiProvider.refreshToken();
+          } else {
+            alerta_info(contexto,
+                'Servidor não respondeu com sucesso o envio da inventario! Por favor tente novamente');
+          }
+        }).catchError((err) {
+          print('[postInventario] ERRO');
+          print(err);
+          if (this.mounted == true) {
+            setState(() {
+              erroEncomenda = true;
+            });
+          }
 
-      ArtigoInventario.postInventario(inventario, lista_artigo_inventario)
-          .then((value) async {
-        if (value.statusCode == 200) {
-          await Navigator.pushReplacementNamed(contexto, '/inventario_sucesso');
-        } else if (value.statusCode == 401 || value.statusCode == 500) {
-          //  #TODO informar ao usuario sobre a renovação da sessão
-          // mostrando mensagem e um widget de LOADING
-          alerta_info(contexto, 'Aguarde a sua sessão esta a ser renovada');
-          await SessaoApiProvider.refreshToken();
-        } else {
           alerta_info(contexto,
-              'Servidor não respondeu com sucesso o envio da inventario! Por favor tente novamente');
-        }
-      }).catchError((err) {
-        print('[postInventario] ERRO');
-        print(err);
-        if (this.mounted == true) {
-          setState(() {
-            erroEncomenda = true;
-          });
-        }
-
-        alerta_info(contexto,
-            'Ocorreu um erro interno ao enviar expedição! Por favor tente novamente');
-      });
+              'Ocorreu um erro interno ao enviar expedição! Por favor tente novamente');
+        });
+      } else {
+        alerta_info(contexto, "Verifique sua conexão.");
+      }
     }
     _selectedIndex = index;
   }
@@ -469,25 +481,6 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         artigos.removeAt(i);
       }
     }
-  }
-
-  Future<bool> temConexao(String mensagem) async {
-    // var conexaoResultado = await (Connectivity().checkConnectivity());
-    bool rv;
-    if (true) {
-      rv = false;
-      // Flushbar(
-      //   title: "Atenção",
-      //   messageText: Text(mensagem,
-      //       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      //   duration: Duration(seconds: 4),
-      //   backgroundColor: Colors.red,
-      // )..show(contexto);
-    } else {
-      rv = true;
-    }
-
-    return rv;
   }
 
   Future<bool> temLocalizacao() async {
