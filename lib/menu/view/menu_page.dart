@@ -1,16 +1,14 @@
-// import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:primobile/menu/widgets/menu_appbar.dart';
 // import 'package:primobile/artigo/artigo_api_provider.dart';
 // import 'package:primobile/cliente/cliente_api_/provider.dart';
 // import 'package:primobile/encomenda/encomenda_api_provider.dart';
-import 'package:primobile/menu/util.dart';
 // import 'package:flushbar/flushbar.dart';
 // import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'dart:async';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:primobile/sessao/sessao_api_provider.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // import 'package:primobile/util.dart';
 
@@ -34,22 +32,16 @@ class _MenuPageState extends State<MenuPage> {
   String estadoSyncNum = "";
   BuildContext menuContexto;
   String baseUrl;
+  // FlutterLocalNotificationsPlugin fltrNotification;
 
   @override
   void initState() {
     super.initState();
-    // print("menu");
-    // // Map<String, dynamic> sessao = Map<String, dynamic>();
-
-    // SessaoApiProvider.readSession().then((sessao) {
-    //   if (sessao != null) {
-    //     timer = Timer.periodic(
-    //         Duration(seconds: int.parse(sessao['expires_in'].toString()) - 15),
-    //         (Timer t) => SessaoApiProvider.refreshToken());
-    //   }
-    // });
-
-    // // int.parse(sessao['expires_in']) - 15
+    // var androidInitialize = new AndroidInitializationSettings("app_icon");
+    // var IOSinitialize = new IOSInitializationSettings();
+    // var initializationsSettings = new InitializationSettings(
+    //     android: androidInitialize, iOS: IOSinitialize);
+    // fltrNotification = new FlutterLocalNotificationsPlugin();
   }
 
   @override
@@ -88,6 +80,21 @@ class _MenuPageState extends State<MenuPage> {
     //   });
     // });
 
+    // Future notificationSelected(String payload) async {}
+
+    // Future showNotification() async {
+    //   var androidDetails = new AndroidNotificationDetails(
+    //       "channelId", "channelName", "channelDescription",
+    //       importance: Importance.max);
+    //   var IOSDetails = new IOSNotificationDetails();
+
+    //   var generalNotificationDetails =
+    //       new NotificationDetails(android: androidDetails, iOS: IOSDetails);
+
+    //   await fltrNotification.show(0, "Titulo notificacao", "Corpo Descricao",
+    //       generalNotificationDetails);
+    // }
+
     createAlertDialog(BuildContext context) {
       return showDialog(
           context: context,
@@ -99,8 +106,9 @@ class _MenuPageState extends State<MenuPage> {
                 MaterialButton(
                   elevation: 5.0,
                   child: Text('Sim'),
-                  onPressed: () {
+                  onPressed: () async {
                     SystemNavigator.pop();
+                    // await showNotification();
                   },
                 ),
                 MaterialButton(
@@ -137,7 +145,7 @@ class _MenuPageState extends State<MenuPage> {
                         CircleAvatar(
                           backgroundColor: Colors.white,
                           radius: 55.0,
-                          child: Image.asset('assets/images/logo.png'),
+                          child: Image.asset('assets/images/logo.jpg'),
                         ),
                       ],
                     ),
@@ -171,6 +179,9 @@ class _MenuPageState extends State<MenuPage> {
 //   timer?.cancel();
 //   super.dispose();
 // }
+//
+//
+//
   }
 
   List<Widget> menuItemView() {

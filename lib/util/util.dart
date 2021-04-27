@@ -1,16 +1,3 @@
-// import 'dart:convert';
-// import 'dart:io';
-// import 'dart:typed_data';
-
-// import 'package:another_flushbar/flushbar.dart';
-// import 'package:data_connection_checker/data_connection_checker.dart';
-// import 'package:dio/dio.dart';
-// import 'package:dio_retry/dio_retry.dart';
-// import 'package:flutter/material.dart';
-// import 'package:geolocator/geolocator.dart';
-// import 'package:http/http.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:path_provider/path_provider.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -22,6 +9,8 @@ import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_retry/dio_retry.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart' as path;
 import 'package:image_picker/image_picker.dart';
@@ -32,6 +21,12 @@ import 'package:http_parser/http_parser.dart';
 import 'package:primobile/expedicao/models/expedicao.dart';
 import 'package:primobile/inventario/models/models.dart';
 import 'package:primobile/rececao/models/models.dart';
+// import 'package:connectivity/connectivity.dart';
+
+// final Connectivity connectivity = Connectivity();
+
+dynamic conexaoListener;
+MaterialColor primaryColor = Colors.red;
 
 class Opcoes {
   static const String Sincronizar = 'sincronizar';
@@ -619,4 +614,83 @@ bool existeInventarioSelecionado(
     }
   }
   return existe;
+}
+
+// Future<void> initConnectivity(bool mounted, dynamic cbActualizarConexao) async {
+//   ConnectivityResult result = ConnectivityResult.none;
+//   // Platform messages may fail, so we use a try/catch PlatformException.
+//   try {
+//     result = await connectivity.checkConnectivity();
+//   } on PlatformException catch (e) {
+//     print(e.toString());
+//   }
+//   // If the widget was removed from the tree while the asynchronous platform
+//   // message was in flight, we want to discard the reply rather than calling
+//   // setState to update our non-existent appearance.
+//   // if (!mounted) {
+//   //   return Future.value(null);
+//   // }
+
+//   return cbActualizarConexao != null ?? cbActualizarConexao(result);
+// }
+
+// // obter o tipo de conexao do usuario. WIFI or Mobile/Celular
+// Future<void> _geTipoConexao(ConnectivityResult result) async {
+//   String _connectionStatus;
+//   switch (result) {
+//     case ConnectivityResult.wifi:
+//     case ConnectivityResult.mobile:
+//       return true;
+//     case ConnectivityResult.none:
+//       return false;
+//       // setState(() => _connectionStatus = result.toString());
+
+//       break;
+//     default:
+//       // setState(() => _connectionStatus = 'Failed to get connectivity.');
+//       return null;
+//       break;
+//   }
+// }
+
+// Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+//   switch (result) {
+//     case ConnectivityResult.wifi:
+//     case ConnectivityResult.mobile:
+//     case ConnectivityResult.none:
+//       // setState(() => _connectionStatus = result.toString());
+//       break;
+//     default:
+//       // setState(() => _connectionStatus = 'Failed to get connectivity.');
+//       break;
+//   }
+// }
+
+Future<bool> temConexao() async {
+  return await DataConnectionChecker().hasConnection;
+}
+
+// actively listen for status updates
+Future<void> updateConnectionStatus(BuildContext context) async {
+  try {
+    conexaoListener = DataConnectionChecker().onStatusChange.listen((status) {
+      switch (status) {
+        case DataConnectionStatus.connected:
+          print('Data connection is available.');
+          primaryColor = Colors.blue;
+
+          break;
+        case DataConnectionStatus.disconnected:
+          print('You are disconnected from the internet.');
+          primaryColor = Colors.red;
+
+          break;
+      }
+    });
+  } catch (e) {}
+}
+
+Future<void> calcelarUpdateConnectionStatus() async {
+  // await Future.delayed(Duration(seconds: 30));
+  await conexaoListener?.cancel();
 }

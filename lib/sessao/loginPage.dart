@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:primobile/util/util.dart';
@@ -23,18 +25,49 @@ class _LoginPageState extends State<LoginPage> {
       color: Colors.white,
       boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)]);
   Dialog dialog = new Dialog();
+  // StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  // String _connectionStatus = 'Unknown';
+
+  @override
+  void initState() {
+    super.initState();
+    // initConnectivity(mounted, _updateConexao);
+
+    // _connectivitySubscription =
+    //     connectivity.onConnectivityChanged.listen(_updateConexao);
+    //
+    //
+    //
+    //\
+    temConexao().then((conexao) {
+      if (conexao == true) {
+        try {
+          var sessaoProvider = SessaoApiProvider.readSession();
+          sessaoProvider.then((value) {
+            if (value == null) {
+              Navigator.pushReplacementNamed(contexto, '/config_instancia');
+            }
+          });
+        } catch (e) {}
+      }
+    }).catchError((e) {
+      throw e;
+    });
+
+    updateConnectionStatus(contexto);
+  }
+
+  @override
+  void dispose() {
+    // _connectivitySubscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     // Ler o arquivo de configuracao
     // Se for nulo redirecionar para pagina de configuracao.
-    var sessaoProvider = SessaoApiProvider.readSession();
     contexto = context;
-    sessaoProvider.then((value) {
-      if (value == null) {
-        Navigator.pushNamed(context, '/config_instancia');
-      }
-    });
 
     return Scaffold(
         appBar: loginAppBar(),
@@ -57,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                   CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 50.0,
-                    child: Image.asset('assets/images/logo.png'),
+                    child: Image.asset('assets/images/logo.jpg'),
                   )
                 ],
               ),
@@ -224,32 +257,45 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushNamed(context, '/menu');
     }
   }
-}
 
-AppBar loginAppBar() {
-  return new AppBar(
-    title: new Center(
-      child: Text('Login'),
-    ),
-    backgroundColor: Colors.blue,
-    actions: <Widget>[
-      PopupMenuButton<String>(
-        onSelected: opcaoAcao,
-        itemBuilder: (BuildContext context) {
-          return Opcoes.escolhaLogin.map((String escolha) {
-            return PopupMenuItem<String>(
-              value: escolha,
-              child: Text(escolha),
-            );
-          }).toList();
-        },
-      )
-    ],
-  );
-}
-
-void opcaoAcao(String opcao) async {
-  if (opcao == Opcoes.Configurar) {
-    Navigator.pushNamed(contexto, '/config_instancia');
+  AppBar loginAppBar() {
+    return new AppBar(
+      title: new Center(
+        child: Text('Login '),
+      ),
+      backgroundColor: primaryColor,
+      actions: <Widget>[
+        PopupMenuButton<String>(
+          onSelected: opcaoAcao,
+          itemBuilder: (BuildContext context) {
+            return Opcoes.escolhaLogin.map((String escolha) {
+              return PopupMenuItem<String>(
+                value: escolha,
+                child: Text(escolha),
+              );
+            }).toList();
+          },
+        )
+      ],
+    );
   }
+
+  void opcaoAcao(String opcao) async {
+    if (opcao == Opcoes.Configurar) {
+      Navigator.pushNamed(contexto, '/config_instancia');
+    }
+  }
+
+  // Future<void> _updateConexao(ConnectivityResult result) async {
+  //   switch (result) {
+  //     case ConnectivityResult.wifi:
+  //     case ConnectivityResult.mobile:
+  //     case ConnectivityResult.none:
+  //       setState(() => _connectionStatus = result.toString());
+  //       break;
+  //     default:
+  //       setState(() => _connectionStatus = 'Failed to get connectivity.');
+  //       break;
+  //   }
+  // }
 }

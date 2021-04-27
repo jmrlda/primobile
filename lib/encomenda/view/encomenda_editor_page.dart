@@ -790,22 +790,19 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                     keyboardType: TextInputType.number,
                     controller: txtArtigoQtd,
                     onChanged: (value) {
-
                       try {
                         if (value.length > 0) {
-                        if (double.parse(value) > 0 &&
-                            double.parse(value) <= artigo.quantidadeStock) {
-                          artigo.quantidade = double.parse(value);
-                        } else {
-                          alerta_info(contexto,
-                              "Quantidade superior que o Stock disponivel!");
-                        }
+                          if (double.parse(value) > 0 &&
+                              double.parse(value) <= artigo.quantidadeStock) {
+                            artigo.quantidade = double.parse(value);
+                          } else {
+                            alerta_info(contexto,
+                                "Quantidade superior que o Stock disponivel!");
+                          }
 
-                        actualizarEstado();
-                      }
-                      } catch (e) {
-                      }
-                      
+                          actualizarEstado();
+                        }
+                      } catch (e) {}
                     },
                     onSubmitted: (value) {
                       print("valor");

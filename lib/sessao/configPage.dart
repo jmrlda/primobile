@@ -5,7 +5,6 @@ import 'package:primobile/usuario/models/models.dart';
 import 'package:primobile/util/util.dart';
 
 // import 'package:primobile/sessao/sessao_api_provider.dart';
-// import 'package:connectivity/connectivity.dart';
 // import 'package:primobile/util.dart';
 //
 //
@@ -47,18 +46,20 @@ class _ConfigPageState extends State<ConfigPage> {
       var sessaoProvider = SessaoApiProvider.readSession();
       if (sessaoProvider != null) {
         sessaoProvider.then((value) {
-          txtNomeEmpresa.text = value['nome_empresa'];
-          txtIpGlobal.text = value['ip_global'];
-          txtIpLocal.text = value['ip_local'];
+          if (value != null) {
+            txtNomeEmpresa.text = value['nome_empresa'];
+            txtIpGlobal.text = value['ip_global'];
+            txtIpLocal.text = value['ip_local'];
 
-          txtCompany.text = value['company'];
-          txtGrantType.text = value['grant_type'];
-          txtLine.text = value['line'];
-          txtInstance.text = value['instance'];
-          txtPorta.text = value['porta'];
+            txtCompany.text = value['company'];
+            txtGrantType.text = value['grant_type'];
+            txtLine.text = value['line'];
+            txtInstance.text = value['instance'];
+            txtPorta.text = value['porta'];
 
-          txtAdmin.text = "";
-          txtAdminSenha.text = "";
+            txtAdmin.text = "";
+            txtAdminSenha.text = "";
+          }
         });
       }
     } catch (e) {}
