@@ -177,44 +177,51 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                                     TextStyle(fontSize: 18, color: Colors.blue),
                               ),
                               GestureDetector(
-                                onTap: () {
-                                  final result = Navigator.pushNamed(
-                                      context, '/inventario_lista');
+                                onTap: () async {
+                                  bool conexao = await temConexao();
 
-                                  result.then((value) async {
-                                    try {
-                                      if (value != null) {
-                                        inventario = value;
-                                        lista_artigo_inventario =
-                                            new List<ArtigoInventario>();
-                                        lista_artigo_inventario =
-                                            await _fetchLinhaInventario(
-                                                int.parse(
-                                                    inventario.documentoNumero),
-                                                0,
-                                                0);
+                                  if (conexao == true) {
+                                    final result = Navigator.pushNamed(
+                                        context, '/inventario_lista');
 
-                                        if (lista_artigo_inventario == null) {
-                                          SessaoApiProvider.refreshToken();
+                                    result.then((value) async {
+                                      try {
+                                        if (value != null) {
+                                          inventario = value;
+                                          lista_artigo_inventario =
+                                              new List<ArtigoInventario>();
                                           lista_artigo_inventario =
                                               await _fetchLinhaInventario(
                                                   int.parse(inventario
                                                       .documentoNumero),
                                                   0,
                                                   0);
-                                        }
-                                        index = 0;
 
-                                        actualizarEstado();
+                                          if (lista_artigo_inventario == null) {
+                                            SessaoApiProvider.refreshToken();
+                                            lista_artigo_inventario =
+                                                await _fetchLinhaInventario(
+                                                    int.parse(inventario
+                                                        .documentoNumero),
+                                                    0,
+                                                    0);
+                                          }
+                                          index = 0;
+
+                                          actualizarEstado();
+                                        }
+                                      } catch (e) {
+                                        print("Exception");
+                                        print(e);
                                       }
-                                    } catch (e) {
-                                      print("Exception");
+                                    }).catchError((e) {
+                                      print("exception catch");
                                       print(e);
-                                    }
-                                  }).catchError((e) {
-                                    print("exception catch");
-                                    print(e);
-                                  });
+                                    });
+                                  } else {
+                                    alerta_info(
+                                        contexto, "Verifique sua conexão.");
+                                  }
                                 },
                                 child: Text(
                                   inventarioNumDoc,

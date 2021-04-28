@@ -271,53 +271,63 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                                     // filtroResultadoBusca( value );
                                   },
                                   onTap: () async {
-                                    final result = Navigator.pushNamed(
-                                        context, '/cliente_selecionar_lista');
-                                    // print(result);
-                                    result.then((obj) {
-                                      this.cliente = obj;
-                                      if ((this.cliente.anulado == false &&
-                                              this.cliente.limiteCredito ==
-                                                  0) ||
-                                          this.cliente.anulado == false &&
-                                              this.cliente.totalDeb <
-                                                  this.cliente.limiteCredito) {
-                                        txtClienteController.text =
-                                            this.cliente.nome;
-                                      } else {
-                                        String msg = "";
-                                        if (this.cliente.anulado == true) {
-                                          msg =
-                                              "Cliente anulado. Entre em contacto com o Administrador";
-                                        } else if (this.cliente.totalDeb >
-                                            this.cliente.limiteCredito) {
-                                          msg = "Cliente excedeu o limite de Credito de " +
-                                              this
-                                                  .cliente
-                                                  .limiteCredito
-                                                  .toString() +
-                                              " MTN. Entre em contacto com o Administrador";
-                                        }
+                                    bool conexao = await temConexao();
 
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              title: Text("atenção"),
-                                              content: Text(msg),
-                                              actions: <Widget>[
-                                                new FlatButton(
-                                                  child: new Text("ok"),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      }
-                                    });
+                                    if (conexao == true) {
+                                      final result = Navigator.pushNamed(
+                                          context, '/cliente_selecionar_lista');
+                                      // print(result);
+                                      result.then((obj) {
+                                        this.cliente = obj;
+                                        if ((this.cliente.anulado == false &&
+                                                this.cliente.limiteCredito ==
+                                                    0) ||
+                                            this.cliente.anulado == false &&
+                                                this.cliente.totalDeb <
+                                                    this
+                                                        .cliente
+                                                        .limiteCredito) {
+                                          txtClienteController.text =
+                                              this.cliente.nome;
+                                        } else {
+                                          String msg = "";
+                                          if (this.cliente.anulado == true) {
+                                            msg =
+                                                "Cliente anulado. Entre em contacto com o Administrador";
+                                          } else if (this.cliente.totalDeb >
+                                              this.cliente.limiteCredito) {
+                                            msg = "Cliente excedeu o limite de Credito de " +
+                                                this
+                                                    .cliente
+                                                    .limiteCredito
+                                                    .toString() +
+                                                " MTN. Entre em contacto com o Administrador";
+                                          }
+
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text("atenção"),
+                                                content: Text(msg),
+                                                actions: <Widget>[
+                                                  new FlatButton(
+                                                    child: new Text("ok"),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        }
+                                      });
+                                    } else {
+                                      alerta_info(
+                                          contexto, "Verifique sua conexão.");
+                                    }
                                   },
 
                                   controller: txtClienteController,
@@ -394,14 +404,20 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
       }
     }
     if (index == 1) {
-      final result = await Navigator.pushNamed(
-          contexto, '/artigo_selecionar_lista',
-          arguments: artigos);
-      if (result != null) {
-        artigos = result;
-      }
+      bool conexao = await temConexao();
 
-      actualizarEstado();
+      if (conexao == true) {
+        final result = await Navigator.pushNamed(
+            contexto, '/artigo_selecionar_lista',
+            arguments: artigos);
+        if (result != null) {
+          artigos = result;
+        }
+
+        actualizarEstado();
+      } else {
+        alerta_info(contexto, "Verifique sua conexão.");
+      }
 
       // Terminar
     }
@@ -930,7 +946,13 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
           color: Colors.blue,
           onPressed: () async {
             // Navigator.pushNamed(contexto, '/artigo_selecionar_lista');
-            await Navigator.pushNamed(contexto, '/artigo_selecionar_lista');
+            bool conexao = await temConexao();
+
+            if (conexao == true) {
+              await Navigator.pushNamed(contexto, '/artigo_selecionar_lista');
+            } else {
+              alerta_info(contexto, "Verifique sua conexão.");
+            }
           },
           child: const Text('Adicionar ',
               style: TextStyle(fontSize: 15, color: Colors.white)),

@@ -175,31 +175,38 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                                     TextStyle(fontSize: 18, color: Colors.blue),
                               ),
                               GestureDetector(
-                                onTap: () {
-                                  final result = Navigator.pushNamed(
-                                      context, '/expedicao_lista');
+                                onTap: () async {
+                                  bool conexao = await temConexao();
 
-                                  result.then((value) async {
-                                    expedicao = value;
-                                    lista_artigo_expedicao.clear();
-                                    lista_artigo_expedicao =
-                                        await _fetchLinhaExpedicao(
-                                            expedicao.expedicao, 0, 0);
+                                  if (conexao == true) {
+                                    final result = Navigator.pushNamed(
+                                        context, '/expedicao_lista');
 
-                                    if (lista_artigo_expedicao == null) {
-                                      SessaoApiProvider.refreshToken();
+                                    result.then((value) async {
+                                      expedicao = value;
+                                      lista_artigo_expedicao.clear();
                                       lista_artigo_expedicao =
                                           await _fetchLinhaExpedicao(
-                                              int.parse(expedicao.expedicao
-                                                  .toString()),
-                                              0,
-                                              0);
-                                    }
-                                    posicao = List.filled(
-                                        lista_artigo_expedicao.length, false);
+                                              expedicao.expedicao, 0, 0);
 
-                                    actualizarEstado();
-                                  });
+                                      if (lista_artigo_expedicao == null) {
+                                        SessaoApiProvider.refreshToken();
+                                        lista_artigo_expedicao =
+                                            await _fetchLinhaExpedicao(
+                                                int.parse(expedicao.expedicao
+                                                    .toString()),
+                                                0,
+                                                0);
+                                      }
+                                      posicao = List.filled(
+                                          lista_artigo_expedicao.length, false);
+
+                                      actualizarEstado();
+                                    });
+                                  } else {
+                                    alerta_info(
+                                        contexto, "Verifique sua conexão.");
+                                  }
                                 },
                                 child: Text(
                                   expedicaoNumDoc,
@@ -353,9 +360,6 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
       }
 
       bool conexao = await temConexao();
-
-      bool dado = false; //await temDados('Sem acesso a internet!', contexto);
-      bool localizacao = false; //await temLocalizacao();
 
       if (conexao == true) {
         ArtigoExpedicao.postExpedicao(expedicao, lista_artigo_expedicao)

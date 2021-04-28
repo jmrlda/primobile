@@ -177,35 +177,41 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                                     TextStyle(fontSize: 18, color: Colors.blue),
                               ),
                               GestureDetector(
-                                onTap: () {
-                                  final result = Navigator.pushNamed(
-                                      context, '/rececao_lista');
+                                onTap: () async {
+                                  bool conexao = await temConexao();
+                                  if (conexao == true) {
+                                    final result = Navigator.pushNamed(
+                                        context, '/rececao_lista');
 
-                                  result.then((value) async {
-                                    rececao = value;
-                                    lista_artigo_rececao.clear();
-                                    lista_artigo_rececao =
-                                        await _fetchLinhaRececao(
-                                            rececao.rececao, 0, 0);
-
-                                    if (lista_artigo_rececao == null) {
-                                      SessaoApiProvider.refreshToken();
+                                    result.then((value) async {
+                                      rececao = value;
+                                      lista_artigo_rececao.clear();
                                       lista_artigo_rececao =
                                           await _fetchLinhaRececao(
-                                              int.parse(
-                                                  rececao.rececao.toString()),
-                                              0,
-                                              0);
-                                    }
+                                              rececao.rececao, 0, 0);
 
-                                    posicao = List<bool>.filled(
-                                        lista_artigo_rececao.length, false);
+                                      if (lista_artigo_rececao == null) {
+                                        SessaoApiProvider.refreshToken();
+                                        lista_artigo_rececao =
+                                            await _fetchLinhaRececao(
+                                                int.parse(
+                                                    rececao.rececao.toString()),
+                                                0,
+                                                0);
+                                      }
 
-                                    actualizarEstado();
-                                  }).catchError((e) {
-                                    print('lista rececao erro');
-                                    print(e);
-                                  });
+                                      posicao = List<bool>.filled(
+                                          lista_artigo_rececao.length, false);
+
+                                      actualizarEstado();
+                                    }).catchError((e) {
+                                      print('lista rececao erro');
+                                      print(e);
+                                    });
+                                  } else {
+                                    alerta_info(
+                                        contexto, "Verifique sua conexão.");
+                                  }
                                 },
                                 child: Text(
                                   rececaoNumDoc,
