@@ -181,7 +181,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                                   bool conexao = await temConexao();
                                   if (conexao == true) {
                                     final result = Navigator.pushNamed(
-                                        context, '/rececao_lista');
+                                        context, '/rececao_selecionar_lista');
 
                                     result.then((value) async {
                                       rececao = value;

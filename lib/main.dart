@@ -42,9 +42,17 @@ void main() {
       '/encomenda_lista_confirmacao': (context) =>
           EncomendaListaConfirmacaoPage(),
       '/rececao_editor': (context) => RececaoEditorPage(),
-      '/rececao_lista': (context) => RececaoPage(),
+      '/rececao_lista': (context) => RececaoPage(isSelected: false),
+      '/rececao_selecionar_lista': (context) => RececaoPage(
+            isSelected: true,
+          ),
       '/expedicao_editor': (context) => ExpedicaoEditorPage(),
-      '/expedicao_lista': (context) => ExpedicaoPage(),
+      '/expedicao_lista': (context) => ExpedicaoPage(
+            isSelected: false,
+          ),
+      '/expedicao_selecionar_lista': (context) => ExpedicaoPage(
+            isSelected: true,
+          ),
       '/venda_editor': (context) => VendaEditorPage(),
       '/expedicao_sucesso': (context) => SucessoPage(
             modulo: "Expedição",
@@ -57,7 +65,12 @@ void main() {
       '/config_instancia': (context) {
         return ConfigPage();
       },
-      '/inventario_lista': (context) => InventarioPage(),
+      '/inventario_lista': (context) => InventarioPage(
+            isSelected: false,
+          ),
+      '/inventario_selecionar_lista': (context) => InventarioPage(
+            isSelected: true,
+          ),
       '/inventario_editor': (context) => InventarioEditorPage(),
       '/inventario_sucesso': (context) => SucessoPage(
             modulo: "Inventario",

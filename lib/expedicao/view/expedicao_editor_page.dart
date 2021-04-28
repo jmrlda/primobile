@@ -180,7 +180,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
 
                                   if (conexao == true) {
                                     final result = Navigator.pushNamed(
-                                        context, '/expedicao_lista');
+                                        context, '/expedicao_selecionar_lista');
 
                                     result.then((value) async {
                                       expedicao = value;

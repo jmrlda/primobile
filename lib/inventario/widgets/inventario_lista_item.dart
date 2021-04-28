@@ -70,11 +70,14 @@ class InventarioListaItem extends StatelessWidget {
     Conexao.url = Conexao.baseUrl + inventario.documentoNumero.toString();
     TextEditingController txtArtigoQtd = new TextEditingController();
     String msgQtd = '';
-
+    if (this.isSelected == false) {
+      listaInventarioSelecionado.clear();
+    }
     return new Container(
         color: existeInventarioSelecionado(
-                    inventario, listaInventarioSelecionado) ==
-                false
+                        inventario, listaInventarioSelecionado) ==
+                    false ||
+                this.isSelected == false
             ? Colors.white
             : Colors.red,
         child: _ListaTile(
@@ -83,7 +86,6 @@ class InventarioListaItem extends StatelessWidget {
             if (isSelected) {
               Navigator.pop(context, inventario);
             }
-            Navigator.pop(context, inventario);
           },
           leading: GestureDetector(
               child: ClipOval(child: networkIconImage(Conexao.url)),

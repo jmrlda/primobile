@@ -82,7 +82,6 @@ class RececaoListaItem extends StatelessWidget {
             if (isSelected) {
               Navigator.pop(context, rececao);
             }
-            Navigator.pop(context, rececao);
           },
           leading: GestureDetector(
               child: ClipOval(child: networkIconImage(Conexao.url)),

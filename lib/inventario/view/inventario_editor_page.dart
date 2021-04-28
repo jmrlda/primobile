@@ -181,8 +181,8 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                                   bool conexao = await temConexao();
 
                                   if (conexao == true) {
-                                    final result = Navigator.pushNamed(
-                                        context, '/inventario_lista');
+                                    final result = Navigator.pushNamed(context,
+                                        '/inventario_selecionar_lista');
 
                                     result.then((value) async {
                                       try {

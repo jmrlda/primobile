@@ -83,7 +83,6 @@ class ExpedicaoListaItem extends StatelessWidget {
             if (isSelected) {
               Navigator.pop(context, expedicao);
             }
-            Navigator.pop(context, expedicao);
           },
           leading: GestureDetector(
               child: ClipOval(child: networkIconImage(Conexao.url)),
