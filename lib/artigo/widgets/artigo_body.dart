@@ -7,7 +7,7 @@ import 'package:primobile/artigo/bloc/artigo_bloc.dart';
 import 'package:primobile/artigo/artigos.dart';
 import 'package:primobile/artigo/util.dart';
 
-Widget artigoBody(BuildContext context, ArtigoBloc _artigoBloc) {
+Widget artigoBody(BuildContext context, ArtigoBloc _artigoBloc, bool isSelected) {
   TextEditingController editingController = TextEditingController();
 
   return Container(
@@ -56,7 +56,7 @@ Widget artigoBody(BuildContext context, ArtigoBloc _artigoBloc) {
         ),
         Expanded(
             child: ArtigoLista(
-          title: 'teste artigo',
+          title: 'teste artigo', isSelected: isSelected,
         )),
       ],
     ),

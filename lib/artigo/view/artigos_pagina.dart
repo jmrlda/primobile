@@ -7,6 +7,9 @@ import 'package:primobile/artigo/widgets/artigo_appbar.dart';
 import 'package:primobile/artigo/widgets/artigo_body.dart';
 
 class ArtigoPage extends StatelessWidget {
+  bool isSelected;
+  ArtigoPage({this.isSelected = false});
+
   @override
   Widget build(BuildContext context) {
     ArtigoBloc _artigoBloc = ArtigoBloc(httpClient: http.Client())
@@ -16,14 +19,16 @@ class ArtigoPage extends StatelessWidget {
       body: BlocProvider(
         create: (BuildContext context) => _artigoBloc,
         // ArtigoBloc(httpClient: http.Client())..add(ArtigoFetched()),
-        child: artigoBody(context, _artigoBloc),
+        child: artigoBody(context, _artigoBloc, this.isSelected),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.save),
-        onPressed: () async {
-          Navigator.pop(context, listaArtigoSelecionado);
-        },
-      ),
+      floatingActionButton: this.isSelected
+          ? FloatingActionButton(
+              child: Icon(Icons.save),
+              onPressed: () async {
+                Navigator.pop(context, listaArtigoSelecionado);
+              },
+            )
+          : null,
     );
   }
 }

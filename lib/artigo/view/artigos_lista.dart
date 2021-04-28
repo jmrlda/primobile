@@ -6,18 +6,22 @@ import 'package:primobile/artigo/widgets/bottom_loader.dart';
 import 'package:primobile/util/util.dart';
 
 class ArtigoLista extends StatefulWidget {
-  ArtigoLista({Key key, this.title}) : super(key: key);
+  ArtigoLista({Key key, this.title, this.isSelected = false}) : super(key: key);
 
   final String title;
+  final bool isSelected;
 
   @override
-  _ArtigoLista createState() => _ArtigoLista();
+  _ArtigoLista createState() => _ArtigoLista(isSelected: isSelected);
 }
 
 class _ArtigoLista extends State<ArtigoLista> {
   final _scrollController = ScrollController();
   final _scrollThreshold = 200.0;
   ArtigoBloc _artigoBloc;
+  final bool isSelected;
+
+  _ArtigoLista({this.isSelected = false});
 
   @override
   void initState() {
@@ -27,15 +31,13 @@ class _ArtigoLista extends State<ArtigoLista> {
 
     try {
       updateConnection(() {
-        if (this.mounted)
-          setState(() {
-            PRIMARY_COLOR = CONEXAO_ON_COLOR;
-          });
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_ON_COLOR;
+        });
       }, () {
-        if (this.mounted)
-          setState(() {
-            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
-          });
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+        });
       });
     } catch (e) {}
   }
@@ -68,6 +70,8 @@ class _ArtigoLista extends State<ArtigoLista> {
                   : ArtigoListaItem(
                       artigo: state.artigos[index],
                       artigoBloc: _artigoBloc,
+                      isSelected: this.isSelected,
+                      setState: setState,
                     );
             },
             itemCount: state.hasReachedMax
@@ -90,6 +94,8 @@ class _ArtigoLista extends State<ArtigoLista> {
                   : ArtigoListaItem(
                       artigo: state.artigos[index],
                       artigoBloc: _artigoBloc,
+                      isSelected: this.isSelected,
+                      setState: setState,
                     );
             },
             itemCount: state.hasReachedMax

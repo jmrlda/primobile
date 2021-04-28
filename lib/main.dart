@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:primobile/artigo/util.dart';
 import 'package:primobile/artigo/view/view.dart';
 import 'package:primobile/encomenda/view/encomenda_editor_page.dart';
 import 'package:primobile/inventario/inventario.dart';
@@ -28,8 +29,8 @@ void main() {
     routes: {
       '/': (context) => LoginPage(),
       '/menu': (context) => MenuPage(),
-      '/artigo_lista': (context) => ArtigoPage(),
-      '/artigo_selecionar_lista': (context) => ArtigoPage(),
+      '/artigo_lista': (context) => ArtigoPage(isSelected: false),
+      '/artigo_selecionar_lista': (context) => ArtigoPage(isSelected: true),
       '/cliente_lista': (context) => ClientePage(
             isSelected: false,
           ),
