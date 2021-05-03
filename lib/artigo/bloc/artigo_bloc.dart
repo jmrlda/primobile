@@ -38,21 +38,16 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
 
           yield ArtigoSucesso(artigos: artigos, hasReachedMax: true);
           return;
-        }
-
-        if (currentState is ArtigoSucesso) {
-          // final artigos = await _fetchArtigos(currentState.artigos.length, 20);
+        } else if (currentState is ArtigoSucesso) {
+          final artigos = await _fetchArtigos(currentState.artigos.length, 20);
           yield currentState.artigos.isEmpty
               ? currentState.copyWith(hasReachedMax: true)
-              : ArtigoSucesso(
-                  artigos: currentState.artigos, hasReachedMax: true);
-        }
-
-        if (currentState is ArtigoSucessoPesquisa) {
+              : ArtigoSucesso(artigos: artigos, hasReachedMax: true);
+        } else if (currentState is ArtigoSucessoPesquisa) {
           final artigos = await _fetchArtigos(0, 20);
           yield ArtigoSucesso(artigos: artigos, hasReachedMax: true);
           return;
-        }
+        } else if (currentState is ArtigoFalha) {}
       } catch (_) {
         yield ArtigoFalha();
       }
@@ -66,23 +61,31 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
           yield ArtigoSucessoPesquisa(
               artigos: artigos, hasReachedMax: true, query: this.query);
           return;
-        }
-
-        if (currentState is ArtigoSucesso) {
+        } else if (currentState is ArtigoSucesso) {
           final artigos =
               artigoPesquisar(this.query, await _fetchArtigos(0, 20));
           yield ArtigoSucessoPesquisa(
               artigos: artigos, hasReachedMax: true, query: this.query);
           return;
-        }
-
-        if (currentState is ArtigoSucessoPesquisa) {
-          final artigos = artigoPesquisar(
-              this.query, await _fetchArtigos(currentState.artigos.length, 20));
+        } else if (currentState is ArtigoSucessoPesquisa) {
+          final artigos =
+              artigoPesquisar(this.query, await _fetchArtigos(0, 20));
           yield artigos.isEmpty
-              ? currentState.copyWith()
+              ? ArtigoFalha()
               : ArtigoSucessoPesquisa(
                   artigos: artigos, hasReachedMax: true, query: this.query);
+          // yield ArtigoSucessoPesquisa(
+          //     artigos: artigos, hasReachedMax: true, query: this.query);
+          return;
+        } else if (currentState is ArtigoFalha) {
+          final artigos =
+              artigoPesquisar(this.query, await _fetchArtigos(0, 20));
+
+          yield ArtigoSucessoPesquisa(
+              artigos: artigos, hasReachedMax: true, query: this.query);
+          return;
+        } else {
+          yield ArtigoFalha();
         }
       } catch (_) {
         yield ArtigoFalha();
@@ -138,7 +141,7 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
           return lista_artigos;
         } else {
           final msg = json.decode(response.body);
-          print("Ocorreu um erro" + msg["Message"]);
+          print("Ocorreu um erro " + msg);
         }
       }
     } catch (e) {

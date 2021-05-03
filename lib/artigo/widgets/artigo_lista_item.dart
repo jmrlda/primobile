@@ -56,13 +56,13 @@ class _ListaTile extends ListTile {
 
 class ArtigoListaItem extends StatelessWidget {
   final Artigo artigo;
-  final ArtigoBloc artigoBloc;
+  // final ArtigoBloc artigoBloc;
   final bool isSelected;
   final StateSetter setState;
   const ArtigoListaItem(
       {Key key,
       @required this.artigo,
-      this.artigoBloc,
+      // this.artigoBloc,
       this.setState,
       this.isSelected = false})
       : super(key: key);
@@ -153,17 +153,16 @@ class ArtigoListaItem extends StatelessWidget {
                                               double.parse(txtArtigoQtd.text
                                                   .toString()));
                                         } else {
-                                          if (double.parse(txtArtigoQtd.text) >
-                                              artigo.quantidadeStock) {
-                                            setState(() {
-                                              msgQtd = 'Quantidade ' +
-                                                  txtArtigoQtd.text +
-                                                  ' ' +
-                                                  artigo.unidade +
-                                                  ' maior que o Stock disponivel ';
-                                            });
-                                          } else if (double.parse(
-                                                  txtArtigoQtd.text) <=
+                                          // if (double.parse(txtArtigoQtd.text) >
+                                          //     artigo.quantidadeStock) {
+                                          //   setState(() {
+                                          //     msgQtd = 'Quantidade ' +
+                                          //         txtArtigoQtd.text +
+                                          //         ' ' +
+                                          //         artigo.unidade +
+                                          //         ' maior que o Stock disponivel ';
+                                          //   });
+                                          if (double.parse(txtArtigoQtd.text) <=
                                               0) {
                                             setState(() {
                                               msgQtd =

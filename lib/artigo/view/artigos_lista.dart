@@ -5,6 +5,8 @@ import 'package:primobile/artigo/widgets/artigo_lista_item.dart';
 import 'package:primobile/artigo/widgets/bottom_loader.dart';
 import 'package:primobile/util/util.dart';
 
+import '../util.dart';
+
 class ArtigoLista extends StatefulWidget {
   ArtigoLista({Key key, this.title, this.isSelected = false}) : super(key: key);
 
@@ -18,7 +20,7 @@ class ArtigoLista extends StatefulWidget {
 class _ArtigoLista extends State<ArtigoLista> {
   final _scrollController = ScrollController();
   final _scrollThreshold = 200.0;
-  ArtigoBloc _artigoBloc;
+  // ArtigoBloc artigoBloc;
   final bool isSelected;
 
   _ArtigoLista({this.isSelected = false});
@@ -27,7 +29,7 @@ class _ArtigoLista extends State<ArtigoLista> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _artigoBloc = BlocProvider.of<ArtigoBloc>(context);
+    // artigoBloc = BlocProvider.of<ArtigoBloc>(context);
 
     try {
       updateConnection(() {
@@ -69,7 +71,7 @@ class _ArtigoLista extends State<ArtigoLista> {
                   ? BottomLoader()
                   : ArtigoListaItem(
                       artigo: state.artigos[index],
-                      artigoBloc: _artigoBloc,
+                      // artigoBloc: artigoBloc,
                       isSelected: this.isSelected,
                       setState: setState,
                     );
@@ -84,7 +86,7 @@ class _ArtigoLista extends State<ArtigoLista> {
         if (state is ArtigoSucessoPesquisa) {
           if (state.artigos.isEmpty) {
             return Center(
-              child: Text('Nenhum artigo encontrado'),
+              child: Text('Artigo não encontrado'),
             );
           }
           return ListView.builder(
@@ -93,7 +95,7 @@ class _ArtigoLista extends State<ArtigoLista> {
                   ? BottomLoader()
                   : ArtigoListaItem(
                       artigo: state.artigos[index],
-                      artigoBloc: _artigoBloc,
+                      // artigoBloc: artigoBloc,
                       isSelected: this.isSelected,
                       setState: setState,
                     );
@@ -118,7 +120,7 @@ class _ArtigoLista extends State<ArtigoLista> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (maxScroll - currentScroll <= _scrollThreshold) {
-      // _artigoBloc.add(ArtigoFetched());
+      // artigoBloc.add(ArtigoFetched());
     }
   }
 }

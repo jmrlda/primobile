@@ -1,12 +1,19 @@
+import 'package:flutter/widgets.dart';
 import 'package:primobile/artigo/models/artigo.dart';
 
+import 'bloc/bloc.dart';
+
 List<Artigo> artigoLista = new List<Artigo>();
+List<Artigo> artigoListaDisplay = new List<Artigo>();
+
 List<Artigo> artigosDuplicado = new List<Artigo>();
 List<Artigo> listaArtigoSelecionado = List<Artigo>();
 bool isSelected = false;
 
 String baseUrl = "";
 String url = "";
+TextEditingController artigoPesquisarController = TextEditingController();
+ArtigoBloc artigoBloc;
 
 void opcaoAcao(String opcao) async {
   if (opcao == 'sincronizar') {}
