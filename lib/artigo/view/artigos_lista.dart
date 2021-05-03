@@ -56,13 +56,13 @@ class _ArtigoLista extends State<ArtigoLista> {
         }
         if (state is ArtigoFalha) {
           return Center(
-            child: Text('falha na busca por artigos'),
+            child: Text('falha na busca por artigos!'),
           );
         }
         if (state is ArtigoSucesso) {
           if (state.artigos.isEmpty) {
             return Center(
-              child: Text('Sem artigos'),
+              child: Text('Sem artigos!'),
             );
           }
           return ListView.builder(

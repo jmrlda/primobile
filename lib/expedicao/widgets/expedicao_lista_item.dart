@@ -56,12 +56,12 @@ class _ListaTile extends ListTile {
 
 class ExpedicaoListaItem extends StatelessWidget {
   final Expedicao expedicao;
-  final ExpedicaoBloc expedicaoBloc;
+  // final ExpedicaoBloc expedicaoBloc;
   final isSelected;
   const ExpedicaoListaItem(
       {Key key,
       @required this.expedicao,
-      this.expedicaoBloc,
+      // this.expedicaoBloc,
       this.isSelected = false})
       : super(key: key);
 

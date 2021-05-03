@@ -23,6 +23,7 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
     ArtigoEvent event,
   ) async* {
     final currentState = state;
+
     if (event is ArtigoFetched) {
       try {
         if (currentState is ArtigoInicial) {
@@ -47,7 +48,10 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
           final artigos = await _fetchArtigos(0, 20);
           yield ArtigoSucesso(artigos: artigos, hasReachedMax: true);
           return;
-        } else if (currentState is ArtigoFalha) {}
+        } else {
+          yield ArtigoFalha();
+          return;
+        }
       } catch (_) {
         yield ArtigoFalha();
       }

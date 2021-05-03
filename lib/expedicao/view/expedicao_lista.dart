@@ -33,7 +33,7 @@ class _ExpedicaoLista extends State<ExpedicaoLista> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _expedicaoBloc = BlocProvider.of<ExpedicaoBloc>(context);
+    // _expedicaoBloc = BlocProvider.of<ExpedicaoBloc>(context);
 
     try {
       updateConnection(() {
@@ -62,13 +62,13 @@ class _ExpedicaoLista extends State<ExpedicaoLista> {
         }
         if (state is ExpedicaoFalha) {
           return Center(
-            child: Text('falha na busca por Expedicao'),
+            child: Text('falha na busca por Expedição!'),
           );
         }
         if (state is ExpedicaoSucesso) {
           if (state.expedicao.isEmpty) {
             return Center(
-              child: Text('Sem expedicao'),
+              child: Text('Expedição não encontrado!'),
             );
           }
 
@@ -78,7 +78,7 @@ class _ExpedicaoLista extends State<ExpedicaoLista> {
                   ? BottomLoader()
                   : ExpedicaoListaItem(
                       expedicao: state.expedicao[index],
-                      expedicaoBloc: _expedicaoBloc,
+                      // expedicaoBloc: _expedicaoBloc,
                       isSelected: this.isSeleted,
                     );
             },
@@ -92,7 +92,7 @@ class _ExpedicaoLista extends State<ExpedicaoLista> {
         if (state is ExpedicaoSucessoPesquisa) {
           if (state.expedicao.isEmpty) {
             return Center(
-              child: Text('Nenhum expedicao encontrado'),
+              child: Text('Nenhuma expedição encontrado'),
             );
           }
           return ListView.builder(
@@ -101,7 +101,6 @@ class _ExpedicaoLista extends State<ExpedicaoLista> {
                   ? BottomLoader()
                   : ExpedicaoListaItem(
                       expedicao: state.expedicao[index],
-                      expedicaoBloc: _expedicaoBloc,
                     );
             },
             itemCount: state.hasReachedMax
