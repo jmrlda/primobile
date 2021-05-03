@@ -8,6 +8,7 @@ import 'package:primobile/menu/widgets/menu_appbar.dart';
 // import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'dart:async';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:primobile/util/util.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -45,6 +46,14 @@ class _MenuPageState extends State<MenuPage> {
     // fltrNotification = new FlutterLocalNotificationsPlugin();
     //
     //
+    //
+    SessaoApiProvider.readSession().then((sessao) {
+      if (sessao != null) {
+        timer = Timer.periodic(
+            Duration(seconds: int.parse(sessao['expires_in'].toString()) - 15),
+            (Timer t) => SessaoApiProvider.refreshToken());
+      }
+    });
     try {
       updateConnection(() {
         if (this.mounted)
