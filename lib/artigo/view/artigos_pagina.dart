@@ -118,10 +118,11 @@ class _ArtigoPageState extends State<ArtigoPage> {
                           artigoBloc..add(ArtigoSearched());
                         } else {
                           artigoBloc.query = "";
+                          artigoBloc..add(ArtigoFetched());
 
-                          artigoBloc =
-                              ArtigoBloc(httpClient: http.Client(), query: "")
-                                ..add(ArtigoFetched());
+                          // artigoBloc =
+                          //     ArtigoBloc(httpClient: http.Client(), query: "")
+                          //       ..add(ArtigoFetched());
                         }
                       });
                     },

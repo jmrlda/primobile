@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/artigo/util.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
+import 'package:primobile/util/util.dart';
 
 part 'artigo_event.dart';
 part 'artigo_state.dart';
@@ -108,7 +109,13 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
       var sessao = await SessaoApiProvider.readSession();
       var response;
       List<Artigo> lista_artigos = List<Artigo>();
-
+      dynamic data = json.decode(await getCacheData("artigo"));
+      if (data != null) {
+        for (dynamic rawArtigo in data) {
+          lista_artigos.add(Artigo.fromJson(rawArtigo));
+        }
+        return lista_artigos;
+      }
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');
         return List<Artigo>();
@@ -135,6 +142,8 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
           for (dynamic rawArtigo in data) {
             lista_artigos.add(Artigo.fromJson(rawArtigo));
           }
+
+          await saveCacheData("artigo", lista_artigos);
 
           return lista_artigos;
         } else if (response.statusCode == 401 || response.statusCode == 500) {

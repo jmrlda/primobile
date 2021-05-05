@@ -225,19 +225,20 @@ class ArtigoListaItem extends StatelessWidget {
           title: Text(
             artigo.descricao,
             style: TextStyle(
-                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16),
+                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12),
           ),
           subtitle: Text(
-            "Cod: " +
+            "COD: " +
                 artigo.artigo +
+                "\nQTD: " +
+                artigo.quantidadeStock.toString() +
                 ' ' +
-                "Un: " +
                 artigo.unidade +
-                ', ' +
+                '\n' +
                 "PVP: " +
                 artigo.preco.toString() +
                 ' MT',
-            style: TextStyle(color: Colors.blue, fontSize: 14),
+            style: TextStyle(color: Colors.blue, fontSize: 11),
           ),
           data: artigo.descricao,
         ));
