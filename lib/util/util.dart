@@ -22,6 +22,7 @@ import 'package:primobile/expedicao/models/expedicao.dart';
 import 'package:primobile/inventario/models/models.dart';
 import 'package:primobile/rececao/models/models.dart';
 // import 'package:connectivity/connectivity.dart';
+import 'package:localstorage/localstorage.dart';
 
 // final Connectivity connectivity = Connectivity();
 
@@ -31,6 +32,7 @@ MaterialColor CONEXAO_ON_COLOR = Colors.blue;
 // MaterialColor CONEXAO_ON_EDITOR_COLOR = Colors.blue[900];
 
 MaterialColor CONEXAO_OFF_COLOR = Colors.blueGrey;
+LocalStorage storage;
 
 class Opcoes {
   static const String Sincronizar = 'sincronizar';
@@ -714,7 +716,101 @@ Future<void> updateConnection(
   } catch (e) {}
 }
 
-Future<void> calcelarUpdateConnectionStatus() async {
+Future<void> cancelarUpdateConnectionStatus() async {
   // await Future.delayed(Duration(seconds: 30));
   await conexaoListener?.cancel();
+}
+
+//  Todas as classes de operação de arquivo precisa dessa interface,
+//portanto, suas propriedades se tornam padrão.
+abstract class IFileManager {
+  // WriteUserRequestDataWithTime:
+  // está gravando dados no cache. Quando a chave e a data for passado no parametro,
+  // isso vai gravar os dados por hora.
+  // Se passar no processo de escrita com sucesso,
+  // retornará o valor verdadeiro ou se houver algum problema em retornar o falso.
+  Future<bool> writeUserRequestDAtaWithTime(
+      String key, String modelo, Duration tempo);
+
+// GetUserRequestDataOnString :
+// essa função retorna os dados de cache para o valor da chave.
+  Future<String> getUserRequestDataOnString(String key);
+
+// RemoveUserRequestSingleCache :
+// Desta vez, remover o modelo pela chave em um cache.
+  Future<bool> removeUserRequestSingleCache(String key);
+
+  // RemoveUserRequestCach :
+  // Finalmente, remova todo o cache.
+  //(Por que precisamos de uma chave? Em breve iremos 🤗 dica: segurança
+  Future<bool> removerUserRequestCache(String key);
+}
+
+// class LocalPreferences implements IFileManager {
+//   _LocalManager manager = _LocalManager.instance;
+//   @override
+//   Future<String> getUserRequestDataOnString(String key) async {
+//     return await manager.getModelString(key);
+//   }
+
+//   @override
+//   Future<bool> removeUserRequestCache(String key) async {
+//     return await manager.removeAllLocalData(key);
+//   }
+
+//   @override
+//   Future<bool> removeUserRequestSingleCache(String key) async {
+//     return await manager.removeModel(key);
+//   }
+
+//   @override
+//   Future<bool> writeUserRequestDataWithTime(String key, Object model, Duration time) async {
+//     if (time == null)
+//       return false;
+//     else
+//       return await manager.writeModelInJson(model, key, time);
+//   }
+// }
+
+Future<bool> saveCacheData(String key, dynamic data) async {
+  bool rv = false;
+  try {
+    storage = new LocalStorage(key);
+    await storage.ready;
+    storage.setItem(key, json.encode(data));
+    rv = true;
+  } catch (e) {
+    rv = false;
+  }
+
+  return rv;
+}
+
+Future<dynamic> getCacheData(String key) async {
+  dynamic rv = false;
+  try {
+    storage = new LocalStorage(key);
+    await storage.ready;
+    dynamic data = storage.getItem(key);
+    if (data == null) rv = null;
+    rv = data;
+  } catch (e) {
+    rv = null;
+  }
+
+  return rv;
+}
+
+Future<bool> removeKeyCacheData(String key) async {
+  bool rv = false;
+  try {
+    storage = new LocalStorage(key);
+    await storage.ready;
+    storage.deleteItem(key);
+    rv = true;
+  } catch (e) {
+    rv = false;
+  }
+
+  return rv;
 }

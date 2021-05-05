@@ -24,14 +24,15 @@ List<Artigo> artigoPesquisar(String query, List<Artigo> listaArtigo) {
   List<Artigo> resultado = List<Artigo>();
 
   if (query.trim().isNotEmpty) {
-    listaArtigo.forEach((item) {
+    for (Artigo item in listaArtigo) {
       if (item.descricao
               .toLowerCase()
               .contains(query.toString().toLowerCase()) ||
           item.artigo.toLowerCase().contains(query.toString().toLowerCase())) {
         resultado.add(item);
       }
-    });
+    }
+    ;
   }
   return resultado;
 }
