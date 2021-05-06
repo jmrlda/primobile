@@ -1,10 +1,17 @@
+import 'package:flutter/widgets.dart';
+// import 'package:gallery_saver/files.dart';
+import 'package:http/http.dart' as http;
 import 'package:primobile/cliente/models/models.dart';
+
+import 'bloc/bloc.dart';
 
 List<Cliente> clienteLista = new List<Cliente>();
 List<Cliente> clienteListaSelecionado = new List<Cliente>();
 bool isSelected = false;
 String baseUrl = "";
 String url = "";
+TextEditingController clientePesquisaController = TextEditingController();
+ClienteBloc clienteBloc = ClienteBloc(httpClient: http.Client());
 
 void opcaoAcao(String opcao) async {
   if (opcao == 'sincronizar') {}

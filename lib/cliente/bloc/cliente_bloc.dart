@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:primobile/cliente/models/models.dart';
 import 'package:primobile/cliente/util.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
+import 'package:primobile/util/util.dart';
 
 part 'cliente_event.dart';
 part 'cliente_state.dart';
@@ -28,28 +29,27 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
       try {
         if (currentState is ClienteInicial) {
           List<Cliente> clientes = await _fetchClientes(0, 20);
-          if (clientes != null && clientes.length == 0) {
+          if (clientes != null) {
             await SessaoApiProvider.refreshToken();
             clientes = await _fetchClientes(0, 20);
-          } else if (clientes == null) {
+          }
+          if (clientes == null) {
             yield ClienteFalha();
             return;
           }
 
           yield ClienteSucesso(clientes: clientes, hasReachedMax: true);
           return;
-        }
+        } else if (currentState is ClienteSucesso) {
+          List<Cliente> clientes = await _fetchClientes(0, 20);
 
-        if (currentState is ClienteSucesso) {
-          yield currentState.clientes.isEmpty
-              ? currentState.copyWith(hasReachedMax: true)
-              : ClienteSucesso(
-                  clientes: currentState.clientes, hasReachedMax: true);
-        }
-
-        if (currentState is ClienteSucessoPesquisa) {
-          final clientes = await _fetchClientes(0, 20);
           yield ClienteSucesso(clientes: clientes, hasReachedMax: true);
+          return;
+        } else if (currentState is ClienteSucessoPesquisa) {
+          final clientes = await _fetchClientes(0, 20);
+          yield clientes.isEmpty
+              ? ClienteFalha()
+              : ClienteSucesso(clientes: clientes, hasReachedMax: true);
           return;
         }
       } catch (_) {
@@ -66,25 +66,24 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
               clientes: clientes, hasReachedMax: true, query: this.query);
 
           return;
-        }
-
-        if (currentState is ClienteSucesso) {
-          final clientes = clientePesquisar(
-              this.query != null ? this.query : 'jmr',
-              await _fetchClientes(0, 20));
+        } else if (currentState is ClienteSucesso) {
+          final clientes =
+              clientePesquisar(this.query, await _fetchClientes(0, 20));
           yield ClienteSucessoPesquisa(
               clientes: clientes, hasReachedMax: true, query: this.query);
-        }
-
-        if (currentState is ClienteSucessoPesquisa) {
-          final clientes = clientePesquisar(
-              this.query != null ? this.query : 'jmr',
-              await _fetchClientes(0, 20));
+          return;
+        } else if (currentState is ClienteSucessoPesquisa) {
+          final clientes =
+              clientePesquisar(this.query, await _fetchClientes(0, 20));
 
           yield clientes.isEmpty
-              ? currentState.copyWith()
+              ? ClienteFalha()
               : ClienteSucessoPesquisa(
                   clientes: clientes, hasReachedMax: true, query: this.query);
+
+          return;
+        } else {
+          yield ClienteFalha();
         }
       } catch (e) {
         yield ClienteFalha();
@@ -100,6 +99,18 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
 
   Future<List<Cliente>> _fetchClientes(int startIndex, int limit) async {
     try {
+      dynamic data = await getCacheData("cliente");
+      List<Cliente> listaCliente = List<Cliente>();
+      if (data != null) {
+        data = json.decode(data);
+
+        // listaCliente.clear();
+        for (dynamic rawCliente in data) {
+          listaCliente.add(Cliente.fromJson(rawCliente));
+        }
+        return listaCliente;
+      }
+
       var sessao = await SessaoApiProvider.readSession();
       var response;
       if (sessao == null || sessao.length == 0) {
