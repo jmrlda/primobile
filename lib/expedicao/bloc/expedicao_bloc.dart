@@ -29,7 +29,7 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
       try {
         if (currentState is ExpedicaoInicial) {
           List<Expedicao> expedicao = await _fetchExpedicao(0, 20);
-          if (expedicao != null && expedicao.length == 0) {
+          if (expedicao != null) {
             await SessaoApiProvider.refreshToken();
             expedicao = await _fetchExpedicao(0, 20);
           } else if (expedicao == null) {
@@ -47,19 +47,18 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
               query: this.query, expedicao: expedicao, hasReachedMax: true);
           return;
         } else if (currentState is ExpedicaoSucessoPesquisa) {
-          final expedicao =
-              expedicaoPesquisar(this.query, await _fetchExpedicao(0, 20));
+          final expedicao = await _fetchExpedicao(0, 20);
           yield expedicao.isEmpty
               ? ExpedicaoFalha()
-              : ExpedicaoSucessoPesquisa(
-                  expedicao: expedicao, hasReachedMax: true, query: this.query);
+              : ExpedicaoSucesso(expedicao: expedicao, hasReachedMax: true);
 
           return;
         } else if (currentState is ExpedicaoFalha) {
-          final expedicao =
-              expedicaoPesquisar(this.query, await _fetchExpedicao(0, 20));
-          yield ExpedicaoSucessoPesquisa(
-              query: this.query, expedicao: expedicao, hasReachedMax: true);
+          // final expedicao =
+          //     expedicaoPesquisar(this.query, await _fetchExpedicao(0, 20));
+          final expedicao = await _fetchExpedicao(0, 20);
+
+          yield ExpedicaoSucesso(expedicao: expedicao, hasReachedMax: true);
           return;
         } else {
           yield ExpedicaoFalha();
@@ -119,11 +118,23 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
       (state is ExpedicaoSucessoPesquisa) && state.hasReachedMax;
 
   Future<List<Expedicao>> _fetchExpedicao(int startIndex, int limit) async {
-    if (listaExpedicao != null && listaExpedicao.length > 0) {
-      return listaExpedicao;
-    }
+    // if (listaExpedicao != null && listaExpedicao.length > 0) {
+    //   return listaExpedicao;
+    // }
 
     try {
+      dynamic data = await getCacheData("expedicao");
+
+      if (data != null) {
+        data = json.decode(data);
+
+        listaExpedicao.clear();
+        for (dynamic rawExpedicao in data) {
+          listaExpedicao.add(Expedicao.fromJson(rawExpedicao));
+        }
+        return listaExpedicao;
+      }
+
       var sessao = await SessaoApiProvider.readSession();
       var response;
       if (sessao == null || sessao.length == 0) {
@@ -150,6 +161,7 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
           listaExpedicao = data.map((expedicao) {
             return Expedicao.fromJson(expedicao);
           }).toList();
+          await saveCacheData("expedicao", listaExpedicao);
 
           return listaExpedicao;
         } else if (response.statusCode == 401 || response.statusCode == 500) {

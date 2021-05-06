@@ -82,16 +82,26 @@ class _ExpedicaoPageState extends State<ExpedicaoPage> {
                             ),
                             hintText: 'Procurar'),
                         onChanged: (value) {
+                          // setState(() {
+                          //   if (value != null && value.trim().length > 0) {
+                          //     expedicaoBloc.query = value;
+                          //     expedicaoBloc..add(ExpedicaoSearched());
+                          //   } else {
+                          //     expedicaoBloc.query = "";
+
+                          //     expedicaoBloc = ExpedicaoBloc(
+                          //         httpClient: http.Client(), query: "")
+                          //       ..add(ExpedicaoFetched());
+                          //   }
+                          // });
                           setState(() {
                             if (value != null && value.trim().length > 0) {
                               expedicaoBloc.query = value;
+
                               expedicaoBloc..add(ExpedicaoSearched());
                             } else {
                               expedicaoBloc.query = "";
-
-                              expedicaoBloc = ExpedicaoBloc(
-                                  httpClient: http.Client(), query: "")
-                                ..add(ExpedicaoFetched());
+                              expedicaoBloc..add(ExpedicaoFetched());
                             }
                           });
                         },
