@@ -475,7 +475,7 @@ class _MenuPageState extends State<MenuPage> {
                   iconSize: 35,
                   color: Colors.white,
                   onPressed: () {
-                    Navigator.pushNamed(context, '/cliente_lista');
+                    Navigator.pushNamed(context, '/fornecedor_lista');
                   },
                 ),
               ),

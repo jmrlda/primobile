@@ -12,6 +12,7 @@ import 'cliente/view/view.dart';
 import 'encomenda/encomenda.dart';
 import 'expedicao/expedicao.dart';
 import 'expedicao/view/view.dart';
+import 'fornecedor/view/view.dart';
 import 'inventario/view/view.dart';
 import 'menu/view/menu_page.dart';
 import 'rececao/rececao.dart';
@@ -76,6 +77,13 @@ void main() {
       '/inventario_sucesso': (context) => SucessoPage(
             modulo: "Inventario",
             mensagemSucesso: "Actualizado com Sucesso",
+          ),
+
+           '/fornecedor_lista': (context) => FornecedorPage(
+            isSelected: false,
+          ),
+      '/fornecedor_selecionar_lista': (context) => FornecedorPage(
+            isSelected: true,
           ),
     },
 
