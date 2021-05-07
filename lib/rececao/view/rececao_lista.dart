@@ -62,7 +62,7 @@ class _RececaoLista extends State<RececaoLista> {
         }
         if (state is RececaoFalha) {
           return Center(
-            child: Text('falha na busca por Rececao'),
+            child: Text('falha na busca por Receção'),
           );
         }
 
@@ -74,7 +74,7 @@ class _RececaoLista extends State<RececaoLista> {
         if (state is RececaoSucesso) {
           if (state.rececao.isEmpty) {
             return Center(
-              child: Text('Sem rececao'),
+              child: Text('Sem receção'),
             );
           }
 
@@ -98,7 +98,7 @@ class _RececaoLista extends State<RececaoLista> {
         if (state is RececaoSucessoPesquisa) {
           if (state.rececao.isEmpty) {
             return Center(
-              child: Text('Nenhum Rececao encontrado'),
+              child: Text('Nenhuma Receção encontrada'),
             );
           }
           return ListView.builder(

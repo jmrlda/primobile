@@ -71,24 +71,39 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
         }
 
         if (currentState is InventarioSucesso) {
-          final inventario = inventarioPesquisar(
-              this.query != null ? this.query : 'jmr',
-              await _fetchInventario(0, 20));
+          final inventario =
+              inventarioPesquisar(this.query, await _fetchInventario(0, 20));
+          // yield InventarioSucessoPesquisa(
+          //     inventario: inventario, hasReachedMax: true, query: this.query);
+          // return;
+
           yield InventarioSucessoPesquisa(
               inventario: inventario, hasReachedMax: true, query: this.query);
+          return;
         }
 
         if (currentState is InventarioSucessoPesquisa) {
-          final inventario = inventarioPesquisar(
-              this.query != null ? this.query : 'jmr',
-              await _fetchInventario(0, 20));
+          final inventario =
+              inventarioPesquisar(this.query, await _fetchInventario(0, 20));
 
           yield inventario.isEmpty
-              ? currentState.copyWith()
+              ? InventarioFalha()
               : InventarioSucessoPesquisa(
                   inventario: inventario,
                   hasReachedMax: true,
                   query: this.query);
+        } else if (currentState is InventarioFalha) {
+          final inventario =
+              inventarioPesquisar(this.query, await _fetchInventario(0, 20));
+          yield inventario.isEmpty
+              ? InventarioFalha()
+              : InventarioSucessoPesquisa(
+                  inventario: inventario,
+                  hasReachedMax: true,
+                  query: this.query);
+          return;
+        } else {
+          InventarioFalha();
         }
       } catch (e) {
         yield InventarioFalha();
@@ -106,8 +121,20 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
     try {
       var sessao = await SessaoApiProvider.readSession();
       var response;
-      List<Inventario> lista_inventario = List<Inventario>();
+      List<Inventario> listaInventario = List<Inventario>();
+      dynamic data = await getCacheData("inventario");
 
+      if (data != null) {
+        data = json.decode(data);
+        // listaCliente.clear();
+        if (data.length > 0) {
+          for (dynamic rawInventario in data) {
+            listaInventario.add(Inventario.fromJson(rawInventario));
+          }
+
+          return listaInventario;
+        }
+      }
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessão não existe');
         return List<Inventario>();
@@ -132,16 +159,17 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
           data = json.decode(data)["DataSet"]["Table"];
 
           for (dynamic rawArtigo in data) {
-            lista_inventario.add(Inventario.fromJson(rawArtigo));
+            listaInventario.add(Inventario.fromJson(rawArtigo));
           }
+          await saveCacheData("inventario", listaInventario);
 
-          return lista_inventario;
+          return listaInventario;
         } else if (response.statusCode == 401 || response.statusCode == 500) {
           //  #TODO informar ao usuario sobre a renovação da sessão
           // mostrando mensagem e um widget de LOADING
-          lista_inventario = List<Inventario>();
+          listaInventario = List<Inventario>();
 
-          return lista_inventario;
+          return listaInventario;
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);

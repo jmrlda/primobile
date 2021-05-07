@@ -1,4 +1,7 @@
+import 'package:flutter/widgets.dart';
+import 'package:primobile/fornecedor/bloc/fornecedor_bloc.dart';
 import 'package:primobile/fornecedor/models/fornecedor.dart';
+import 'package:http/http.dart' as http;
 
 List<Fornecedor> fornecedorLista = new List<Fornecedor>();
 List<Fornecedor> fornecedorListaSelecionado = List<Fornecedor>();
@@ -7,6 +10,10 @@ bool isSelected = false;
 String baseUrl = "";
 String url = "";
 
+TextEditingController fornecedorPesquisaController = TextEditingController();
+FornecedorBloc fornecedorBloc = FornecedorBloc(httpClient: http.Client());
+
+// funcoes e classes
 void opcaoAcao(String opcao) async {
   if (opcao == 'sincronizar') {}
 }
@@ -18,10 +25,13 @@ List<Fornecedor> fornecedorPesquisar(
 
   if (query.trim().isNotEmpty) {
     listaFornecedor.forEach((item) {
-      if (item.descricao
+      if (item.fornecedor
               .toLowerCase()
               .contains(query.toString().toLowerCase()) ||
-          item.artigo.toLowerCase().contains(query.toString().toLowerCase())) {
+          item.nome.toLowerCase().contains(query.toString().toLowerCase()) ||
+          item.nomeFiscal
+              .toLowerCase()
+              .contains(query.toString().toLowerCase())) {
         resultado.add(item);
       }
     });
@@ -32,10 +42,10 @@ List<Fornecedor> fornecedorPesquisar(
 // ao selecionar um artigo, adicionar a lista
 // de artigos selecionados, se o artigo ja tiver
 // sido selecionado remover da lista.
-bool adicionarArtigo(Fornecedor a) {
+bool adicionarFornecedor(Fornecedor a) {
   bool existe = false;
   for (var i = 0; i < fornecedorListaSelecionado.length; i++) {
-    if (fornecedorListaSelecionado[i].artigo == a.artigo) {
+    if (fornecedorListaSelecionado[i].fornecedor == a.fornecedor) {
       existe = true;
       fornecedorListaSelecionado.removeAt(i);
     }
@@ -52,7 +62,7 @@ bool existeFornecedorSelecionado(Fornecedor f) {
   bool existe = false;
 
   for (var i = 0; i < fornecedorListaSelecionado.length; i++) {
-    if (fornecedorListaSelecionado[i].artigo == f.artigo) {
+    if (fornecedorListaSelecionado[i].fornecedor == f.fornecedor) {
       existe = true;
     }
   }

@@ -111,10 +111,12 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
       List<Artigo> lista_artigos = List<Artigo>();
       dynamic data = json.decode(await getCacheData("artigo"));
       if (data != null) {
-        for (dynamic rawArtigo in data) {
-          lista_artigos.add(Artigo.fromJson(rawArtigo));
+        if (data.length > 0) {
+          for (dynamic rawArtigo in data) {
+            lista_artigos.add(Artigo.fromJson(rawArtigo));
+          }
+          return lista_artigos;
         }
-        return lista_artigos;
       }
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');

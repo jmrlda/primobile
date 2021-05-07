@@ -38,18 +38,17 @@ class RececaoBloc extends Bloc<RececaoEvent, RececaoState> {
           }
           yield RececaoSucesso(rececao: rececao, hasReachedMax: true);
           return;
-        }
-
-        if (currentState is RececaoSucesso) {
+        } else if (currentState is RececaoSucesso) {
+          List<Rececao> rececao = await _fetchRececao(0, 20);
           yield currentState.rececao.isEmpty
               ? currentState.copyWith(hasReachedMax: true)
-              : RececaoSucesso(
-                  rececao: currentState.rececao, hasReachedMax: true);
-        }
-
-        if (currentState is RececaoSucessoPesquisa) {
+              : RececaoSucesso(rececao: rececao, hasReachedMax: true);
+        } else if (currentState is RececaoSucessoPesquisa) {
           final rececao = await _fetchRececao(0, 20);
           yield RececaoSucesso(rececao: rececao, hasReachedMax: true);
+          return;
+        } else {
+          yield RececaoFalha();
           return;
         }
       } catch (_) {
@@ -66,25 +65,29 @@ class RececaoBloc extends Bloc<RececaoEvent, RececaoState> {
               rececao: rececao, hasReachedMax: true, query: this.query);
 
           return;
-        }
-
-        if (currentState is RececaoSucesso) {
-          final rececao = rececaoPesquisar(
-              this.query != null ? this.query : 'jmr',
-              await _fetchRececao(0, 20));
+        } else if (currentState is RececaoSucesso) {
+          final rececao =
+              rececaoPesquisar(this.query, await _fetchRececao(0, 20));
           yield RececaoSucessoPesquisa(
               rececao: rececao, hasReachedMax: true, query: this.query);
-        }
-
-        if (currentState is RececaoSucessoPesquisa) {
-          final rececao = rececaoPesquisar(
-              this.query != null ? this.query : 'jmr',
-              await _fetchRececao(0, 20));
+          return;
+        } else if (currentState is RececaoSucessoPesquisa) {
+          final rececao =
+              rececaoPesquisar(this.query, await _fetchRececao(0, 20));
 
           yield rececao.isEmpty
-              ? currentState.copyWith()
+              ? RececaoFalha()
               : RececaoSucessoPesquisa(
                   rececao: rececao, hasReachedMax: true, query: this.query);
+          return;
+        } else if (currentState is RececaoFalha) {
+          final rececao =
+              rececaoPesquisar(this.query, await _fetchRececao(0, 20));
+          yield RececaoSucessoPesquisa(
+              rececao: rececao, hasReachedMax: true, query: this.query);
+          return;
+        } else {
+          yield RececaoFalha();
         }
       } catch (e) {
         yield RececaoFalha();
@@ -99,9 +102,25 @@ class RececaoBloc extends Bloc<RececaoEvent, RececaoState> {
       (state is RececaoSucessoPesquisa) && state.hasReachedMax;
 
   Future<List<Rececao>> _fetchRececao(int startIndex, int limit) async {
+    List<Rececao> listaRececao = List<Rececao>();
+
     try {
       var sessao = await SessaoApiProvider.readSession();
       var response;
+      dynamic data = await getCacheData("rececao");
+
+      if (data != null) {
+        data = json.decode(data);
+        // listaCliente.clear();
+        if (data.length > 0) {
+          for (dynamic rawRececao in data) {
+            listaRececao.add(Rececao.fromJson(rawRececao));
+          }
+
+          return listaRececao;
+        }
+      }
+
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');
         return List<Rececao>();
@@ -123,9 +142,17 @@ class RececaoBloc extends Bloc<RececaoEvent, RececaoState> {
 
         if (response.statusCode == 200) {
           final List data = json.decode(response.body)["Data"] as List;
-          return data.map((rececao) {
-            return Rececao.fromJson(rececao);
-          }).toList();
+          // data.map((rececao) {
+          //   listaRececao.add(Rececao.fromJson(rececao));
+          // });
+
+          for (dynamic rececao in data) {
+            listaRececao.add(Rececao.fromJson(rececao));
+          }
+
+          await saveCacheData("rececao", listaRececao);
+
+          return listaRececao;
         } else if (response.statusCode == 401 || response.statusCode == 500) {
           //  #TODO informar ao usuario sobre a renovação da sessão
           // mostrando mensagem e um widget de LOADING

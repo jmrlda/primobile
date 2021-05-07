@@ -129,10 +129,12 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
         data = json.decode(data);
 
         listaExpedicao.clear();
-        for (dynamic rawExpedicao in data) {
-          listaExpedicao.add(Expedicao.fromJson(rawExpedicao));
+        if (data.length > 0) {
+          for (dynamic rawExpedicao in data) {
+            listaExpedicao.add(Expedicao.fromJson(rawExpedicao));
+          }
+          return listaExpedicao;
         }
-        return listaExpedicao;
       }
 
       var sessao = await SessaoApiProvider.readSession();

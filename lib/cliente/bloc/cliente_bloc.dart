@@ -82,6 +82,13 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
                   clientes: clientes, hasReachedMax: true, query: this.query);
 
           return;
+        } else if (currentState is ClienteFalha) {
+          final clientes =
+              clientePesquisar(this.query, await _fetchClientes(0, 20));
+
+          ClienteSucessoPesquisa(
+              clientes: clientes, hasReachedMax: true, query: this.query);
+          return;
         } else {
           yield ClienteFalha();
         }
@@ -105,10 +112,12 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
         data = json.decode(data);
 
         // listaCliente.clear();
-        for (dynamic rawCliente in data) {
-          listaCliente.add(Cliente.fromJson(rawCliente));
+        if (data.length > 0) {
+          for (dynamic rawCliente in data) {
+            listaCliente.add(Cliente.fromJson(rawCliente));
+          }
+          return listaCliente;
         }
-        return listaCliente;
       }
 
       var sessao = await SessaoApiProvider.readSession();
@@ -133,9 +142,15 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
 
         if (response.statusCode == 200) {
           final List data = json.decode(response.body)["Data"] as List;
-          return data.map((cliente) {
-            return Cliente.fromJson(cliente);
-          }).toList();
+          for (dynamic rawCliente in data) {
+            listaCliente.add(Cliente.fromJson(rawCliente));
+          }
+          // data.map((cliente) {
+          //   listaCliente.add(Cliente.fromJson(cliente));
+          // });
+          await saveCacheData("cliente", listaCliente);
+
+          return listaCliente;
         } else if (response.statusCode == 401 || response.statusCode == 500) {
           //  #TODO informar ao usuario sobre a renovação da sessão
           // mostrando mensagem e um widget de LOADING
