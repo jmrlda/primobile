@@ -19,7 +19,7 @@ class Rececao {
         usuario: json['usuario'],
       );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'rececao': rececao,
         'data': data,
         'listaArtigo': listaArtigo,
@@ -30,8 +30,8 @@ class Rececao {
     // String numContrib = json['numContrib'] == "" ? "0" : data['numContrib'];
     // numContrib = numContrib.replaceAll(" ", "");
     return Rececao(
-      rececao: json['Número Documento'],
-      usuario: json['Utilizador'],
+      rececao: json['rececao'],
+      usuario: json['usuario'],
     );
 
     // data['imagemBuffer'] == null ? null : data['imagemBuffer']);
@@ -47,7 +47,7 @@ class Rececao {
     artigosJson.clear();
     if (listaArtigo != null) {
       listaArtigo.forEach((element) {
-        artigosJson.add(element.toMap());
+        artigosJson.add(element.toJson());
       });
     } else {
       artigosJson = [];

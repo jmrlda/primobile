@@ -18,7 +18,7 @@ class Filial {
       this.instance,
       this.porta});
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'nome': nome,
         'ip_global': ipGlobal,
         'ip_local': ipLocal,

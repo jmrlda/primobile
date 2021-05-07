@@ -76,7 +76,7 @@ class Artigo {
       imagemBuffer: null,
       codigoBarra: data['codigoBarra']);
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'artigo': artigo,
         'descricao': descricao,
         'preco': preco,

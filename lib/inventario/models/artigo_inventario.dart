@@ -38,7 +38,7 @@ class ArtigoInventario {
           unidade: map['unidade'],
           quantidadeStockReserva: double.parse(map['quantidade_reserva']));
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'artigo': artigo,
         'descricao': descricao,
         'quantidade_stock': quantidadeStock,

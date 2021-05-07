@@ -33,7 +33,7 @@ class Usuario extends Equatable {
         telefone: json['telefone'],
       );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'usuario': usuario,
         'nome': nome,
         'senha': senha,

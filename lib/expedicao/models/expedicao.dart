@@ -19,7 +19,7 @@ class Expedicao {
         usuario: json['usuario'],
       );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'expedicao': expedicao,
         'data': data,
         'listaArtigo': listaArtigo,
@@ -55,8 +55,8 @@ class Expedicao {
     int i = 0;
     if (listaArtigo != null) {
       listaArtigo.forEach((element) {
-        artigosJson.add(element.toMap());
-        //regrasPreco_json.add(regrasPreco[i++].toMap());
+        artigosJson.add(element.toJson());
+        //regrasPreco_json.add(regrasPreco[i++].toJson());
       });
     } else {
       artigosJson = [];

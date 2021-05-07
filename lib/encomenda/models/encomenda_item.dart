@@ -29,7 +29,7 @@ class EncomendaItem {
     );
   }
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'encomenda': encomenda.id,
         'artigo': artigo.artigo,
         'valor_unit': artigo.preco,

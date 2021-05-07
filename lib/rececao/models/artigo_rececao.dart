@@ -31,7 +31,7 @@ class ArtigoRececao {
         codigoBarra: json['codigo_barra'],
       );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'artigo': artigo,
         'descricao': descricao,
         'quantidade_recebida': quantidadeRecebida,

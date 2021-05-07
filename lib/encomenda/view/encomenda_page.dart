@@ -835,7 +835,7 @@ class _EncomendaPageState extends State<EncomendaListaPage> {
       // encomenda.artigos[i] = artigo;
       //  try {
       //       encomenda.regrasPreco.add(regraPreco);
-      //      encomenda.regrasPreco_json.add(jsonEncode(regraPreco.toMap()));
+      //      encomenda.regrasPreco_json.add(jsonEncode(regraPreco.toJson()));
 
       //  }catch ( err ) {
       //    print('[getDescontoPreco] Erro: ' + err.toString());

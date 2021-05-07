@@ -10,7 +10,7 @@ class Sessao {
 
   Sessao({this.usuario, this.filial});
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'usuario': usuario,
         'filial': filial,
       };

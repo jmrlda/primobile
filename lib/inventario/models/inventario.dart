@@ -23,7 +23,7 @@ class Inventario {
         responsavel: map['responsavel'],
       );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'documento_numero': documentoNumero,
         'descricao': descricao,
         'responsavel': responsavel,
@@ -56,8 +56,8 @@ class Inventario {
     _artigosJson.clear();
     if (listaArtigo != null) {
       listaArtigo.forEach((element) {
-        _artigosJson.add(element.toMap());
-        //regrasPreco_json.add(regrasPreco[i++].toMap());
+        _artigosJson.add(element.toJson());
+        //regrasPreco_json.add(regrasPreco[i++].toJson());
       });
     } else {
       _artigosJson = [];

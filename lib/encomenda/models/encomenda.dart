@@ -89,7 +89,7 @@ class Encomenda {
         regrasPreco: json['regrasPreco']);
   }
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'cliente': cliente.cliente,
         'vendedor': vendedor.usuario,
         // 'artigos': artigos,
@@ -107,8 +107,8 @@ class Encomenda {
     int i = 0;
     if (artigos != null) {
       artigos.forEach((element) {
-        artigosJson.add(element.toMap());
-        //regrasPreco_json.add(regrasPreco[i++].toMap());
+        artigosJson.add(element.toJson());
+        //regrasPreco_json.add(regrasPreco[i++].toJson());
       });
     } else {
       artigosJson = [];
@@ -117,8 +117,8 @@ class Encomenda {
 
     return [
       {
-        'cliente': cliente.toMap(),
-        'vendedor': vendedor.toMap(),
+        'cliente': cliente.toJson(),
+        'vendedor': vendedor.toJson(),
         'artigos': artigosJson,
         'valorTotal': valorTotal,
         'estado': estado,

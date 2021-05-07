@@ -45,7 +45,7 @@ class Cliente {
       imagemBuffer:
           json['imagemBuffer'].length <= 0 ? null : json['imagemBuffer']);
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'cliente': cliente,
         'nome': nome,
         'numContrib': numContrib,

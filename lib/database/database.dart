@@ -126,7 +126,7 @@ class DBProvider {
     final db = await database;
     var res = await db.insert(
       "Artigo",
-      artigo.toMap(),
+      artigo.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     return res;
@@ -267,7 +267,7 @@ class DBProvider {
     // final db = null;
     database.then((value) {
       final db = value;
-      db.update('Artigo', artigo.toMap(),
+      db.update('Artigo', artigo.toJson(),
           where: "artigo = ?", whereArgs: [artigo.artigo]).then((value) {
         print("alterado com sucesso!");
       });
@@ -276,14 +276,14 @@ class DBProvider {
 
   actualizarUsuario(Usuario usuario) async {
     final db = await database;
-    var res = await db.update('Usuario', usuario.toMap(),
+    var res = await db.update('Usuario', usuario.toJson(),
         where: "usuario = ?", whereArgs: [usuario.usuario]);
     return res;
   }
 
   actualizarCliente(Cliente cliente) async {
     final db = await database;
-    var res = await db.update('Artigo', cliente.toMap(),
+    var res = await db.update('Artigo', cliente.toJson(),
         where: "cliente = ?", whereArgs: [cliente.cliente]);
     return res;
   }
@@ -391,7 +391,7 @@ class DBProvider {
     try {
       res = await db.insert(
         "Cliente",
-        cliente.toMap(),
+        cliente.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
@@ -408,7 +408,7 @@ class DBProvider {
     Batch batch = db.batch();
     try {
       for (Cliente cliente in clientes) {
-        batch.insert("Cliente", cliente.toMap(),
+        batch.insert("Cliente", cliente.toJson(),
             conflictAlgorithm: ConflictAlgorithm.replace);
       }
       res = await batch.commit(noResult: true);
@@ -425,7 +425,7 @@ class DBProvider {
       final db = await database;
       var res = await db.insert(
         "Usuario",
-        usuario.toMap(),
+        usuario.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       return res;
@@ -440,7 +440,7 @@ class DBProvider {
       final db = await database;
       res = await db.insert(
         "Encomenda",
-        encomenda.toMap(),
+        encomenda.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
@@ -460,12 +460,12 @@ class DBProvider {
     var res;
     Batch batch = db.batch();
     for (Encomenda enc in encomendas) {
-      batch.insert("Encomenda", enc.toMap(),
+      batch.insert("Encomenda", enc.toJson(),
           conflictAlgorithm: ConflictAlgorithm.replace);
       try {
         // res = await db.insert(
         //   "Cliente",
-        //   cliente.toMap(),
+        //   cliente.toJson(),
         //   conflictAlgorithm: ConflictAlgorithm.replace,
         // );
         res = await batch.commit(noResult: true);
