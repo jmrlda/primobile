@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:primobile/artigo/util.dart';
 import 'package:primobile/util/util.dart';
 
-dynamic fornecedorAppBar() {
+dynamic fornecedorAppBar(BuildContext context) {
   return new AppBar(
     backgroundColor: PRIMARY_COLOR,
     actions: [
@@ -22,7 +22,7 @@ dynamic fornecedorAppBar() {
     title: new Text("Fornecedor"),
     leading: new IconButton(
       icon: new Icon(Icons.arrow_back),
-      onPressed: () => null,
+      onPressed: () => Navigator.of(context).pop(),
     ),
   );
 }

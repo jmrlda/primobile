@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:primobile/artigo/bloc/artigo_bloc.dart';
-import 'package:primobile/artigo/widgets/bottom_loader.dart';
+import 'package:primobile/fornecedor/bloc/fornecedor_bloc.dart';
+import 'package:primobile/fornecedor/widgets/bottom_loader.dart';
 import 'package:primobile/fornecedor/widgets/fornecedor_lista_item.dart';
 import 'package:primobile/util/util.dart';
 
 class FornecedorLista extends StatefulWidget {
-  FornecedorLista({Key key, this.title}) : super(key: key);
+  FornecedorLista({Key key, this.title, this.isSelected}) : super(key: key);
 
   final String title;
+  final bool isSelected;
 
   @override
-  _FornecedorLista createState() => _FornecedorLista();
+  _FornecedorLista createState() => _FornecedorLista(isSeleted: isSelected);
 }
 
 class _FornecedorLista extends State<FornecedorLista> {
   final _scrollController = ScrollController();
   final _scrollThreshold = 200.0;
-  ArtigoBloc _artigoBloc;
+  FornecedorBloc _fornecedorBloc;
+  final bool isSeleted;
+  _FornecedorLista({this.isSeleted = false});
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _artigoBloc = BlocProvider.of<ArtigoBloc>(context);
+    _fornecedorBloc = BlocProvider.of<FornecedorBloc>(context);
 
     try {
       updateConnection(() {
@@ -42,59 +45,61 @@ class _FornecedorLista extends State<FornecedorLista> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ArtigoBloc, ArtigoState>(
+    return BlocBuilder<FornecedorBloc, FornecedorState>(
       // ignore: missing_return
       builder: (context, state) {
-        if (state is ArtigoInicial) {
+        if (state is FornecedorInicial) {
           return Center(
             child: CircularProgressIndicator(),
           );
         }
-        if (state is ArtigoFalha) {
+        if (state is FornecedorFalha) {
           return Center(
             child: Text('falha na busca por fornecedor'),
           );
         }
-        if (state is ArtigoSucesso) {
-          if (state.artigos.isEmpty) {
+        if (state is FornecedorSucesso) {
+          if (state.fornecedores.isEmpty) {
             return Center(
               child: Text('Sem fornecedor'),
             );
           }
           return ListView.builder(
             itemBuilder: (BuildContext context, int index) {
-              return index >= state.artigos.length
+              return index >= state.fornecedores.length
                   ? BottomLoader()
                   : FornecedorListaItem(
-                      artigo: state.artigos[index],
-                      artigoBloc: _artigoBloc,
+                      fornecedor: state.fornecedores[index],
+                      fornecedorBloc: _fornecedorBloc,
+                      isSelected: this.isSeleted,
                     );
             },
             itemCount: state.hasReachedMax
-                ? state.artigos.length
-                : state.artigos.length + 1,
+                ? state.fornecedores.length
+                : state.fornecedores.length + 1,
             controller: _scrollController,
           );
         }
 
-        if (state is ArtigoSucessoPesquisa) {
-          if (state.artigos.isEmpty) {
+        if (state is FornecedorSucessoPesquisa) {
+          if (state.fornecedores.isEmpty) {
             return Center(
               child: Text('Nenhum fornecedor encontrado'),
             );
           }
           return ListView.builder(
             itemBuilder: (BuildContext context, int index) {
-              return index >= state.artigos.length
+              return index >= state.fornecedores.length
                   ? BottomLoader()
                   : FornecedorListaItem(
-                      artigo: state.artigos[index],
-                      artigoBloc: _artigoBloc,
+                      fornecedor: state.fornecedores[index],
+                      fornecedorBloc: _fornecedorBloc,
+                      isSelected: this.isSeleted,
                     );
             },
             itemCount: state.hasReachedMax
-                ? state.artigos.length
-                : state.artigos.length + 1,
+                ? state.fornecedores.length
+                : state.fornecedores.length + 1,
             controller: _scrollController,
           );
         }
@@ -112,7 +117,7 @@ class _FornecedorLista extends State<FornecedorLista> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (maxScroll - currentScroll <= _scrollThreshold) {
-      // _artigoBloc.add(ArtigoFetched());
+      // _fornecedorBloc.add(FornecedorFetched());
     }
   }
 }
