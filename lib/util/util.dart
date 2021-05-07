@@ -19,6 +19,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' show get;
 import 'package:http_parser/http_parser.dart';
 import 'package:primobile/expedicao/models/expedicao.dart';
+import 'package:primobile/fornecedor/models/fornecedor.dart';
 import 'package:primobile/inventario/models/models.dart';
 import 'package:primobile/rececao/models/models.dart';
 // import 'package:connectivity/connectivity.dart';
@@ -777,7 +778,9 @@ Future<bool> saveCacheData(String key, dynamic data) async {
   try {
     storage = new LocalStorage(key);
     await storage.ready;
-    storage.setItem(key, json.encode(data));
+    String data_encoded = jsonEncode(data);
+
+    storage.setItem(key, data_encoded);
     rv = true;
   } catch (e) {
     rv = false;
@@ -813,4 +816,26 @@ Future<bool> removeKeyCacheData(String key) async {
   }
 
   return rv;
+}
+
+// metodo para busca de artigos na lista
+List<Fornecedor> fornecedorPesquisar(
+    String query, List<Fornecedor> listaFornecedor) {
+  List<Fornecedor> resultado = List<Fornecedor>();
+
+  if (query.trim().isNotEmpty) {
+    for (Fornecedor item in listaFornecedor) {
+      if (item.nome.toLowerCase().contains(query.toString().toLowerCase()) ||
+          item.fornecedor
+              .toLowerCase()
+              .contains(query.toString().toLowerCase()) ||
+          item.nomeFiscal
+              .toLowerCase()
+              .contains(query.toString().toLowerCase())) {
+        resultado.add(item);
+      }
+    }
+    ;
+  }
+  return resultado;
 }
