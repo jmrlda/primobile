@@ -160,10 +160,13 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
 
         if (response.statusCode == 200) {
           final List data = json.decode(response.body)["Data"] as List;
+          ToList lista = new ToList();
+
           listaExpedicao = data.map((expedicao) {
+            lista.items.add(expedicao);
             return Expedicao.fromJson(expedicao);
           }).toList();
-          await saveCacheData("expedicao", listaExpedicao);
+          await saveCacheData("expedicao", lista);
 
           return listaExpedicao;
         } else if (response.statusCode == 401 || response.statusCode == 500) {

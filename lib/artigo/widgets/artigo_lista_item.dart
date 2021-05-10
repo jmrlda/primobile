@@ -54,44 +54,47 @@ class _ListaTile extends ListTile {
   }
 }
 
-class ArtigoListaItem extends StatelessWidget {
+class ArtigoListaItem extends StatefulWidget {
   final Artigo artigo;
   // final ArtigoBloc artigoBloc;
   final bool isSelected;
-  final StateSetter setState;
   const ArtigoListaItem(
       {Key key,
       @required this.artigo,
       // this.artigoBloc,
-      this.setState,
       this.isSelected = false})
       : super(key: key);
 
   @override
+  _ArtigoListaItemState createState() => _ArtigoListaItemState();
+}
+
+class _ArtigoListaItemState extends State<ArtigoListaItem> {
+  @override
   Widget build(BuildContext context) {
-    Conexao.url = Conexao.baseUrl + artigo.artigo;
+    Conexao.url = Conexao.baseUrl + widget.artigo.artigo;
     TextEditingController txtArtigoQtd = new TextEditingController();
     String msgQtd = '';
 
-    if (this.isSelected == false) {
+    if (this.widget.isSelected == false) {
       listaArtigoSelecionado.clear();
     }
 
-    dynamic artigoCor =
-        existeArtigoSelecionado(artigo) == false || this.isSelected == false
-            ? Colors.white
-            : Colors.red;
+    dynamic artigoCor = existeArtigoSelecionado(widget.artigo) == false ||
+            this.widget.isSelected == false
+        ? Colors.white
+        : Colors.red;
 
     return new Container(
         color: artigoCor,
         child: _ListaTile(
-          selected: isSelected,
+          selected: widget.isSelected,
           onTap: () async {
-            if (this.isSelected) {
-              if (existeArtigoSelecionado(artigo) == false) {
+            if (this.widget.isSelected) {
+              if (existeArtigoSelecionado(widget.artigo) == false) {
                 try {
                   txtArtigoQtd.text =
-                      artigo.quantidade.toStringAsFixed(2).toString();
+                      widget.artigo.quantidade.toStringAsFixed(2).toString();
                   double qtd = await showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -105,18 +108,19 @@ class ArtigoListaItem extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Center(
-                                  child: Text(artigo.descricao,
+                                  child: Text(widget.artigo.descricao,
                                       style: TextStyle(fontSize: 12))),
                               Center(
                                   child: Text(
                                       'Total Disponivel ' +
-                                          artigo.quantidadeStock.toString() +
+                                          widget.artigo.quantidadeStock
+                                              .toString() +
                                           ' ' +
-                                          artigo.unidade,
+                                          widget.artigo.unidade,
                                       style: TextStyle(fontSize: 14))),
                               Center(
-                                  child:
-                                      Text('Quantidade em ' + artigo.unidade)),
+                                  child: Text('Quantidade em ' +
+                                      widget.artigo.unidade)),
                               TextField(
                                 keyboardType: TextInputType.number,
                                 controller: txtArtigoQtd,
@@ -146,7 +150,7 @@ class ArtigoListaItem extends StatelessWidget {
                                     onPressed: () {
                                       try {
                                         if (double.parse(txtArtigoQtd.text) <=
-                                                artigo.quantidadeStock &&
+                                                widget.artigo.quantidadeStock &&
                                             double.parse(txtArtigoQtd.text) >
                                                 0) {
                                           Navigator.of(context).pop(
@@ -187,18 +191,18 @@ class ArtigoListaItem extends StatelessWidget {
                   );
 
                   if (qtd != null) {
-                    artigo.quantidade = qtd;
-                    adicionarArtigo(artigo);
+                    widget.artigo.quantidade = qtd;
+                    adicionarArtigo(widget.artigo);
                   } else {
-                    artigo.quantidade = 1.0;
-                    adicionarArtigo(artigo);
+                    widget.artigo.quantidade = 1.0;
+                    adicionarArtigo(widget.artigo);
                   }
                 } catch (e) {
-                  artigo.quantidade = 1.0;
+                  widget.artigo.quantidade = 1.0;
                 }
               } else {
                 setState(() {
-                  adicionarArtigo(artigo);
+                  adicionarArtigo(widget.artigo);
                   artigoBloc..add(ArtigoFetched());
                 });
               }
@@ -211,7 +215,7 @@ class ArtigoListaItem extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Center(child: Text(artigo.descricao)),
+                      title: Center(child: Text(widget.artigo.descricao)),
                       actions: <Widget>[
                         IconButton(
                           icon: new Icon(Icons.close),
@@ -223,24 +227,24 @@ class ArtigoListaItem extends StatelessWidget {
                 );
               }),
           title: Text(
-            artigo.descricao,
+            widget.artigo.descricao,
             style: TextStyle(
                 color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12),
           ),
           subtitle: Text(
             "COD: " +
-                artigo.artigo +
+                widget.artigo.artigo +
                 "\nQTD: " +
-                artigo.quantidadeStock.toString() +
+                widget.artigo.quantidadeStock.toString() +
                 ' ' +
-                artigo.unidade +
+                widget.artigo.unidade +
                 '\n' +
                 "PVP: " +
-                artigo.preco.toString() +
+                widget.artigo.preco.toString() +
                 ' MT',
             style: TextStyle(color: Colors.blue, fontSize: 11),
           ),
-          data: artigo.descricao,
+          data: widget.artigo.descricao,
         ));
   }
 }

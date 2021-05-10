@@ -111,7 +111,7 @@ class RececaoBloc extends Bloc<RececaoEvent, RececaoState> {
 
       if (data != null) {
         data = json.decode(data);
-        // listaCliente.clear();
+        listaRececao.clear();
         if (data.length > 0) {
           for (dynamic rawRececao in data) {
             listaRececao.add(Rececao.fromJson(rawRececao));
@@ -145,12 +145,15 @@ class RececaoBloc extends Bloc<RececaoEvent, RececaoState> {
           // data.map((rececao) {
           //   listaRececao.add(Rececao.fromJson(rececao));
           // });
+          ToList lista = new ToList();
 
           for (dynamic rececao in data) {
-            listaRececao.add(Rececao.fromJson(rececao));
+            Rececao _rececao = Rececao.fromJson(rececao);
+            lista.items.add(_rececao);
+            listaRececao.add(_rececao);
           }
 
-          await saveCacheData("rececao", listaRececao);
+          await saveCacheData("rececao", lista);
 
           return listaRececao;
         } else if (response.statusCode == 401 || response.statusCode == 500) {

@@ -53,14 +53,14 @@ class Artigo {
       this.codigoBarra});
 
   factory Artigo.fromMap(Map<String, dynamic> data) => new Artigo(
-      artigo: data['Artigo'],
-      descricao: data['Descricao'],
+      artigo: data['artigo'],
+      descricao: data['descricao'],
       preco: data['PVP1'],
       quantidade: 1,
       quantidadeStock: 1,
       civa: 1.0,
       iva: 1.0,
-      unidade: data['Unidade Base'],
+      unidade: data['unidade'],
       pvp1: data['PVP1'],
       pvp1Iva: true,
       pvp2: data['PVP2'],
@@ -129,14 +129,14 @@ class Artigo {
       };
   factory Artigo.fromJson(Map<String, dynamic> data) {
     return Artigo(
-      artigo: data['Artigo'],
-      descricao: data['Descricao'],
+      artigo: data['artigo'],
+      descricao: data['descricao'],
       preco: data['pvp1'],
       quantidade: 0,
-      quantidadeStock: data['STKActual'],
+      quantidadeStock: data['quantidadeStock'],
       civa: 1.0,
       iva: 1.0,
-      unidade: data['UnidadeBase'],
+      unidade: data['unidade'],
       pvp1: data['pvp2'],
       pvp1Iva: true,
       pvp2: data['pvp2'],
@@ -150,7 +150,7 @@ class Artigo {
       pvp6: data['pvp6'],
       pvp6Iva: true,
       imagemBuffer: null,
-      codigoBarra: data['CodBarras'],
+      codigoBarra: data['codigoBarra'],
     );
   }
 

@@ -161,7 +161,7 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
           for (dynamic rawArtigo in data) {
             listaInventario.add(Inventario.fromJson(rawArtigo));
           }
-          await saveCacheData("inventario", listaInventario);
+          // await saveCacheData("inventario", listaInventario);
 
           return listaInventario;
         } else if (response.statusCode == 401 || response.statusCode == 500) {

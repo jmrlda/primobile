@@ -773,14 +773,14 @@ abstract class IFileManager {
 //   }
 // }
 
-Future<bool> saveCacheData(String key, dynamic data) async {
+Future<bool> saveCacheData(String key, ToList data) async {
   bool rv = false;
   try {
     storage = new LocalStorage(key);
     await storage.ready;
-    String data_encoded = jsonEncode(data);
+    // String data_encoded = jsonEncode(data);
 
-    storage.setItem(key, data_encoded);
+    await storage.setItem(key, data, jsonEncode);
     rv = true;
   } catch (e) {
     rv = false;
@@ -838,4 +838,20 @@ List<Fornecedor> fornecedorPesquisar(
     ;
   }
   return resultado;
+}
+
+class ToList {
+  List<dynamic> items = [];
+
+  toJSONEncodable() {
+    return items.map((item) {
+      return item.toJson();
+    }).toList();
+  }
+
+  toJson() {
+    return items.map((item) {
+      return item.toJson();
+    }).toList();
+  }
 }

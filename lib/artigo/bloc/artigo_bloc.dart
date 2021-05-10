@@ -140,12 +140,15 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
         if (response.statusCode == 200) {
           dynamic data = json.decode(response.body);
           data = json.decode(data)["DataSet"]["Table"];
-
+          ToList lista = new ToList();
           for (dynamic rawArtigo in data) {
-            lista_artigos.add(Artigo.fromJson(rawArtigo));
+            Artigo _artigo = Artigo.fromJson(rawArtigo);
+            lista_artigos.add(_artigo);
+            lista.items.add(_artigo);
           }
 
-          await saveCacheData("artigo", lista_artigos);
+// lista_artigos =
+          await saveCacheData("artigo", lista);
 
           return lista_artigos;
         } else if (response.statusCode == 401 || response.statusCode == 500) {

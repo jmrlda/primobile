@@ -106,8 +106,9 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
 
   Future<List<Cliente>> _fetchClientes(int startIndex, int limit) async {
     try {
-      dynamic data = await getCacheData("cliente");
       List<Cliente> listaCliente = List<Cliente>();
+
+      dynamic data = await getCacheData("cliente");
       if (data != null) {
         data = json.decode(data);
 
@@ -142,13 +143,18 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
 
         if (response.statusCode == 200) {
           final List data = json.decode(response.body)["Data"] as List;
+          ToList lista = new ToList();
+
           for (dynamic rawCliente in data) {
-            listaCliente.add(Cliente.fromJson(rawCliente));
+            Cliente _cliente = Cliente.fromJson(rawCliente);
+
+            listaCliente.add(_cliente);
+            lista.items.add(_cliente);
           }
           // data.map((cliente) {
           //   listaCliente.add(Cliente.fromJson(cliente));
           // });
-          await saveCacheData("cliente", listaCliente);
+          await saveCacheData("cliente", lista);
 
           return listaCliente;
         } else if (response.statusCode == 401 || response.statusCode == 500) {

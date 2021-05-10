@@ -152,13 +152,17 @@ class FornecedorBloc extends Bloc<FornecedorEvent, FornecedorState> {
 
         if (response.statusCode == 200) {
           final List data = json.decode(response.body)["Data"] as List;
+          ToList lista = new ToList();
+
           for (dynamic rawFornecedor in data) {
-            listaFornecedor.add(Fornecedor.fromJson(rawFornecedor));
+            Fornecedor _fornecedor = Fornecedor.fromJson(rawFornecedor);
+            listaFornecedor.add(_fornecedor);
+            lista.items.add(_fornecedor);
           }
           // data.map((cliente) {
           //   listaFornecedor.add(Fornecedor.fromJson(cliente));
           // });
-          await saveCacheData("fornecedor", listaFornecedor);
+          await saveCacheData("fornecedor", lista);
 
           return listaFornecedor;
         } else if (response.statusCode == 401 || response.statusCode == 500) {

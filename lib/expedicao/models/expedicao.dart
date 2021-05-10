@@ -21,8 +21,8 @@ class Expedicao {
 
   Map<String, dynamic> toJson() => {
         'expedicao': expedicao,
-        'data': data,
-        'listaArtigo': listaArtigo,
+        'data': data ?? "",
+        'listaArtigo': listaArtigo ?? [],
         'usuario': usuario,
       };
 
@@ -30,10 +30,10 @@ class Expedicao {
     // String numContrib = json['numContrib'] == "" ? "0" : data['numContrib'];
     // numContrib = numContrib.replaceAll(" ", "");
     return Expedicao(
-      expedicao: json['Número Documento'],
+      expedicao: json['Número Documento'] ?? json['expedicao'],
       // data: json['data'],
       // listaArtigo: json['listaArtigo'],
-      usuario: json['Utilizador'],
+      usuario: json['Utilizador'] ?? json['usuario'],
     );
     // data['imagemBuffer'] == null ? null : data['imagemBuffer']);
   }

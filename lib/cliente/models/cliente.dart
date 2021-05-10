@@ -49,7 +49,7 @@ class Cliente {
         'cliente': cliente,
         'nome': nome,
         'numContrib': numContrib,
-        'endereco': endereco.descricao,
+        'endereco': endereco.toJson(),
         'anulado': anulado,
         'tipoCred': tipoCred,
         'totalDeb': totalDeb,
@@ -66,13 +66,12 @@ class Cliente {
     // String numContrib = json['numContrib'] == "" ? "0" : data['numContrib'];
     // numContrib = numContrib.replaceAll(" ", "");
     return Cliente(
-        cliente: json['Cliente'] != null ? json['Cliente'] : "",
-        nome: json['Nome'] != null ? json['Nome'] : "",
-        nomeFiscal: json['Nome Fiscal'] != null ? json['Nome Fiscal'] : "",
+        cliente: json['Cliente'] ?? json['cliente'],
+        nome: json['Nome'] ?? json['nome'],
+        nomeFiscal: json['Nome Fiscal'] ?? json['nomeFiscal'],
         // numContrib:
         //     int.parse(json['N.º Contribuinte'].toString().replaceAll(" ", "")),
-        endereco: new Endereco(
-            descricao: json['Morada'] != null ? json['Morada'] : ""),
+        endereco: Endereco.fromJson(json['endereco']),
         anulado: false,
         tipoCred: 0,
         totalDeb: 0,
@@ -101,4 +100,20 @@ class Endereco {
       this.ruaAv = "",
       this.bairro = "",
       this.descricao = ""});
+
+  Map<String, dynamic> toJson() => {
+        'pais': pais,
+        'provincia': provincia,
+        'ruaAv': ruaAv,
+        'bairro': bairro,
+        'descricao': descricao,
+      };
+
+  factory Endereco.fromJson(Map<String, dynamic> json) => new Endereco(
+        bairro: json['bairro'],
+        descricao: json['descricao'],
+        pais: json['pais'],
+        provincia: json['provincia'],
+        ruaAv: json['ruaAv'],
+      );
 }

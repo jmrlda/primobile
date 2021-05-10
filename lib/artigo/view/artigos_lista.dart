@@ -73,7 +73,6 @@ class _ArtigoLista extends State<ArtigoLista> {
                       artigo: state.artigos[index],
                       // artigoBloc: artigoBloc,
                       isSelected: this.isSelected,
-                      setState: setState,
                     );
             },
             itemCount: state.hasReachedMax
@@ -97,7 +96,6 @@ class _ArtigoLista extends State<ArtigoLista> {
                       artigo: state.artigos[index],
                       // artigoBloc: artigoBloc,
                       isSelected: this.isSelected,
-                      setState: setState,
                     );
             },
             itemCount: state.hasReachedMax

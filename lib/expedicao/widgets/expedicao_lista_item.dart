@@ -110,7 +110,7 @@ class ExpedicaoListaItem extends StatelessWidget {
                 color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16),
           ),
           subtitle: Text(
-            "Utilizador: " + expedicao.usuario,
+            "Utilizador: " + expedicao.usuario ?? "",
             style: TextStyle(color: Colors.blue, fontSize: 14),
           ),
           data: expedicao.expedicao.toString(),

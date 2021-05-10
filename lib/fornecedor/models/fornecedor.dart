@@ -23,11 +23,11 @@ class Fornecedor {
       this.imagemBufferStr});
 
   factory Fornecedor.fromMap(Map<String, dynamic> json) => new Fornecedor(
-        fornecedor: json['fornecedor'],
-        nome: json['nome'],
-        nomeFiscal: json['nome_fiscal'],
-        telefone: json['telefone'],
-        numContribuinte: json['numContribuinte'],
+        fornecedor: json['fornecedor'] ?? json['Fornecedor'],
+        nome: json['nome'] ?? json['Nome'],
+        nomeFiscal: json['nomeFiscal'] ?? json['Nome Fiscal'],
+        telefone: json['telefone'] ?? json['Telefone'],
+        numContribuinte: json['numContribuinte'] ?? json['N.º Contribuinte'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -43,11 +43,11 @@ class Fornecedor {
 
   factory Fornecedor.fromJson(Map<String, dynamic> json) {
     return Fornecedor(
-      fornecedor: json['fornecedor'],
-      nome: json['nome'],
-      nomeFiscal: json['nome_fiscal'],
-      telefone: json['telefone'],
-      numContribuinte: json['numContribuinte'],
+      fornecedor: json['fornecedor'] ?? json['Fornecedor'],
+      nome: json['nome'] ?? json['Nome'],
+      nomeFiscal: json['nomeFiscal'] ?? json['Nome Fiscal'],
+      telefone: json['telefone'] ?? json['Telefone'],
+      numContribuinte: json['numContribuinte'] ?? json['N.º Contribuinte'],
       //  imagemBuffer:  data['imagemBuffer'] ,
     );
   }

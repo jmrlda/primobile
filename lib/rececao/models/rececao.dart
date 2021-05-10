@@ -30,8 +30,8 @@ class Rececao {
     // String numContrib = json['numContrib'] == "" ? "0" : data['numContrib'];
     // numContrib = numContrib.replaceAll(" ", "");
     return Rececao(
-      rececao: json['rececao'],
-      usuario: json['usuario'],
+      rececao: json['rececao'] ?? json['Número Documento'],
+      usuario: json['usuario'] ?? json['Utilizador'],
     );
 
     // data['imagemBuffer'] == null ? null : data['imagemBuffer']);
