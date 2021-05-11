@@ -6,17 +6,20 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/expedicao/models/expedicao.dart';
 import 'package:primobile/expedicao/models/models.dart';
+import 'package:primobile/expedicao/util.dart';
 import 'package:primobile/inventario/inventario.dart';
 import 'package:primobile/inventario/models/artigo_inventario.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/util/util.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 BuildContext contexto;
 http.Client httpClient = http.Client();
 List<ArtigoExpedicao> linhaExpedicao = List<ArtigoExpedicao>();
 List<ArtigoExpedicao> lista_artigo_expedicao = List<ArtigoExpedicao>();
 ScrollController _scrollController = new ScrollController();
+TextEditingController txtPesquisar = new TextEditingController();
 List<bool> posicao;
 int idx = 0;
 
@@ -30,6 +33,8 @@ class ExpedicaoEditorPage extends StatefulWidget {
 
 class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
   TextEditingController txtArtigoQtd = new TextEditingController();
+  bool evtPesquisar = false;
+  final GlobalKey expedicaoPesquisaKey = GlobalKey();
 
   BuildContext context;
   var items = List<dynamic>();
@@ -54,6 +59,8 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
     // items.addAll(encomendaItens);
 
     super.initState();
+    expedicaoPesquisarController.text = "";
+    lista_artigo_expedicao.clear();
 
     try {
       updateConnection(() {
@@ -76,32 +83,39 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
     });
   }
 
-  Future<bool> createAlertDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Center(child: Text('Atenção')),
-            content: Text('Deseja Cancelar Expedição ?'),
-            actions: <Widget>[
-              MaterialButton(
-                elevation: 5.0,
-                child: Text('Sim'),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-              ),
-              MaterialButton(
-                elevation: 5.0,
-                child: Text('Não'),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-              )
-            ],
-          );
-        });
-  }
+  // Future<bool> createAlertDialog(BuildContext context) {
+  //   return showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           title: Center(child: Text('Atenção')),
+  //           content: Text('Deseja Cancelar Expedição ?'),
+  //           actions: <Widget>[
+  //             MaterialButton(
+  //               elevation: 5.0,
+  //               child: Text('Sim'),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop(true);
+  //               },
+  //             ),
+  //             MaterialButton(
+  //               elevation: 5.0,
+  //               child: Text('Não'),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop(false);
+  //               },
+  //             ),
+  //             MaterialButton(
+  //               elevation: 5.0,
+  //               child: Text('Salvar'),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop(false);
+  //               },
+  //             )
+  //           ],
+  //         );
+  //       });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -112,12 +126,14 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
         appBar: new AppBar(
           backgroundColor: PRIMARY_COLOR,
           centerTitle: true,
-          title: new Text("Expedição"),
+          title: togglePesquisa(),
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back),
             onPressed: () {
-              if (artigos != null && artigos.length > 0) {
-                createAlertDialog(context).then((sair) {
+              if (lista_artigo_expedicao != null &&
+                  lista_artigo_expedicao.length > 0) {
+                createAlertDialog(context, "Deseja Cancelar Expedição ?", null)
+                    .then((sair) {
                   if (sair == true) {
                     Navigator.of(context).pop();
                   }
@@ -134,7 +150,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
             children: <Widget>[
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 285,
+                height: 170,
                 decoration: BoxDecoration(
                   color: Colors.blue[900], // fromRGBO(7, 89, 250, 100)
                   // gradient: LinearGradient(
@@ -147,9 +163,9 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                     espaco(),
                     Container(
                       width: MediaQuery.of(context).size.width - 30,
-                      height: 200,
+                      height: 100,
                       padding: EdgeInsets.only(
-                          top: 5, left: 16, right: 16, bottom: 20),
+                          top: 0, left: 16, right: 16, bottom: 0),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                           color: Colors.white,
@@ -170,9 +186,9 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
-                                "Expedição",
+                                "Nº Documento:",
                                 style:
-                                    TextStyle(fontSize: 18, color: Colors.blue),
+                                    TextStyle(fontSize: 15, color: Colors.blue),
                               ),
                               GestureDetector(
                                 onTap: () async {
@@ -211,36 +227,49 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                                 child: Text(
                                   expedicaoNumDoc,
                                   style: TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 15,
                                       color: Colors.blue,
                                       fontWeight: FontWeight.bold),
                                 ),
                               )
                             ],
                           ),
+                          // Spacer(),
+
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //   children: <Widget>[
+                          //     Text(
+                          //       "",
+                          //       style:
+                          //           TextStyle(fontSize: 15, color: Colors.blue),
+                          //     ),
+                          //     Text(
+                          //       "",
+                          //       style: TextStyle(
+                          //           fontSize: 15,
+                          //           color: Colors.blue,
+                          //           fontWeight: FontWeight.bold),
+                          //     ),
+                          //   ],
+                          // ),
                           Spacer(),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text(
-                                "Armazem",
-                                style:
-                                    TextStyle(fontSize: 18, color: Colors.blue),
-                              ),
-                              Text(
-                                "A1",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold),
-                              )
+                              // Text(
+                              //   "Armazem",
+                              //   style:
+                              //       TextStyle(fontSize: 18, color: Colors.blue),
+                              // ),
                             ],
                           ),
                           Spacer(),
                         ],
                       ),
                     ),
+                    Spacer(),
                   ],
                 ),
               ),
@@ -263,12 +292,12 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.exit_to_app, color: Colors.blue),
-              label: 'Sair',
+              icon: Icon(Icons.search, color: Colors.blue),
+              label: 'Pesquisar',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.camera, color: Colors.blue),
-              label: 'Camera',
+              icon: FaIcon(FontAwesomeIcons.barcode, color: Colors.blue),
+              label: 'Scan',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.check_circle_outline, color: Colors.blue),
@@ -282,7 +311,8 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
       ),
       onWillPop: () async {
         if (artigos != null && artigos.length > 0) {
-          bool rv = await createAlertDialog(context);
+          bool rv = await createAlertDialog(
+              context, "Deseja Cancelar Expedição ?", null);
           print('alert ' + rv.toString());
           return rv;
         } else {
@@ -297,15 +327,18 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
   void _onItemTapped(int index) async {
     // Sair
     if (index == 0) {
-      if (artigos != null && artigos.length > 0) {
-        createAlertDialog(contexto).then((sair) {
-          if (sair == true) {
-            Navigator.of(contexto).pop();
-          }
-        });
-      }
-    }
-    if (index == 1) {
+      // if (artigos != null && artigos.length > 0) {
+      //   createAlertDialog(contexto).then((sair) {
+      //     if (sair == true) {
+      //       Navigator.of(contexto).pop();
+      //     }
+      //   });
+      // }
+
+      setState(() {
+        evtPesquisar = true;
+      });
+    } else if (index == 1) {
       // Ler codigo de barra de um artigo e identificar se esta
       // na lista de ArtigoExpedição, se localizado, alterar as quantidades
       // a expedir e alterar o estado da linha como processado ou actualizado
@@ -322,77 +355,84 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
       //     });
       //   }
       // });
-      scanBarCode();
+      await scanBarCode();
 
       actualizarEstado();
 
       // Terminar
-    }
-    if (index == 2) {
-      createAlertDialogEncomendaProcesso(BuildContext context) {
-        bool rv = false;
-        return showDialog(
-            context: contexto,
-            builder: (contexto) {
-              // 1 minuto ate fechar a janela devido a demora do processo de envio de encomenda
-              Future.delayed(Duration(seconds: 60), () {
-                // alerta_info(contexto, "Parado processo devido o tempo de espera!");
-                if (this.mounted) {
-                  setState(() {
-                    rv = true;
-                  });
-                }
-                // Navigator.of(context).pop(true);
+    } else if (index == 2) {
+      if (lista_artigo_expedicao != null && lista_artigo_expedicao.length > 0) {
+        createAlertDialogEncomendaProcesso(BuildContext context) {
+          bool rv = false;
+          return showDialog(
+              context: contexto,
+              builder: (contexto) {
+                // 1 minuto ate fechar a janela devido a demora do processo de envio de encomenda
+                Future.delayed(Duration(seconds: 60), () {
+                  // alerta_info(contexto, "Parado processo devido o tempo de espera!");
+                  if (this.mounted) {
+                    setState(() {
+                      rv = true;
+                    });
+                  }
+                  // Navigator.of(context).pop(true);
+                });
+                return WillPopScope(
+                  child: AlertDialog(
+                    title: Center(child: Text('Aguarde')),
+                    content: Container(
+                        width: 50,
+                        height: 50,
+                        child: Center(child: CircularProgressIndicator())),
+                  ),
+                  onWillPop: () async {
+                    return rv;
+                  },
+                );
               });
-              return WillPopScope(
-                child: AlertDialog(
-                  title: Center(child: Text('Aguarde')),
-                  content: Container(
-                      width: 50,
-                      height: 50,
-                      child: Center(child: CircularProgressIndicator())),
-                ),
-                onWillPop: () async {
-                  return rv;
-                },
-              );
-            });
-      }
+        }
 
-      bool conexao = await temConexao();
+        bool conexao = await temConexao();
 
-      if (conexao == true) {
-        ArtigoExpedicao.postExpedicao(expedicao, lista_artigo_expedicao)
-            .then((value) async {
-          if (value.statusCode == 200) {
-            await Navigator.pushReplacementNamed(
-                contexto, '/expedicao_sucesso');
-          } else if (value.statusCode == 401 || value.statusCode == 500) {
-            //  #TODO informar ao usuario sobre a renovação da sessão
-            // mostrando mensagem e um widget de LOADING
-            alerta_info(contexto, 'Aguarde a sua sessão esta a ser renovada');
-            await SessaoApiProvider.refreshToken();
-          } else {
+        if (conexao == true) {
+          ArtigoExpedicao.postExpedicao(expedicao, lista_artigo_expedicao)
+              .then((value) async {
+            if (value.statusCode == 200) {
+              await Navigator.pushReplacementNamed(
+                  contexto, '/expedicao_sucesso');
+            } else if (value.statusCode == 401 || value.statusCode == 500) {
+              //  #TODO informar ao usuario sobre a renovação da sessão
+              // mostrando mensagem e um widget de LOADING
+              alerta_info(contexto, 'Aguarde a sua sessão esta a ser renovada');
+              await SessaoApiProvider.refreshToken();
+            } else {
+              alerta_info(contexto,
+                  'Servidor não respondeu com sucesso o envio da expedição! Por favor tente novamente');
+            }
+          }).catchError((err) {
+            print('[postExpedicao] ERRO');
+            print(err);
+            if (this.mounted == true) {
+              setState(() {
+                erroEncomenda = true;
+              });
+            }
+
             alerta_info(contexto,
-                'Servidor não respondeu com sucesso o envio da expedição! Por favor tente novamente');
-          }
-        }).catchError((err) {
-          print('[postExpedicao] ERRO');
-          print(err);
-          if (this.mounted == true) {
-            setState(() {
-              erroEncomenda = true;
-            });
-          }
-
-          alerta_info(contexto,
-              'Ocorreu um erro interno ao enviar expedição! Por favor tente novamente');
+                'Ocorreu um erro interno ao enviar expedição! Por favor tente novamente');
+          });
+        } else {
+          alerta_info(contexto, "Verifique sua conexão.");
+        }
+      }
+      _selectedIndex = index;
+    } else {
+      if (this.mounted == true) {
+        setState(() {
+          erroEncomenda = true;
         });
-      } else {
-        alerta_info(contexto, "Verifique sua conexão.");
       }
     }
-    _selectedIndex = index;
   }
 
   void actualizarEstado() {
@@ -497,6 +537,40 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
     return lista_widget;
   }
 
+  List<Widget> PesquisaListaArtigo(
+      List<ArtigoExpedicao> artigos, String keyword) {
+    List<Widget> lista_widget = List<Widget>();
+    if (keyword == null || keyword.length == 0) {
+      return getListaArtigo(artigos);
+    }
+    keyword = keyword.toLowerCase();
+    if (artigos != null || artigos.length > 0) {
+      int i = 0;
+      artigos.forEach((artigo) {
+        if (artigo.artigo.toLowerCase().contains(keyword) ||
+            artigo.descricao.toLowerCase().contains(keyword)) {
+          lista_widget.add(expedicaoItem(artigo));
+        }
+      });
+    }
+
+    if (lista_widget.length == 0) {
+      lista_widget.add(Container(
+          height: 100,
+          padding: EdgeInsets.all(20),
+          color: Colors.white,
+          child: Center(
+            child: Text(
+              "Artigo não encontrado.",
+              style: TextStyle(color: Colors.blue, fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+          )));
+    }
+
+    return lista_widget;
+  }
+
   Widget buildArtigoExpedicao(List<ArtigoExpedicao> artigos, int index) {
     List<Widget> lista_widget = List<Widget>();
     if (artigos != null || artigos.length > 0) {
@@ -577,16 +651,18 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
   }
 
   ArtigoExpedicaoCard expedicaoItem(ArtigoExpedicao artigo) {
-    txtArtigoQtd.text = artigo.quantidadeExpedir.toString();
+    String qtdExpedir = artigo.quantidadeExpedir.toString();
     ArtigoExpedicaoCard artigoInventario;
     final GlobalKey expansionTileKey = GlobalKey();
 
     if (posicao[idx] == true) {
-      txtArtigoQtd.selection = TextSelection(
-          baseOffset: 0, extentOffset: txtArtigoQtd.value.text.length);
-      artigoInventario = buildExpedicaoItem(artigo, true, expansionTileKey);
+      // txtArtigoQtd.selection = TextSelection(
+      //     baseOffset: 0, extentOffset: txtArtigoQtd.value.text.length);
+      artigoInventario =
+          buildExpedicaoItem(artigo, true, expansionTileKey, qtdExpedir);
     } else {
-      artigoInventario = buildExpedicaoItem(artigo, false, expansionTileKey);
+      artigoInventario =
+          buildExpedicaoItem(artigo, false, expansionTileKey, qtdExpedir);
     }
     idx++;
 
@@ -594,35 +670,39 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
   }
 
   ArtigoExpedicaoCard buildExpedicaoItem(
-      ArtigoExpedicao artigo, bool state, GlobalKey key) {
+      ArtigoExpedicao artigo, bool state, GlobalKey key, String qtdExpedir) {
+    TextEditingController txtPesquisa = TextEditingController();
+    txtPesquisa.text = qtdExpedir;
+
     return ArtigoExpedicaoCard(
       artigo: artigo,
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 20, right: 16, bottom: 4),
-          ),
-
           ExpansionTile(
             key: key,
             maintainState: state,
             initiallyExpanded: state,
             title: Text(artigo.descricao,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16)),
+                style: TextStyle(color: Colors.blue, fontSize: 13)),
             subtitle: Column(
               children: <Widget>[
                 Row(
                   children: <Widget>[
                     Text("Artigo:    " + artigo.artigo,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)),
+                        style: TextStyle(color: Colors.blue, fontSize: 13)),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Text(
+                        "Armazem:    " +
+                            artigo.armazem +
+                            "  Localização:    " +
+                            artigo.localizacao,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.blue, fontSize: 12)),
                   ],
                 ),
               ],
@@ -637,8 +717,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                       "Qtd. Pendente: ",
                       style: TextStyle(
                         color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -650,8 +729,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                       artigo.quantidadePendente.toString(),
                       style: TextStyle(
                         color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -667,8 +745,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                       "Qtd. Expedir: ",
                       style: TextStyle(
                         color: Colors.blue,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -680,25 +757,24 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                       child: TextField(
                         autofocus: true,
                         keyboardType: TextInputType.number,
-                        controller: txtArtigoQtd,
+                        controller: txtPesquisa,
                         onChanged: (value) {
                           try {
-                            if (double.parse(txtArtigoQtd.text) > 0) {
+                            if (double.parse(txtPesquisa.text) > 0) {
                               artigo.quantidadeExpedir =
-                                  double.parse(txtArtigoQtd.text);
+                                  double.parse(txtPesquisa.text);
                             }
                           } catch (e) {}
                         },
                         onTap: () {
-                          txtArtigoQtd.selection = TextSelection(
+                          txtPesquisa.selection = TextSelection(
                               baseOffset: 0,
-                              extentOffset: txtArtigoQtd.value.text.length);
+                              extentOffset: txtPesquisa.value.text.length);
                         },
                         textAlign: TextAlign.end,
                         style: TextStyle(
                           color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 13,
                         ),
                       ),
                       width: 100,
@@ -757,11 +833,19 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
 //
 //
 //
-  void scanBarCode() {
-    // dynamic codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
-    //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
-
-    String codigoBarra = '6935364092313';
+  Future<void> scanBarCode() async {
+    String codigoBarra = null;
+    try {
+      // codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
+      //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+      codigoBarra = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+      print(codigoBarra);
+    } catch (e) {
+      print("Ocorreu um erro: ");
+      print(e);
+    }
+    // String codigoBarra = '6935364092313';
 
     try {
       if (codigoBarra != null) {
@@ -787,6 +871,44 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Widget togglePesquisa() {
+    return evtPesquisar
+        ? new TextField(
+            key: expedicaoPesquisaKey,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: 'Pesquise aqui...',
+            ),
+            onChanged: (value) {
+              // items.clear();
+
+              setState(() {
+                if (value.length >= 0) {
+                  items = PesquisaListaArtigo(lista_artigo_expedicao, value);
+                } else {
+                  items = getListaArtigo(lista_artigo_expedicao);
+                }
+              });
+            },
+            onEditingComplete: () {
+              if (expedicaoPesquisarController.text.length == 0) {
+                setState(() {
+                  evtPesquisar = false;
+                });
+              }
+            },
+            onSubmitted: (value) {
+              if (value.length == 0) {
+                setState(() {
+                  evtPesquisar = false;
+                });
+              }
+            },
+            controller: expedicaoPesquisarController,
+          )
+        : new Text('Expedição');
   }
 }
 
