@@ -855,3 +855,41 @@ class ToList {
     }).toList();
   }
 }
+
+Future<bool> createAlertDialog(
+    BuildContext context, String mensagem, Function onSave) {
+  return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Center(child: Text('Atenção')),
+          content: Text(mensagem),
+          actions: <Widget>[
+            MaterialButton(
+              elevation: 5.0,
+              child: Text('Sim'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+            MaterialButton(
+              elevation: 5.0,
+              child: Text('Não'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            MaterialButton(
+              elevation: 5.0,
+              child: Text('Salvar'),
+              onPressed: () {
+                if (onSave != null) {
+                  onSave();
+                }
+                Navigator.of(context).pop(false);
+              },
+            )
+          ],
+        );
+      });
+}
