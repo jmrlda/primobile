@@ -29,12 +29,13 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
       try {
         if (currentState is ExpedicaoInicial) {
           List<Expedicao> expedicao = await _fetchExpedicao(0, 20);
-          if (expedicao != null) {
+          if (expedicao == null) {
             await SessaoApiProvider.refreshToken();
             expedicao = await _fetchExpedicao(0, 20);
-          } else if (expedicao == null) {
-            yield ExpedicaoFalha();
-            return;
+            if (expedicao == null) {
+              yield ExpedicaoFalha();
+              return;
+            }
           }
 
           yield ExpedicaoSucesso(expedicao: expedicao, hasReachedMax: true);
@@ -123,19 +124,21 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
     // }
 
     try {
-      dynamic data = await getCacheData("expedicao");
+      // TODO: verificar quando buscar dados do cache
 
-      if (data != null) {
-        data = json.decode(data);
+      // dynamic data = await getCacheData("expedicao");
 
-        listaExpedicao.clear();
-        if (data.length > 0) {
-          for (dynamic rawExpedicao in data) {
-            listaExpedicao.add(Expedicao.fromJson(rawExpedicao));
-          }
-          return listaExpedicao;
-        }
-      }
+      // if (data != null) {
+      //   data = json.decode(data);
+
+      //   listaExpedicao.clear();
+      //   if (data.length > 0) {
+      //     for (dynamic rawExpedicao in data) {
+      //       listaExpedicao.add(Expedicao.fromJson(rawExpedicao));
+      //     }
+      //     return listaExpedicao;
+      //   }
+      // }
 
       var sessao = await SessaoApiProvider.readSession();
       var response;
@@ -166,7 +169,7 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
             lista.items.add(expedicao);
             return Expedicao.fromJson(expedicao);
           }).toList();
-          await saveCacheData("expedicao", lista);
+          // await saveCacheData("expedicao", lista);
 
           return listaExpedicao;
         } else if (response.statusCode == 401 || response.statusCode == 500) {
