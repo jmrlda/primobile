@@ -13,6 +13,8 @@ class ArtigoRececao {
   String codigoBarra;
   double quantidadeRecebida;
   double quantidadeRejeitada;
+  String armazem;
+  String localizacao;
 
   ArtigoRececao(
       {this.artigo,
@@ -20,16 +22,19 @@ class ArtigoRececao {
       this.unidade,
       this.codigoBarra,
       this.quantidadeRecebida,
-      this.quantidadeRejeitada});
+      this.quantidadeRejeitada,
+      this.armazem = "",
+      this.localizacao = ""});
 
   factory ArtigoRececao.fromMap(Map<String, dynamic> json) => new ArtigoRececao(
-        artigo: json['artigo'],
-        descricao: json['descricao'],
-        unidade: json['unidade'],
-        quantidadeRecebida: json['quantidade_recebida'],
-        quantidadeRejeitada: json['quantidade_rejeitada'],
-        codigoBarra: json['codigo_barra'],
-      );
+      artigo: json['artigo'],
+      descricao: json['descricao'],
+      unidade: json['unidade'],
+      quantidadeRecebida: json['quantidade_recebida'],
+      quantidadeRejeitada: json['quantidade_rejeitada'],
+      codigoBarra: json['codigo_barra'],
+      armazem: json['armazem'],
+      localizacao: json['localizacao']);
 
   Map<String, dynamic> toJson() => {
         'artigo': artigo,
@@ -37,18 +42,22 @@ class ArtigoRececao {
         'quantidade_recebida': quantidadeRecebida,
         'quantidade_rejeitada': quantidadeRejeitada,
         'codigo_barra': codigoBarra,
+        'armazem': armazem,
+        'localizacao': localizacao
       };
 
   factory ArtigoRececao.fromJson(Map<String, dynamic> json) {
     // String numContrib = json['numContrib'] == "" ? "0" : data['numContrib'];
     // numContrib = numContrib.replaceAll(" ", "");
     return ArtigoRececao(
-      artigo: json['artigo'],
-      descricao: json['descricao'],
-      codigoBarra: json['codigo_barra'],
-      quantidadeRecebida: double.parse(json['quantidade_recebida']),
-      quantidadeRejeitada: double.parse(json['quantidade_rejeitada']),
-    );
+        artigo: json['artigo'],
+        descricao: json['descricao'],
+        codigoBarra: json['codigo_barra'],
+        quantidadeRecebida: double.parse(json['quantidade_recebida']),
+        quantidadeRejeitada: double.parse(json['quantidade_rejeitada']),
+        armazem: json['armazem'],
+        localizacao: json['localizacao']);
+
     // data['imagemBuffer'] == null ? null : data['imagemBuffer']);
   }
 
