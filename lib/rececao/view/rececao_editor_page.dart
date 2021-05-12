@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/rececao/models/models.dart';
+import 'package:primobile/rececao/util.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/util/util.dart';
@@ -47,6 +50,8 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
   bool erroEncomenda = false;
   String rececaoNumDoc = "Selecionar";
   List<bool> posicao;
+  bool evtPesquisar = false;
+  final GlobalKey rececaoPesquisaKey = GlobalKey();
 
   @override
   void initState() {
@@ -76,32 +81,32 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
     });
   }
 
-  Future<bool> createAlertDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Center(child: Text('Atenção')),
-            content: Text('Deseja Cancelar Receção ?'),
-            actions: <Widget>[
-              MaterialButton(
-                elevation: 5.0,
-                child: Text('Sim'),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-              ),
-              MaterialButton(
-                elevation: 5.0,
-                child: Text('Não'),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-              )
-            ],
-          );
-        });
-  }
+  // Future<bool> createAlertDialog(BuildContext context) {
+  //   return showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           title: Center(child: Text('Atenção')),
+  //           content: Text('Deseja Cancelar Receção ?'),
+  //           actions: <Widget>[
+  //             MaterialButton(
+  //               elevation: 5.0,
+  //               child: Text('Sim'),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop(true);
+  //               },
+  //             ),
+  //             MaterialButton(
+  //               elevation: 5.0,
+  //               child: Text('Não'),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop(false);
+  //               },
+  //             )
+  //           ],
+  //         );
+  //       });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -114,12 +119,14 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
         appBar: new AppBar(
           backgroundColor: PRIMARY_COLOR,
           centerTitle: true,
-          title: new Text("Receção"),
+          title: togglePesquisa(),
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back),
             onPressed: () {
-              if (artigos != null && artigos.length > 0) {
-                createAlertDialog(context).then((sair) {
+              if (lista_artigo_rececao != null &&
+                  lista_artigo_rececao.length > 0) {
+                createAlertDialog(context, "Deseja Cancelar Receção ?", null)
+                    .then((sair) {
                   if (sair == true) {
                     Navigator.of(context).pop();
                   }
@@ -136,7 +143,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
             children: <Widget>[
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 285,
+                height: 170,
                 decoration: BoxDecoration(
                   color: Colors.blue[900], // fromRGBO(7, 89, 250, 100)
                   // gradient: LinearGradient(
@@ -149,9 +156,9 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                     espaco(),
                     Container(
                       width: MediaQuery.of(context).size.width - 30,
-                      height: 200,
+                      height: 100,
                       padding: EdgeInsets.only(
-                          top: 5, left: 16, right: 16, bottom: 20),
+                          top: 0, left: 16, right: 16, bottom: 0),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                           color: Colors.white,
@@ -172,9 +179,9 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
-                                "Receção",
+                                "Nº Documento:",
                                 style:
-                                    TextStyle(fontSize: 18, color: Colors.blue),
+                                    TextStyle(fontSize: 15, color: Colors.blue),
                               ),
                               GestureDetector(
                                 onTap: () async {
@@ -185,7 +192,8 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
 
                                     result.then((value) async {
                                       rececao = value;
-                                      lista_artigo_rececao.clear();
+                                      if (lista_artigo_rececao != null)
+                                        lista_artigo_rececao.clear();
                                       lista_artigo_rececao =
                                           await _fetchLinhaRececao(
                                               rececao.rececao, 0, 0);
@@ -216,32 +224,32 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                                 child: Text(
                                   rececaoNumDoc,
                                   style: TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 15,
                                       color: Colors.blue,
                                       fontWeight: FontWeight.bold),
                                 ),
                               )
                             ],
                           ),
-                          Spacer(),
+                          // Spacer(),
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                "Armazem",
-                                style:
-                                    TextStyle(fontSize: 18, color: Colors.blue),
-                              ),
-                              Text(
-                                "A1",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //   children: <Widget>[
+                          //     Text(
+                          //       "Armazem",
+                          //       style:
+                          //           TextStyle(fontSize: 18, color: Colors.blue),
+                          //     ),
+                          //     Text(
+                          //       "A1",
+                          //       style: TextStyle(
+                          //           fontSize: 18,
+                          //           color: Colors.blue,
+                          //           fontWeight: FontWeight.bold),
+                          //     )
+                          //   ],
+                          // ),
                           Spacer(),
                         ],
                       ),
@@ -268,12 +276,12 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.exit_to_app, color: Colors.blue),
-              label: 'Sair',
+              icon: Icon(Icons.search, color: Colors.blue),
+              label: 'Pesquisar',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline, color: Colors.blue),
-              label: 'Camera',
+              icon: FaIcon(FontAwesomeIcons.barcode, color: Colors.blue),
+              label: 'Scan',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.check_circle_outline, color: Colors.blue),
@@ -287,7 +295,8 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
       ),
       onWillPop: () async {
         if (artigos != null && artigos.length > 0) {
-          bool rv = await createAlertDialog(context);
+          bool rv = await createAlertDialog(
+              context, "Deseja Cancelar Receção ?", null);
           print('alert ' + rv.toString());
           return rv;
         } else {
@@ -302,86 +311,89 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
   void _onItemTapped(int index) async {
     // Sair
     if (index == 0) {
-      if (artigos != null && artigos.length > 0) {
-        createAlertDialog(contexto).then((sair) {
-          if (sair == true) {
-            Navigator.of(contexto).pop();
-          }
-        });
-      }
-    }
-    if (index == 1) {
-      scanBarCode();
+      setState(() {
+        evtPesquisar = true;
+      });
+    } else if (index == 1) {
+      await scanBarCode();
       actualizarEstado();
 
       // Terminar
-    }
-    if (index == 2) {
+    } else if (index == 2) {
       // await Navigator.pushReplacementNamed(contexto, '/encomenda_sucesso');
 
       // createAlertDialogErroEncomenda
-      createAlertDialogEncomendaProcesso(BuildContext context) {
-        bool rv = false;
-        return showDialog(
-            context: contexto,
-            builder: (contexto) {
-              // 1 minuto ate fechar a janela devido a demora do processo de envio de encomenda
-              Future.delayed(Duration(seconds: 60), () {
-                // alerta_info(contexto, "Parado processo devido o tempo de espera!");
-                if (this.mounted) {
-                  setState(() {
-                    rv = true;
-                  });
-                }
-                // Navigator.of(context).pop(true);
+      if (lista_artigo_rececao != null && lista_artigo_rececao.length > 0) {
+        createAlertDialogEncomendaProcesso(BuildContext context) {
+          bool rv = false;
+          return showDialog(
+              context: contexto,
+              builder: (contexto) {
+                // 1 minuto ate fechar a janela devido a demora do processo de envio de encomenda
+                Future.delayed(Duration(seconds: 60), () {
+                  // alerta_info(contexto, "Parado processo devido o tempo de espera!");
+                  if (this.mounted) {
+                    setState(() {
+                      rv = true;
+                    });
+                  }
+                  // Navigator.of(context).pop(true);
+                });
+                return WillPopScope(
+                  child: AlertDialog(
+                    title: Center(child: Text('Aguarde')),
+                    content: Container(
+                        width: 50,
+                        height: 50,
+                        child: Center(child: CircularProgressIndicator())),
+                  ),
+                  onWillPop: () async {
+                    return rv;
+                  },
+                );
               });
-              return WillPopScope(
-                child: AlertDialog(
-                  title: Center(child: Text('Aguarde')),
-                  content: Container(
-                      width: 50,
-                      height: 50,
-                      child: Center(child: CircularProgressIndicator())),
-                ),
-                onWillPop: () async {
-                  return rv;
-                },
-              );
-            });
-      }
+        }
 
-      bool conexao = await temConexao();
-      if (conexao == true) {
-        ArtigoRececao.postRececao(rececao, lista_artigo_rececao)
-            .then((value) async {
-          if (value.statusCode == 200) {
-            await Navigator.pushReplacementNamed(contexto, '/rececao_sucesso');
-          } else if (value.statusCode == 401 || value.statusCode == 500) {
-            //  #TODO informar ao usuario sobre a renovação da sessão
-            // mostrando mensagem e um widget de LOADING
-            alerta_info(contexto, 'Aguarde a sua sessão esta a ser renovada');
-            await SessaoApiProvider.refreshToken();
-          } else {
+        bool conexao = await temConexao();
+        if (conexao == true) {
+          ArtigoRececao.postRececao(rececao, lista_artigo_rececao)
+              .then((value) async {
+            if (value.statusCode == 200) {
+              await Navigator.pushReplacementNamed(
+                  contexto, '/rececao_sucesso');
+            } else if (value.statusCode == 401 || value.statusCode == 500) {
+              //  #TODO informar ao usuario sobre a renovação da sessão
+              // mostrando mensagem e um widget de LOADING
+              alerta_info(contexto, 'Aguarde a sua sessão esta a ser renovada');
+              await SessaoApiProvider.refreshToken();
+            } else {
+              alerta_info(contexto,
+                  'Servidor não respondeu com sucesso o envio da Receção! Por favor tente novamente');
+            }
+          }).catchError((err) {
+            print('[postRececao] ERRO');
+            print(err);
+            if (this.mounted == true) {
+              setState(() {
+                erroEncomenda = true;
+              });
+            }
+
             alerta_info(contexto,
-                'Servidor não respondeu com sucesso o envio da Receção! Por favor tente novamente');
-          }
-        }).catchError((err) {
-          print('[postRececao] ERRO');
-          print(err);
-          if (this.mounted == true) {
-            setState(() {
-              erroEncomenda = true;
-            });
-          }
-
-          alerta_info(contexto,
-              'Ocorreu um erro interno ao enviar Receção! Por favor tente novamente');
+                'Ocorreu um erro interno ao enviar Receção! Por favor tente novamente');
+          });
+        } else {
+          alerta_info(contexto, "Verifique sua conexão.");
+        }
+      }
+      _selectedIndex = index;
+    } else {
+      if (this.mounted == true) {
+        setState(() {
+          erroEncomenda = true;
         });
-      } else {
-        alerta_info(contexto, "Verifique sua conexão.");
       }
     }
-    _selectedIndex = index;
   }
 
   void actualizarEstado() {
@@ -443,6 +455,40 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
     return lista_widget;
   }
 
+  List<Widget> PesquisaListaArtigo(
+      List<ArtigoRececao> artigos, String keyword) {
+    List<Widget> lista_widget = List<Widget>();
+    if (keyword == null || keyword.length == 0) {
+      return getListaArtigo(artigos);
+    }
+    keyword = keyword.toLowerCase();
+    if (artigos != null || artigos.length > 0) {
+      int i = 0;
+      artigos.forEach((artigo) {
+        if (artigo.artigo.toLowerCase().contains(keyword) ||
+            artigo.descricao.toLowerCase().contains(keyword)) {
+          lista_widget.add(artigoRececao(artigo));
+        }
+      });
+    }
+
+    if (lista_widget.length == 0) {
+      lista_widget.add(Container(
+          height: 60,
+          padding: EdgeInsets.all(10),
+          color: Colors.white,
+          child: Center(
+            child: Text(
+              "Artigo não encontrado.",
+              style: TextStyle(color: Colors.blue, fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+          )));
+    }
+
+    return lista_widget;
+  }
+
   // Widget representado cada Artigo de uma expedição
   Widget artigoRececao(ArtigoRececao artigo) {
     return rececaoItem(artigo);
@@ -454,6 +500,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
     try {
       var sessao = await SessaoApiProvider.readSession();
       var response;
+
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');
         return <ArtigoRececao>[];
@@ -475,13 +522,15 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
 
         if (response.statusCode == 200) {
           List data = json.decode(response.body);
-
+          // if (lista_artigo_rececao != null)
+          //
+          List<ArtigoRececao> _lista_artigo_rececao = List<ArtigoRececao>();
           data.map((rececao) {
-            lista_artigo_rececao
+            _lista_artigo_rececao
                 .add(ArtigoRececao.fromJson(json.decode(rececao)));
           }).toList();
 
-          return lista_artigo_rececao;
+          return _lista_artigo_rececao;
         }
         final msg = json.decode(response.body);
         print("Ocorreu um erro " + msg["Message"]);
@@ -493,25 +542,32 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
   }
 
   ArtigoRececaoCard rececaoItem(ArtigoRececao artigo) {
-    txtArtigoQtdRecebida.text = artigo.quantidadeRecebida.toString();
-    txtArtigoQtdRejeitada.text = artigo.quantidadeRejeitada.toString();
+    String recebida =
+        txtArtigoQtdRecebida.text = artigo.quantidadeRecebida.toString();
+    String rejeitada =
+        txtArtigoQtdRejeitada.text = artigo.quantidadeRejeitada.toString();
     ArtigoRececaoCard artigoRececao = ArtigoRececaoCard();
     final GlobalKey expansionTileKey = GlobalKey();
 
     if (posicao[idx] == true) {
       txtArtigoQtdRecebida.selection = TextSelection(
           baseOffset: 0, extentOffset: txtArtigoQtdRecebida.value.text.length);
-      artigoRececao = buildRececaoItem(artigo, true, expansionTileKey);
+      artigoRececao =
+          buildRececaoItem(artigo, true, expansionTileKey, recebida, rejeitada);
     } else {
-      artigoRececao = buildRececaoItem(artigo, false, expansionTileKey);
+      artigoRececao = buildRececaoItem(
+          artigo, false, expansionTileKey, recebida, rejeitada);
     }
     idx++;
 
     return artigoRececao;
   }
 
-  ArtigoRececaoCard buildRececaoItem(
-      ArtigoRececao artigo, bool state, GlobalKey key) {
+  ArtigoRececaoCard buildRececaoItem(ArtigoRececao artigo, bool state,
+      GlobalKey key, String qtdRecebida, String qtdRejeitada) {
+    txtArtigoQtdRecebida.text = artigo.quantidadeRecebida.toString();
+    txtArtigoQtdRejeitada.text = artigo.quantidadeRejeitada.toString();
+
     return ArtigoRececaoCard(
       artigo: artigo,
       child: Column(
@@ -524,20 +580,25 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
             // initiallyExpanded: state,
             title: Text(artigo.descricao,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16)),
+                style: TextStyle(color: Colors.blue, fontSize: 14)),
             subtitle: Column(
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Text("Artigo:" + artigo.artigo,
+                    Text("Artigo: " + artigo.artigo,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)),
+                        style: TextStyle(color: Colors.blue, fontSize: 14)),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Text(
+                        "Armazem:    " +
+                            artigo.armazem +
+                            "  Localização:    " +
+                            artigo.localizacao,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.blue, fontSize: 12)),
                   ],
                 ),
               ],
@@ -548,23 +609,22 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                 children: <Widget>[
                   Padding(
                     padding:
-                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 5),
                     child: Text(
                       "Qtd. Recebida: ",
                       style: TextStyle(
                         color: Colors.blue,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
                   ),
-                  Spacer(),
                   Padding(
-                    padding: EdgeInsets.only(
-                        top: 5, left: 15, right: 20, bottom: 15),
+                    padding:
+                        EdgeInsets.only(top: 0, left: 0, right: 0, bottom: 0),
                     child: Container(
                       child: TextField(
                         keyboardType: TextInputType.number,
+                        autofocus: true,
                         controller: txtArtigoQtdRecebida,
                         onChanged: (value) {
                           try {
@@ -585,8 +645,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                         textAlign: TextAlign.end,
                         style: TextStyle(
                           color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 12,
                         ),
                       ),
                       width: 100,
@@ -594,29 +653,23 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                   ),
                 ],
               ),
-              Padding(
-                padding:
-                    EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
-              ),
               Row(
                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   Padding(
                     padding:
-                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 5),
                     child: Text(
                       "Qtd. Rejeitada: ",
                       style: TextStyle(
                         color: Colors.blue,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
                   ),
-                  Spacer(),
                   Padding(
-                    padding: EdgeInsets.only(
-                        top: 5, left: 15, right: 20, bottom: 15),
+                    padding:
+                        EdgeInsets.only(top: 0, left: 0, right: 0, bottom: 0),
                     child: Container(
                       child: TextField(
                         keyboardType: TextInputType.number,
@@ -636,8 +689,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                         textAlign: TextAlign.end,
                         style: TextStyle(
                           color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 12,
                         ),
                       ),
                       width: 100,
@@ -648,9 +700,6 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
             ],
           ),
 
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
-          ),
           //
         ],
       ),
@@ -658,11 +707,20 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
   }
 
   // escanear codigo de barra e pesquisar na lista dos artigos do editor
-  void scanBarCode() {
-    // dynamic codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
-    //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
 
-    String codigoBarra = '6935364092313';
+  Future<void> scanBarCode() async {
+    String codigoBarra = null;
+    try {
+      // codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
+      //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+      codigoBarra = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+      print(codigoBarra);
+    } catch (e) {
+      print("Ocorreu um erro: ");
+      print(e);
+    }
+    // String codigoBarra = '6935364092313';
 
     try {
       if (codigoBarra != null) {
@@ -688,6 +746,44 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Widget togglePesquisa() {
+    return evtPesquisar
+        ? new TextField(
+            key: rececaoPesquisaKey,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: 'Pesquise aqui...',
+            ),
+            onChanged: (value) {
+              // items.clear();
+
+              setState(() {
+                if (value.length >= 0) {
+                  items = PesquisaListaArtigo(lista_artigo_rececao, value);
+                } else {
+                  items = getListaArtigo(lista_artigo_rececao);
+                }
+              });
+            },
+            onEditingComplete: () {
+              if (rececaoPesquisarController.text.length == 0) {
+                setState(() {
+                  evtPesquisar = false;
+                });
+              }
+            },
+            onSubmitted: (value) {
+              if (value.length == 0) {
+                setState(() {
+                  evtPesquisar = false;
+                });
+              }
+            },
+            controller: rececaoPesquisarController,
+          )
+        : new Text('Receção');
   }
 }
 
