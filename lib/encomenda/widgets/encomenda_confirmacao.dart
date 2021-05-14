@@ -168,14 +168,14 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       "Cliente:",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
                       widget.encomenda.cliente.nome,
                       style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     )
@@ -188,14 +188,14 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       "Encomenda:",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
                       widget.encomenda.encomenda_id,
                       style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     )
@@ -207,7 +207,7 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       "Total Artigo:",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     ),
@@ -226,7 +226,7 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       "Total Valor:",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     ),
@@ -241,7 +241,7 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       widget.encomenda.valorTotal.toStringAsFixed(2).toString(),
                       style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     )
@@ -321,22 +321,41 @@ class _EncomendaListaConfirmacaoPageState
                   style: TextStyle(
                       color: Colors.blue,
                       fontWeight: FontWeight.bold,
-                      fontSize: 15),
+                      fontSize: 13),
                 ),
-                subtitle: Text(
-                  "P.Unit: " +
-                      artigo.preco.toStringAsFixed(2).toString() +
-                      ' MT'
-                          ' ' +
-                      "Qtd: " +
-                      artigo.quantidade.toString() +
-                      ' ' +
-                      "Subtotal: " +
-                      (artigo.preco * artigo.quantidade)
-                          .toStringAsFixed(2)
-                          .toString() +
-                      ' MT',
-                  style: TextStyle(color: Colors.blue, fontSize: 14),
+                subtitle: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "P.Unit: " +
+                              artigo.preco.toStringAsFixed(2).toString() +
+                              ' MT',
+                          style: TextStyle(color: Colors.blue, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "Qtd: " + artigo.quantidade.toString(),
+                          style: TextStyle(color: Colors.blue, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "Subtotal: " +
+                              (artigo.preco * artigo.quantidade)
+                                  .toStringAsFixed(2)
+                                  .toString() +
+                              ' MT',
+                          style: TextStyle(color: Colors.blue, fontSize: 13),
+                        )
+                      ],
+                    )
+                  ],
                 ),
                 data: artigo.descricao,
               ),

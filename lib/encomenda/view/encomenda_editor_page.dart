@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:primobile/artigo/models/models.dart';
+import 'package:primobile/artigo/util.dart';
 import 'package:primobile/cliente/models/models.dart';
 import 'package:primobile/encomenda/models/models.dart';
 import 'package:primobile/encomenda/widgets/encomenda_confirmacao.dart';
@@ -25,6 +26,8 @@ class EncomendaEditorPage extends StatefulWidget {
 class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
   TextEditingController txtClienteController = TextEditingController();
   TextEditingController txtQtdArtigoController = TextEditingController();
+  TextEditingController txtPesquisa = TextEditingController();
+
   BuildContext context;
   var items = List<dynamic>();
   final List<dynamic> encomendaItens = <dynamic>[
@@ -41,6 +44,8 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
   List<Artigo> artigos = new List<Artigo>();
   List artigoJson = List();
   bool erroEncomenda = false;
+  bool evtPesquisar = false;
+  final GlobalKey encomendaPesquisaKey = GlobalKey();
 
   @override
   void initState() {
@@ -107,7 +112,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
         appBar: new AppBar(
           backgroundColor: PRIMARY_COLOR,
           centerTitle: true,
-          title: new Text("Encomenda"),
+          title: togglePesquisa(),
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back),
             onPressed: () {
@@ -129,7 +134,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
             children: <Widget>[
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 285,
+                height: 205,
                 decoration: BoxDecoration(
                   color: Colors.blue[900], // fromRGBO(7, 89, 250, 100)
                   // gradient: LinearGradient(
@@ -140,7 +145,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.only(top: 2, bottom: 0),
+                      margin: EdgeInsets.only(top: 1, bottom: 0),
                       // color: Colors.red,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -149,7 +154,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                           Text(
                             totalVenda.toStringAsFixed(2).toString() + "\n",
                             style: TextStyle(
-                                fontSize: 30,
+                                fontSize: 25,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -158,9 +163,9 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width - 30,
-                      height: 200,
+                      height: 140,
                       padding: EdgeInsets.only(
-                          top: 5, left: 16, right: 16, bottom: 20),
+                          top: 2, left: 16, right: 16, bottom: 2),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                           color: Colors.white,
@@ -181,7 +186,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                               Text(
                                 "Mercadoria/Serviço",
                                 style:
-                                    TextStyle(fontSize: 18, color: Colors.blue),
+                                    TextStyle(fontSize: 14, color: Colors.blue),
                               ),
                               Text(
                                 mercadServicValor
@@ -189,7 +194,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                                         .toString() +
                                     "\n",
                                 style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     color: Colors.blue,
                                     fontWeight: FontWeight.bold),
                               )
@@ -202,14 +207,14 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                               Text(
                                 "IVA",
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 14,
                                   color: Colors.blue,
                                 ),
                               ),
                               Text(
                                 ivaTotal.toStringAsFixed(2).toString() + "\n",
                                 style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     color: Colors.blueAccent,
                                     fontWeight: FontWeight.bold),
                               )
@@ -221,28 +226,25 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                               Text(
                                 "Total",
                                 style:
-                                    TextStyle(fontSize: 18, color: Colors.blue),
+                                    TextStyle(fontSize: 14, color: Colors.blue),
                               ),
                               Text(
                                 subtotal.toStringAsFixed(2).toString(),
                                 style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     color: Colors.blueAccent,
                                     fontWeight: FontWeight.bold),
                               )
                             ],
                           ),
-                          Spacer(),
                           Row(
                             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Container(
                                 width: (MediaQuery.of(context).size.width - 62),
-                                height: 60,
+                                height: 40,
 
                                 // margin: EdgeInsets.only(top: 64),/s
-                                padding: EdgeInsets.only(
-                                    top: 4, left: 6, right: 16, bottom: 4),
                                 decoration: BoxDecoration(
                                     // borderRadius: BorderRadius.all(
                                     //   // Radius.circular(50)
@@ -258,7 +260,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                                 child: TextField(
                                   // enabled: false,
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15,
                                   ),
                                   decoration: InputDecoration(
                                       border: InputBorder.none,
@@ -278,50 +280,54 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                                           context, '/cliente_selecionar_lista');
                                       // print(result);
                                       result.then((obj) {
-                                        this.cliente = obj;
-                                        if ((this.cliente.anulado == false &&
-                                                this.cliente.limiteCredito ==
-                                                    0) ||
-                                            this.cliente.anulado == false &&
-                                                this.cliente.totalDeb <
-                                                    this
-                                                        .cliente
-                                                        .limiteCredito) {
-                                          txtClienteController.text =
-                                              this.cliente.nome;
-                                        } else {
-                                          String msg = "";
-                                          if (this.cliente.anulado == true) {
-                                            msg =
-                                                "Cliente anulado. Entre em contacto com o Administrador";
-                                          } else if (this.cliente.totalDeb >
-                                              this.cliente.limiteCredito) {
-                                            msg = "Cliente excedeu o limite de Credito de " +
-                                                this
-                                                    .cliente
-                                                    .limiteCredito
-                                                    .toString() +
-                                                " MTN. Entre em contacto com o Administrador";
-                                          }
+                                        // if (obj) {
 
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: Text("atenção"),
-                                                content: Text(msg),
-                                                actions: <Widget>[
-                                                  new FlatButton(
-                                                    child: new Text("ok"),
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
+                                        this.cliente = obj;
+                                        if (obj != null) {
+                                          if ((this.cliente.anulado == false &&
+                                                  this.cliente.limiteCredito ==
+                                                      0) ||
+                                              this.cliente.anulado == false &&
+                                                  this.cliente.totalDeb <
+                                                      this
+                                                          .cliente
+                                                          .limiteCredito) {
+                                            txtClienteController.text =
+                                                this.cliente.nome;
+                                          } else {
+                                            String msg = "";
+                                            if (this.cliente.anulado == true) {
+                                              msg =
+                                                  "Cliente anulado. Entre em contacto com o Administrador";
+                                            } else if (this.cliente.totalDeb >
+                                                this.cliente.limiteCredito) {
+                                              msg = "Cliente excedeu o limite de Credito de " +
+                                                  this
+                                                      .cliente
+                                                      .limiteCredito
+                                                      .toString() +
+                                                  " MTN. Entre em contacto com o Administrador";
+                                            }
+
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: Text("atenção"),
+                                                  content: Text(msg),
+                                                  actions: <Widget>[
+                                                    new FlatButton(
+                                                      child: new Text("ok"),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          }
                                         }
                                       });
                                     } else {
@@ -361,8 +367,8 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.exit_to_app, color: Colors.blue),
-              label: 'Sair',
+              icon: Icon(Icons.search, color: Colors.blue),
+              label: 'Pesquisar',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.add_circle_outline, color: Colors.blue),
@@ -395,15 +401,17 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
   void _onItemTapped(int index) async {
     // Sair
     if (index == 0) {
-      if (artigos != null && artigos.length > 0) {
-        createAlertDialog(contexto).then((sair) {
-          if (sair == true) {
-            Navigator.of(contexto).pop();
-          }
-        });
-      }
-    }
-    if (index == 1) {
+      // if (artigos != null && artigos.length > 0) {
+      //   createAlertDialog(contexto).then((sair) {
+      //     if (sair == true) {
+      //       Navigator.of(contexto).pop();
+      //     }
+      //   });
+      // }
+      setState(() {
+        evtPesquisar = true;
+      });
+    } else if (index == 1) {
       bool conexao = await temConexao();
 
       if (conexao == true) {
@@ -420,8 +428,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
       }
 
       // Terminar
-    }
-    if (index == 2) {
+    } else if (index == 2) {
       // await Navigator.pushReplacementNamed(contexto, '/encomenda_sucesso');
 
       // createAlertDialogErroEncomenda
@@ -471,11 +478,14 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
             this.cliente != null &&
             this.cliente.cliente != null) {
           // EncomendaApiProvider encomendaApi = EncomendaApiProvider();
-          Map<String, dynamic> rv = await SessaoApiProvider.readSession();
-          Map<String, dynamic> _usuario = rv['resultado'];
+          // Map<String, dynamic> rv = await SessaoApiProvider.readSession();
+          Map<String, dynamic> _usuario = await SessaoApiProvider.readSession();
 
           Usuario usuario = Usuario(
-              usuario: "jmr", nome: "jmr", perfil: "Técnico", documento: "ECL");
+              usuario: _usuario['usuario'],
+              nome: _usuario['usuario'],
+              perfil: "usuario",
+              documento: "ECL");
           Encomenda encomenda = new Encomenda(
               cliente: this.cliente,
               vendedor: usuario,
@@ -711,9 +721,8 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
             // }
           }
         } else {
-          // alerta_info(contexto,
-          //                       'Ocorreu um erro ao inserir encomenda na Base de dados. Por favor Tente novamente!');
-
+          alerta_info(contexto,
+              'Preencha campo em falta ou adicione no minimo uma linha');
         }
       } else {
         alerta_info(contexto, "Verifique sua conexão.");
@@ -774,127 +783,106 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
 
     return ArtigoCard(
       artigo: artigo,
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Padding(
+          padding: EdgeInsets.only(top: 15, left: 5, right: 5, bottom: 5),
+          child: Column(
             children: <Widget>[
-              Text(artigo.artigo,
-                  style: TextStyle(
-                      color: Colors.blue, fontWeight: FontWeight.bold)),
-              Text(artigo.descricao,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: Colors.blue, fontWeight: FontWeight.bold)),
-              Text(artigo.unidade == null ? " " : artigo.unidade,
-                  style: TextStyle(
-                      color: Colors.blue, fontWeight: FontWeight.bold))
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
-          ),
-          Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-                child: Text(
-                  "Quantidade: ",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(artigo.artigo,
+                      style: TextStyle(color: Colors.blue, fontSize: 12)),
+                  Text(artigo.descricao,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.blue, fontSize: 12)),
+                  Text(artigo.unidade == null ? " " : artigo.unidade,
+                      style: TextStyle(color: Colors.blue, fontSize: 12)),
+                ],
               ),
-              Spacer(),
-              Padding(
-                padding:
-                    EdgeInsets.only(top: 5, left: 15, right: 20, bottom: 15),
-                child: Container(
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    controller: txtArtigoQtd,
-                    onChanged: (value) {
-                      try {
-                        if (value.length > 0) {
-                          if (double.parse(value) > 0 &&
-                              double.parse(value) <= artigo.quantidadeStock) {
-                            artigo.quantidade = double.parse(value);
-                          } else {
-                            alerta_info(contexto,
-                                "Quantidade superior que o Stock disponivel!");
-                          }
-
-                          actualizarEstado();
-                        }
-                      } catch (e) {}
-                    },
-                    onSubmitted: (value) {
-                      print("valor");
-                      print(value);
-                    },
-                    onTap: () {
-                      txtArtigoQtd.selection = TextSelection(
-                          baseOffset: 0,
-                          extentOffset: txtArtigoQtd.value.text.length);
-                    },
-                    textAlign: TextAlign.end,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    "Quantidade: ",
                     style: TextStyle(
                       color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: 12,
                     ),
                   ),
-                  width: 100,
-                ),
+                  Container(
+                    child: TextField(
+                      keyboardType: TextInputType.number,
+                      controller: txtArtigoQtd,
+                      onChanged: (value) {
+                        try {
+                          if (value.length > 0) {
+                            if (double.parse(value) > 0) {
+                              artigo.quantidade = double.parse(value);
+                            } else {
+                              alerta_info(contexto,
+                                  "Permitido apenas valores positivos!");
+                            }
+
+                            actualizarEstado();
+                          }
+                        } catch (e) {}
+                      },
+                      onSubmitted: (value) {
+                        print("valor");
+                        print(value);
+                      },
+                      onTap: () {
+                        txtArtigoQtd.selection = TextSelection(
+                            baseOffset: 0,
+                            extentOffset: txtArtigoQtd.value.text.length);
+                      },
+                      textAlign: TextAlign.end,
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 12,
+                      ),
+                    ),
+                    width: 100,
+                  )
+                ],
+              ),
+              espaco(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  // GestureDetector(
+                  //   onTap: () async {
+                  //     artigoQuantidade = await createAlertDialog(contexto);
+                  //     artigo.quantidade = double.parse(artigoQuantidade);
+
+                  //     setState(() {
+                  //       // calcular o custo da encomenda que pode ter preco
+                  //       // ja incluido iva ou nao.
+                  //       // Verificar o caso e calcular o custo total.
+                  //     });
+                  //   },
+                  //   child: Text(
+                  //     "Qtd.: " + artigo.quantidade.toString(),
+                  //     style: TextStyle(color: Colors.blue),
+                  //   ),
+                  // ),
+                  Text(
+                      "Prc.Unit: " + artigo.preco.toStringAsFixed(2).toString(),
+                      style: TextStyle(color: Colors.blue, fontSize: 12)),
+                  Text(
+                      "Subtotal: " +
+                          (artigo.preco * artigo.quantidade)
+                              .toStringAsFixed(2)
+                              .toString(),
+                      style: TextStyle(color: Colors.blue, fontSize: 12))
+                ],
+              ),
+              Padding(
+                padding:
+                    EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
               ),
             ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              // GestureDetector(
-              //   onTap: () async {
-              //     artigoQuantidade = await createAlertDialog(contexto);
-              //     artigo.quantidade = double.parse(artigoQuantidade);
-
-              //     setState(() {
-              //       // calcular o custo da encomenda que pode ter preco
-              //       // ja incluido iva ou nao.
-              //       // Verificar o caso e calcular o custo total.
-              //     });
-              //   },
-              //   child: Text(
-              //     "Qtd.: " + artigo.quantidade.toString(),
-              //     style: TextStyle(color: Colors.blue),
-              //   ),
-              // ),
-              Text("Prc.Unit: " + artigo.preco.toStringAsFixed(2).toString(),
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  )),
-              Text(
-                  "Subtotal: " +
-                      (artigo.preco * artigo.quantidade)
-                          .toStringAsFixed(2)
-                          .toString(),
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ))
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 4),
-          ),
-        ],
-      ),
+          )),
     );
   }
 
@@ -990,6 +978,98 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
         artigos.removeAt(i);
       }
     }
+  }
+
+  Widget togglePesquisa() {
+    return evtPesquisar
+        ? new TextField(
+            key: encomendaPesquisaKey,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: 'Pesquise aqui...',
+            ),
+            onChanged: (value) {
+              // items.clear();
+
+              setState(() {
+                if (value.length >= 0) {
+                  items = PesquisaListaArtigo(artigos, value);
+                } else {
+                  items = getListaArtigo(artigos);
+                }
+              });
+            },
+            onEditingComplete: () {
+              if (txtPesquisa.text.length == 0) {
+                setState(() {
+                  evtPesquisar = false;
+                });
+              }
+            },
+            onSubmitted: (value) {
+              if (value.length == 0) {
+                setState(() {
+                  evtPesquisar = false;
+                });
+              }
+            },
+            controller: txtPesquisa,
+          )
+        : new Text('Encomenda');
+  }
+
+  List<Widget> PesquisaListaArtigo(List<Artigo> artigos, String keyword) {
+    List<Widget> lista_widget = List<Widget>();
+    if (keyword == null || keyword.length == 0) {
+      return getListaArtigo(artigos);
+    }
+    keyword = keyword.toLowerCase();
+    if (artigos != null || artigos.length > 0) {
+      int i = 0;
+      artigos.forEach((artigo) {
+        if (artigo.artigo.toLowerCase().contains(keyword) ||
+            artigo.descricao.toLowerCase().contains(keyword)) {
+          lista_widget.add(artigoEncomenda(artigo));
+        }
+      });
+    }
+
+    if (lista_widget.length == 0) {
+      lista_widget.add(Container(
+          height: 60,
+          padding: EdgeInsets.all(10),
+          color: Colors.white,
+          child: Center(
+            child: Text(
+              "Artigo não encontrado.",
+              style: TextStyle(color: Colors.blue, fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+          )));
+    }
+
+    return lista_widget;
+  }
+
+  // Retornar lista de artigos por expedir convertidos em widgets
+  List<Widget> getListaArtigo(List<Artigo> artigos) {
+    List<Widget> lista_widget = List<Widget>();
+
+    if (artigos != null || artigos.length > 0) {
+      int i = 0;
+      artigos.forEach((artigo) {
+        setState(() {
+          lista_widget.add(artigoEncomenda(artigo));
+        });
+      });
+    } else {
+      lista_widget.add(Text(
+        "Sem Artigo",
+        style: TextStyle(color: Colors.blue, fontSize: 14),
+      ));
+    }
+
+    return lista_widget;
   }
 }
 

@@ -162,14 +162,14 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       "Cliente:",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
                       widget.encomenda.cliente.nome,
                       style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     )
@@ -182,14 +182,14 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       "Encomenda:",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
                       widget.encomenda.encomenda_id,
                       style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     )
@@ -201,14 +201,14 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       "Total Artigo:",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
                       widget.encomenda.artigos.length.toString(),
                       style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     )
@@ -220,9 +220,9 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       "Total Valor:",
                       style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold),
+                        fontSize: 13,
+                        color: Colors.white,
+                      ),
                     ),
                     // (widget.encomenda.valorTotal <= 0)
                     //     ? Text('Processando ...',
@@ -234,9 +234,9 @@ class _EncomendaListaConfirmacaoPageState
                     Text(
                       widget.encomenda.valorTotal.toStringAsFixed(2).toString(),
                       style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold),
+                        fontSize: 13,
+                        color: Colors.white,
+                      ),
                     )
                   ],
                 ),
