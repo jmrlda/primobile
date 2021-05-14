@@ -111,14 +111,6 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
                                   child: Text(widget.artigo.descricao,
                                       style: TextStyle(fontSize: 12))),
                               Center(
-                                  child: Text(
-                                      'Total Disponivel ' +
-                                          widget.artigo.quantidadeStock
-                                              .toString() +
-                                          ' ' +
-                                          widget.artigo.unidade,
-                                      style: TextStyle(fontSize: 14))),
-                              Center(
                                   child: Text('Quantidade em ' +
                                       widget.artigo.unidade)),
                               TextField(
@@ -149,30 +141,16 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
                                     child: Text('Alterar'),
                                     onPressed: () {
                                       try {
-                                        if (double.parse(txtArtigoQtd.text) <=
-                                                widget.artigo.quantidadeStock &&
-                                            double.parse(txtArtigoQtd.text) >
-                                                0) {
+                                        if (double.parse(txtArtigoQtd.text) >
+                                            0) {
                                           Navigator.of(context).pop(
                                               double.parse(txtArtigoQtd.text
                                                   .toString()));
                                         } else {
-                                          // if (double.parse(txtArtigoQtd.text) >
-                                          //     artigo.quantidadeStock) {
-                                          //   setState(() {
-                                          //     msgQtd = 'Quantidade ' +
-                                          //         txtArtigoQtd.text +
-                                          //         ' ' +
-                                          //         artigo.unidade +
-                                          //         ' maior que o Stock disponivel ';
-                                          //   });
-                                          if (double.parse(txtArtigoQtd.text) <=
-                                              0) {
-                                            setState(() {
-                                              msgQtd =
-                                                  'Valido somente valores numericos positivos ';
-                                            });
-                                          }
+                                          setState(() {
+                                            msgQtd =
+                                                'Valido somente valores numericos positivos ';
+                                          });
                                         }
                                       } catch (err) {
                                         setState(() {
@@ -234,6 +212,8 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
           subtitle: Text(
             "COD: " +
                 widget.artigo.artigo +
+                " -- " +
+                widget.artigo.codigoBarra.toString() +
                 "\nQTD: " +
                 widget.artigo.quantidadeStock.toString() +
                 ' ' +
