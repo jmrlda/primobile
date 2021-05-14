@@ -6,9 +6,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/inventario/models/inventario.dart';
 import 'package:primobile/inventario/models/models.dart';
+import 'package:primobile/inventario/util.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/util/util.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 BuildContext contexto;
 http.Client httpClient = http.Client();
@@ -48,6 +50,9 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
   List artigoJson = List();
   bool erroEncomenda = false;
   String inventarioNumDoc = "Selecionar";
+  bool evtPesquisar = false;
+  final GlobalKey inventarioPesquisaKey = GlobalKey();
+
   @override
   void initState() {
     // encomendaItens.add(encomendaItemVazio());
@@ -114,7 +119,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         appBar: new AppBar(
           backgroundColor: PRIMARY_COLOR,
           centerTitle: true,
-          title: new Text("Inventario"),
+          title: togglePesquisa(),
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back),
             onPressed: () {
@@ -136,7 +141,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
             children: <Widget>[
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 250,
+                height: 150,
                 decoration: BoxDecoration(
                   color: Colors.blue[900], // fromRGBO(7, 89, 250, 100)
                   // gradient: LinearGradient(
@@ -149,7 +154,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                     espaco(),
                     Container(
                       width: MediaQuery.of(context).size.width - 30,
-                      height: 150,
+                      height: 80,
                       padding: EdgeInsets.only(
                           top: 5, left: 16, right: 16, bottom: 20),
                       decoration: BoxDecoration(
@@ -172,9 +177,12 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
-                                "Inventario",
-                                style:
-                                    TextStyle(fontSize: 18, color: Colors.blue),
+                                "Nº Documento",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               GestureDetector(
                                 onTap: () async {
@@ -226,32 +234,14 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                                 child: Text(
                                   inventarioNumDoc,
                                   style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 15,
+                                    color: Colors.blue,
+                                  ),
                                 ),
                               )
                             ],
                           ),
-                          Spacer(),
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                "Armazem",
-                                style:
-                                    TextStyle(fontSize: 18, color: Colors.blue),
-                              ),
-                              Text(
-                                "A1",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
                           Spacer(),
                         ],
                       ),
@@ -281,12 +271,12 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.exit_to_app, color: Colors.blue),
-              label: 'Sair',
+              icon: Icon(Icons.search, color: Colors.blue),
+              label: 'Pesquisar',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.camera, color: Colors.blue),
-              label: 'Camera',
+              icon: FaIcon(FontAwesomeIcons.barcode, color: Colors.blue),
+              label: 'Scan',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.check_circle_outline, color: Colors.blue),
@@ -312,11 +302,63 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
 
   int _selectedIndex = 0;
 
-  void scanBarCode() {
-    // dynamic codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
-    //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+  // Future<void> scanBarCode() {
+  //   // dynamic codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
+  //   //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
 
-    String codigoBarra = '5449000045478';
+  //   String codigoBarra = '5449000045478';
+
+  //   try {
+  //     if (codigoBarra != null) {
+  //       print(codigoBarra);
+  //       int i = 0;
+  //       lista_artigo_inventario.forEach((artigo) async {
+  //         if (artigo.codigoBarra == codigoBarra) {
+  //           // print("Encontrado");
+
+  //           print("ARtigo " + artigo.artigo);
+  //           // print("descricao " + artigo.descricao);
+  //           // BuildContext contexto = posicao[i].currentContext;
+  //           // posicao[i].currentState.setState(() {
+
+  //           //             });
+  //           // contexto.
+
+  //           setState(() {
+  //             // items = getListaArtigo(lista_artigo_inventario);
+  //             posicao[i] = true;
+  //           });
+  //           _scrollController
+  //               .animateTo(
+  //             (94.0 * i),
+  //             curve: Curves.easeInToLinear,
+  //             duration: const Duration(milliseconds: 100),
+  //           )
+  //               .then((value) {
+  //             print('scroll');
+  //           });
+  //         }
+  //         i++;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  Future<void> scanBarCode() async {
+    String codigoBarra = null;
+    try {
+      // codigoBarra = FlutterBarcodeScanner.getBarcodeStreamReceiver(
+      //     "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+      codigoBarra = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", "Cancelar", true, ScanMode.DEFAULT);
+      print(codigoBarra);
+    } catch (e) {
+      print("Ocorreu um erro: ");
+      print(e);
+    }
+    // String codigoBarra = '6935364092313';
 
     try {
       if (codigoBarra != null) {
@@ -324,20 +366,8 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         int i = 0;
         lista_artigo_inventario.forEach((artigo) async {
           if (artigo.codigoBarra == codigoBarra) {
-            // print("Encontrado");
-
             print("ARtigo " + artigo.artigo);
-            // print("descricao " + artigo.descricao);
-            // BuildContext contexto = posicao[i].currentContext;
-            // posicao[i].currentState.setState(() {
-
-            //             });
-            // contexto.
-
-            setState(() {
-              // items = getListaArtigo(lista_artigo_inventario);
-              posicao[i] = true;
-            });
+            posicao[i] = true;
             _scrollController
                 .animateTo(
               (94.0 * i),
@@ -359,27 +389,21 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
   void _onItemTapped(int index) async {
     // Sair
     if (index == 0) {
-      if (artigos != null && artigos.length > 0) {
-        createAlertDialog(contexto).then((sair) {
-          if (sair == true) {
-            Navigator.of(contexto).pop();
-          }
-        });
-      }
-    }
-    if (index == 1) {
+      setState(() {
+        evtPesquisar = true;
+      });
+    } else if (index == 1) {
       // Ler codigo de barra de um artigo e identificar se esta
       // na lista de ArtigoExpedição, se localizado, alterar as quantidades
       // a expedir e alterar o estado da linha como processado ou actualizado
 
       //
-      scanBarCode();
+      await scanBarCode();
       // _scrollController.jumpTo(_scrollController.);
       actualizarEstado();
 
       // Terminar
-    }
-    if (index == 2) {
+    } else if (index == 2) {
       createAlertDialogEncomendaProcesso(BuildContext context) {
         bool rv = false;
         return showDialog(
@@ -644,10 +668,6 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
       artigo: artigo,
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(top: 15, left: 20, right: 16, bottom: 4),
-          ),
-
           ExpansionTile(
             initiallyExpanded: state,
             key: expansionTileKey,
@@ -655,28 +675,22 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                     color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16)),
+                    // fontWeight: FontWeight.bold,
+                    fontSize: 13)),
             subtitle: Column(
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Text("Artigo:" + artigo.artigo,
+                    Text("Artigo: " + artigo.artigo,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)),
+                        style: TextStyle(color: Colors.blue, fontSize: 13)),
                   ],
                 ),
                 Row(
                   children: <Widget>[
                     Text("Lote: " + artigo.lote,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)),
+                        style: TextStyle(color: Colors.blue, fontSize: 13)),
                   ],
                 ),
               ],
@@ -692,7 +706,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                       "Localização: ",
                       style: TextStyle(
                         color: Colors.blue,
-                        fontSize: 18,
+                        fontSize: 13,
                       ),
                     ),
                   ),
@@ -703,7 +717,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                       artigo.localizacao,
                       style: TextStyle(
                         color: Colors.blue,
-                        fontSize: 18,
+                        fontSize: 13,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -711,7 +725,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                 ],
               ),
               Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Padding(
                     padding:
@@ -720,43 +734,41 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                       "Quantidade: ",
                       style: TextStyle(
                         color: Colors.blue,
-                        fontSize: 18,
+                        fontSize: 13,
                       ),
                     ),
                   ),
-                  Spacer(),
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: 1, left: 15, right: 20, bottom: 10),
-                    child: Container(
-                      child: TextField(
-                        autofocus: true,
-                        keyboardType: TextInputType.number,
-                        controller: txtArtigoQtd,
-                        onChanged: (value) {
-                          try {
-                            if (double.parse(txtArtigoQtd.text) > 0) {
-                              artigo.quantidadeStock =
-                                  double.parse(txtArtigoQtd.text);
-                            }
-                          } catch (e) {
-                            print(e);
+                  // Spacer(),
+                  Container(
+                    padding:
+                        EdgeInsets.only(top: 0, left: 15, right: 5, bottom: 0),
+                    child: TextField(
+                      autofocus: true,
+                      keyboardType: TextInputType.number,
+                      controller: txtArtigoQtd,
+                      onChanged: (value) {
+                        try {
+                          if (double.parse(txtArtigoQtd.text) > 0) {
+                            artigo.quantidadeStock =
+                                double.parse(txtArtigoQtd.text);
                           }
-                        },
-                        onTap: () {
-                          txtArtigoQtd.selection = TextSelection(
-                              baseOffset: 0,
-                              extentOffset: txtArtigoQtd.value.text.length);
-                        },
-                        textAlign: TextAlign.end,
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                        } catch (e) {
+                          print(e);
+                        }
+                      },
+                      onTap: () {
+                        txtArtigoQtd.selection = TextSelection(
+                            baseOffset: 0,
+                            extentOffset: txtArtigoQtd.value.text.length);
+                      },
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
                       ),
-                      width: 100,
                     ),
+                    width: 100,
                   ),
                 ],
               ),
@@ -799,6 +811,78 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         ],
       ),
     );
+  }
+
+  Widget togglePesquisa() {
+    return evtPesquisar
+        ? new TextField(
+            key: inventarioPesquisaKey,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: 'Pesquise aqui...',
+            ),
+            onChanged: (value) {
+              // items.clear();
+
+              setState(() {
+                if (value.length >= 0) {
+                  items = PesquisaListaArtigo(lista_artigo_inventario, value);
+                } else {
+                  items = getListaArtigo(lista_artigo_inventario);
+                }
+              });
+            },
+            onEditingComplete: () {
+              if (inventarioPesquisarController.text.length == 0) {
+                setState(() {
+                  evtPesquisar = false;
+                });
+              }
+            },
+            onSubmitted: (value) {
+              if (value.length == 0) {
+                setState(() {
+                  evtPesquisar = false;
+                });
+              }
+            },
+            controller: inventarioPesquisarController,
+          )
+        : new Text('Inventario');
+  }
+
+  List<Widget> PesquisaListaArtigo(
+      List<ArtigoInventario> artigos, String keyword) {
+    List<Widget> lista_widget = List<Widget>();
+    if (keyword == null || keyword.length == 0) {
+      return getListaArtigo(artigos);
+    }
+    keyword = keyword.toLowerCase();
+    if (artigos != null || artigos.length > 0) {
+      int i = 0;
+      artigos.forEach((artigo) {
+        if (artigo.artigo.toLowerCase().contains(keyword) ||
+            artigo.descricao.toLowerCase().contains(keyword)) {
+          lista_widget.add(artigoInventario(artigo));
+        }
+      });
+    }
+
+    if (lista_widget.length == 0) {
+      lista_widget.add(Container(
+          height: 60,
+          padding: EdgeInsets.all(10),
+          color: Colors.white,
+          child: Center(
+            child: Text(
+              "Artigo não encontrado.",
+              style: TextStyle(color: Colors.blue, fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+          )));
+    }
+
+    return lista_widget;
   }
 }
 

@@ -111,21 +111,25 @@ class FornecedorListaItem extends StatelessWidget {
           title: Text(
             fornecedor.nome,
             style: TextStyle(
-                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16),
+                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 13),
           ),
-          subtitle: Text(
-            fornecedor.fornecedor +
-                '\n' +
-                fornecedor.numContribuinte.toString().replaceAll(" ", "") +
-                '\n' +
-                "Encomenda Pendente: 0.0 " +
-                '\n' +
-                "Venda não Convertida: 0.0" +
-                '\n' +
-                "Total Deb: 0.0" +
-                '\n' +
-                "Limite Credito: 0.0",
-            style: TextStyle(color: Colors.blue, fontSize: 14),
+          subtitle: Column(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "Fornecedor: ",
+                    style: TextStyle(color: Colors.blue, fontSize: 13),
+                  ),
+                  Text(
+                    fornecedor.nome == null
+                        ? ""
+                        : fornecedor.fornecedor.toString(),
+                    style: TextStyle(color: Colors.blue, fontSize: 13),
+                  )
+                ],
+              ),
+            ],
           ),
           data: fornecedor.fornecedor,
         ));
