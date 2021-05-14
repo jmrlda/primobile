@@ -104,25 +104,32 @@ class ClienteListaItem extends StatelessWidget {
           title: Text(
             cliente.nome,
             style: TextStyle(
-                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16),
+                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 13),
           ),
-          subtitle: Text(
-            cliente.endereco.descricao +
-                ' - ' +
-                cliente.numContrib.toString().replaceAll(" ", "") +
-                ' - ' +
-                "Encomenda Pendente: " +
-                cliente.encomendaPendente.toStringAsFixed(2) +
-                ' - ' +
-                "Venda não Convertida: " +
-                cliente.vendaNaoConvertida.toStringAsFixed(2) +
-                ' - ' +
-                "Total Deb: " +
-                cliente.totalDeb.toStringAsFixed(2) +
-                ' - ' +
-                "Limite Credito: " +
-                cliente.limiteCredito.toStringAsFixed(2),
-            style: TextStyle(color: Colors.blue, fontSize: 14),
+          subtitle: Column(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    cliente.endereco.descricao ?? "",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Nº Contribuinte: " +
+                            cliente.numContrib.toString().replaceAll(" ", "") ??
+                        "",
+                    style: TextStyle(color: Colors.blue, fontSize: 13),
+                  )
+                ],
+              )
+            ],
           ),
           data: cliente.cliente,
         ));

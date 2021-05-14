@@ -6,4 +6,4 @@ List<Expedicao> listaExpedicaoSelecionado = List<Expedicao>();
 List<Expedicao> listaExpedicao = List<Expedicao>();
 ExpedicaoBloc expedicaoBloc;
 
-    TextEditingController expedicaoPesquisarController = TextEditingController();
+TextEditingController expedicaoPesquisarController = TextEditingController();
