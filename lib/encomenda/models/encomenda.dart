@@ -214,8 +214,8 @@ class Encomenda {
   static Future<http.Response> postEncomenda(Encomenda encomenda) async {
     Map<String, dynamic> parsed = await SessaoApiProvider.readSession();
     String protocolo = 'http://';
-    String host = SessaoApiProvider.base_url;
-    String rota = '/WebApi/EncomendaController/Encomenda/ecl/2021/' +
+    String host = await SessaoApiProvider.getRemoteHostUrl();
+    String rota = '/WebApi/EncomendaController/Encomenda/ecl/B2021/' +
         encomenda.cliente.cliente;
     var url = protocolo + host + rota;
     http.Response response;
@@ -326,5 +326,34 @@ class Encomenda {
     print("${response.statusCode}");
     print("${response.body}");
     return response;
+  }
+
+  static bool estaDentroLimiteCredito(Cliente cliente, valorTotal) {
+    double saldo = calcularSaldoCliente(cliente);
+    if (saldo == null) return false;
+    if (valorTotal > saldo) return false;
+
+    return true;
+  }
+
+  static bool temSaldoCliente(Cliente cliente) {
+    double saldo = calcularSaldoCliente(cliente);
+    if (saldo == null) return false;
+    if (saldo <= 0) return false;
+
+    return true;
+  }
+
+  static double calcularSaldoCliente(Cliente cliente) {
+    try {
+      double saldo = (cliente.totalDeb +
+              cliente.encomendaPendente +
+              cliente.vendaNaoConvertida) -
+          cliente.limiteCredito;
+
+      return saldo;
+    } catch (e) {
+      return null;
+    }
   }
 }
