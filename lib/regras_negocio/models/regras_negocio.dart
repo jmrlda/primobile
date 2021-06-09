@@ -76,7 +76,7 @@ class RegraPrecoDesconto {
 
 /*
  * 
- *  Verificar se a regra possui validade e se pela ainda eh aplicavel
+ *  Verificar se a regra possui validade e se  ainda é aplicavel
  * 
  */
   bool isRegraDataValido() {
