@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:primobile/artigo/bloc/artigo_bloc.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/artigo/util.dart';
@@ -93,26 +94,29 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
             if (this.widget.isSelected) {
               if (existeArtigoSelecionado(widget.artigo) == false) {
                 try {
-                  txtArtigoQtd.text =
-                      widget.artigo.quantidade.toStringAsFixed(2).toString();
+                  txtArtigoQtd.text = "1.00";
+                  // widget.artigo.quantidade.toStringAsFixed(2).toString();
                   double qtd = await showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
+                        scrollable: true,
                         content: StatefulBuilder(
                             // You need this, notice the parameters below:
                             builder:
                                 (BuildContext context, StateSetter setState) {
                           return Column(
                             // Then, the content of your dialog.
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Center(
                                   child: Text(widget.artigo.descricao,
                                       style: TextStyle(fontSize: 12))),
                               Center(
-                                  child: Text('Quantidade em ' +
-                                      widget.artigo.unidade)),
+                                  child: Text(
+                                      'Quantidade em ' + widget.artigo.unidade,
+                                      style: TextStyle(fontSize: 12))),
                               TextField(
                                 keyboardType: TextInputType.number,
                                 controller: txtArtigoQtd,
@@ -127,13 +131,11 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
                               SizedBox(
                                 height: 10,
                               ),
-                              Text(
-                                msgQtd,
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                              Text(msgQtd,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold)),
                               Container(
                                   alignment: Alignment.bottomRight,
                                   child: MaterialButton(
