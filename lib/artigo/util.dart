@@ -3,9 +3,12 @@ import 'package:primobile/artigo/models/artigo.dart';
 
 import 'bloc/bloc.dart';
 
-List<Artigo> artigoLista = new List<Artigo>();
 List<Artigo> artigoListaDisplay = new List<Artigo>();
+List<Artigo> artigoListaDisplayFiltro = new List<Artigo>();
 
+// List<Artigo> artigoListaArmazemDisplay = new List<Artigo>();
+Map<String, List<String>> artigoListaArmazemDisplay =
+    Map<String, List<String>>();
 List<Artigo> artigosDuplicado = new List<Artigo>();
 List<Artigo> listaArtigoSelecionado = List<Artigo>();
 bool isSelected = false;
@@ -62,6 +65,7 @@ bool existeArtigoSelecionado(Artigo a) {
   for (var i = 0; i < listaArtigoSelecionado.length; i++) {
     if (listaArtigoSelecionado[i].artigo == a.artigo) {
       existe = true;
+      break;
     }
   }
   return existe;

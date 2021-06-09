@@ -5,8 +5,9 @@ import 'package:primobile/cliente/models/models.dart';
 
 import 'bloc/bloc.dart';
 
-List<Cliente> clienteLista = new List<Cliente>();
 List<Cliente> clienteListaSelecionado = new List<Cliente>();
+List<Cliente> clienteListaDisplay = new List<Cliente>();
+
 bool isSelected = false;
 String baseUrl = "";
 String url = "";

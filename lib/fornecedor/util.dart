@@ -4,6 +4,8 @@ import 'package:primobile/fornecedor/models/fornecedor.dart';
 import 'package:http/http.dart' as http;
 
 List<Fornecedor> fornecedorLista = new List<Fornecedor>();
+List<Fornecedor> fornecedorListaDisplay = new List<Fornecedor>();
+
 List<Fornecedor> fornecedorListaSelecionado = List<Fornecedor>();
 bool isSelected = false;
 
