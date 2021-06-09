@@ -29,10 +29,10 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
       try {
         if (currentState is ClienteInicial) {
           List<Cliente> clientes = await _fetchClientes(0, 20);
-          if (clientes != null) {
-            await SessaoApiProvider.refreshToken();
-            clientes = await _fetchClientes(0, 20);
-          }
+          // if (clientes != null) {
+          //   await SessaoApiProvider.refreshToken();
+          //   clientes = await _fetchClientes(0, 20);
+          // }
           if (clientes == null) {
             yield ClienteFalha();
             return;
@@ -85,9 +85,12 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
         } else if (currentState is ClienteFalha) {
           final clientes =
               clientePesquisar(this.query, await _fetchClientes(0, 20));
-
-          ClienteSucessoPesquisa(
-              clientes: clientes, hasReachedMax: true, query: this.query);
+          yield clientes.isEmpty
+              ? ClienteFalha()
+              : ClienteSucessoPesquisa(
+                  clientes: clientes, hasReachedMax: true, query: this.query);
+          // ClienteSucessoPesquisa(
+          //     clientes: clientes, hasReachedMax: true, query: this.query);
           return;
         } else {
           yield ClienteFalha();
@@ -106,21 +109,56 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
 
   Future<List<Cliente>> _fetchClientes(int startIndex, int limit) async {
     try {
-      List<Cliente> listaCliente = List<Cliente>();
+      if (clienteListaDisplay.length > 0) {
+        return clienteListaDisplay;
+      } else {
+        dynamic data = await getCacheData("cliente");
+        if (data != null) {
+          data = json.decode(data);
 
-      dynamic data = await getCacheData("cliente");
-      if (data != null) {
-        data = json.decode(data);
+          if (data.length > 0) {
+            clienteListaDisplay.clear();
 
-        // listaCliente.clear();
-        if (data.length > 0) {
-          for (dynamic rawCliente in data) {
-            listaCliente.add(Cliente.fromJson(rawCliente));
+            for (dynamic rawCliente in data) {
+              clienteListaDisplay.add(Cliente.fromJson(rawCliente));
+            }
+            return clienteListaDisplay;
           }
-          return listaCliente;
+
+          return List<Cliente>();
         }
+
+        return await _fetch();
+      }
+    } catch (e) {
+      try {
+        return await _fetch();
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+
+  Future<List<Cliente>> clienteSync() async {
+    try {
+      clienteListaDisplay.clear();
+      clienteListaSelecionado.clear();
+
+      removeKeyCacheData("cliente");
+      List<Cliente> clientes = await _fetch();
+      if (clientes == null) {
+        await SessaoApiProvider.refreshToken();
+        clientes = await _fetch();
       }
 
+      return clientes;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<Cliente>> _fetch() async {
+    try {
       var sessao = await SessaoApiProvider.readSession();
       var response;
       if (sessao == null || sessao.length == 0) {
@@ -133,22 +171,23 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
         String baseUrl = await SessaoApiProvider.getHostUrl();
         String protocolo = await SessaoApiProvider.getProtocolo();
         final response = await httpClient.get(
-            protocolo +
-                baseUrl +
-                '/WebApi/Plataforma/Listas/CarregaLista/clientes',
+            protocolo + baseUrl + '/WebApi/ClienteController/Cliente/lista',
             headers: {
               "Authorization": "Bearer $token",
               "Accept": "application/json"
             });
 
         if (response.statusCode == 200) {
-          final List data = json.decode(response.body)["Data"] as List;
-          ToList lista = new ToList();
+          // final List data = json.decode(response.body)["Data"] as List;
+          dynamic data = json.decode(response.body);
+          data = json.decode(data)["DataSet"]["Table"];
 
+          ToList lista = new ToList();
+          clienteListaDisplay.clear();
           for (dynamic rawCliente in data) {
             Cliente _cliente = Cliente.fromJson(rawCliente);
 
-            listaCliente.add(_cliente);
+            clienteListaDisplay.add(_cliente);
             lista.items.add(_cliente);
           }
           // data.map((cliente) {
@@ -156,15 +195,16 @@ class ClienteBloc extends Bloc<ClienteEvent, ClienteState> {
           // });
           await saveCacheData("cliente", lista);
 
-          return listaCliente;
-        } else if (response.statusCode == 401 || response.statusCode == 500) {
+          return clienteListaDisplay;
+        } else if (response.statusCode == 401) {
           //  #TODO informar ao usuario sobre a renovação da sessão
           // mostrando mensagem e um widget de LOADING
-
-          return List<Cliente>();
+          await SessaoApiProvider.refreshToken();
+          return await _fetch();
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);
+          return null;
         }
       }
     } catch (e) {

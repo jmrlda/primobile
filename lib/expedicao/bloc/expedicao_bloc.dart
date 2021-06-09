@@ -125,70 +125,97 @@ class ExpedicaoBloc extends Bloc<ExpedicaoEvent, ExpedicaoState> {
 
     try {
       // TODO: verificar quando buscar dados do cache
-
-      // dynamic data = await getCacheData("expedicao");
-
-      // if (data != null) {
-      //   data = json.decode(data);
-
-      //   listaExpedicao.clear();
-      //   if (data.length > 0) {
-      //     for (dynamic rawExpedicao in data) {
-      //       listaExpedicao.add(Expedicao.fromJson(rawExpedicao));
-      //     }
-      //     return listaExpedicao;
-      //   }
-      // }
-
-      var sessao = await SessaoApiProvider.readSession();
-      var response;
-      if (sessao == null || sessao.length == 0) {
-        print('Ficheiro sessao nao existe');
-        return List<Expedicao>();
+      if (listaExpedicaoDisplay.length > 0) {
+        return listaExpedicaoDisplay;
       } else {
-        String token = sessao['access_token'];
-        String ip = sessao['ip_local'];
-        String porta = sessao['porta'];
-        String baseUrl = await SessaoApiProvider.getHostUrl();
-        String protocolo = await SessaoApiProvider.getProtocolo();
+        dynamic data = await getCacheData("expedicao");
 
-        final response = await httpClient.get(
-            protocolo +
-                baseUrl +
-                '/WebApi/Plataforma/Listas/CarregaLista/inv_cabecexpedicoes',
-            headers: {
-              "Authorization": "Bearer $token",
-              "Accept": "application/json"
-            });
+        if (data != null) {
+          data = json.decode(data);
 
-        if (response.statusCode == 200) {
-          final List data = json.decode(response.body)["Data"] as List;
-          ToList lista = new ToList();
-
-          listaExpedicao = data.map((expedicao) {
-            lista.items.add(expedicao);
-            return Expedicao.fromJson(expedicao);
-          }).toList();
-          // await saveCacheData("expedicao", lista);
-
-          return listaExpedicao;
-        } else if (response.statusCode == 401 || response.statusCode == 500) {
-          //  #TODO informar ao usuario sobre a renovação da sessão
-          // mostrando mensagem e um widget de LOADING
-          listaExpedicao = List<Expedicao>();
-
-          return listaExpedicao;
-        } else {
-          final msg = json.decode(response.body);
-          print("Ocorreu um erro" + msg);
+          listaExpedicaoDisplay.clear();
+          if (data.length > 0) {
+            for (dynamic rawExpedicao in data) {
+              listaExpedicaoDisplay.add(Expedicao.fromJson(rawExpedicao));
+            }
+            return listaExpedicaoDisplay;
+          }
         }
+        return await _fetch();
       }
     } catch (e) {
-      throw e;
+      try {
+        return await _fetch();
+      } catch (e) {
+        return null;
+      }
     }
+  }
 
-    // } else {
-    //   throw Exception('Erro na busca por artigos');
-    // }
+  Future<List<Expedicao>> expedicaoSync() async {
+    try {
+      listaExpedicaoDisplay.clear();
+      listaExpedicaoSelecionado.clear();
+      removeKeyCacheData("expedicao");
+
+      List<Expedicao> expedicao = await _fetch();
+      if (expedicao == null) {
+        await SessaoApiProvider.refreshToken();
+        expedicao = await _fetch();
+      }
+      return expedicao;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<Expedicao>> _fetch() async {
+    var sessao = await SessaoApiProvider.readSession();
+    var response;
+    if (sessao == null || sessao.length == 0) {
+      print('Ficheiro sessao nao existe');
+      return List<Expedicao>();
+    } else {
+      String token = sessao['access_token'];
+      String ip = sessao['ip_local'];
+      String porta = sessao['porta'];
+      String baseUrl = await SessaoApiProvider.getHostUrl();
+      String protocolo = await SessaoApiProvider.getProtocolo();
+
+      final response = await httpClient.get(
+          protocolo +
+              baseUrl +
+              '/WebApi/ExpedicaoCabecController/Expedicao/cabecalho',
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json"
+          });
+
+      if (response.statusCode == 200) {
+        dynamic data = json.decode(response.body);
+        data = json.decode(data)["DataSet"]["Table"];
+        ToList lista = new ToList();
+        listaExpedicaoDisplay.clear();
+
+        for (dynamic rawCliente in data) {
+          Expedicao expedicao = Expedicao.fromJson(rawCliente);
+          lista.items.add(expedicao);
+          listaExpedicaoDisplay.add(expedicao);
+        }
+
+        await saveCacheData("expedicao", lista);
+
+        return listaExpedicaoDisplay;
+      } else if (response.statusCode == 401 || response.statusCode == 500) {
+        //  #TODO informar ao usuario sobre a renovação da sessão
+        // mostrando mensagem e um widget de LOADING
+        listaExpedicaoDisplay = List<Expedicao>();
+
+        return listaExpedicaoDisplay;
+      } else {
+        final msg = json.decode(response.body);
+        print("Ocorreu um erro" + msg);
+      }
+    }
   }
 }

@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/fornecedor/models/models.dart';
+import 'package:primobile/fornecedor/util.dart';
 
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:primobile/util/util.dart';
@@ -94,7 +95,7 @@ class FornecedorBloc extends Bloc<FornecedorEvent, FornecedorState> {
           final fornecedores =
               fornecedorPesquisar(this.query, await _fetchFornecedores(0, 20));
 
-          FornecedorSucessoPesquisa(
+          yield FornecedorSucessoPesquisa(
               fornecedores: fornecedores,
               hasReachedMax: true,
               query: this.query);
@@ -116,20 +117,53 @@ class FornecedorBloc extends Bloc<FornecedorEvent, FornecedorState> {
 
   Future<List<Fornecedor>> _fetchFornecedores(int startIndex, int limit) async {
     try {
-      dynamic data = await getCacheData("fornecedor");
-      List<Fornecedor> listaFornecedor = List<Fornecedor>();
-      if (data != null) {
-        data = json.decode(data);
+      if (fornecedorListaDisplay.length > 0) {
+        return fornecedorListaDisplay;
+      } else {
+        dynamic data = await getCacheData("fornecedor");
+        if (data != null) {
+          data = json.decode(data);
 
-        // listaFornecedor.clear();
-        if (data.length > 0) {
-          for (dynamic rawFornecedor in data) {
-            listaFornecedor.add(Fornecedor.fromJson(rawFornecedor));
+          // listaFornecedor.clear();
+          if (data.length > 0) {
+            for (dynamic rawFornecedor in data) {
+              fornecedorListaDisplay.add(Fornecedor.fromJson(rawFornecedor));
+            }
+            return fornecedorListaDisplay;
           }
-          return listaFornecedor;
         }
+        return await _fetch();
+      }
+    } catch (e) {
+      try {
+        return await _fetch();
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+
+  Future<List<Fornecedor>> fornecedorSync() async {
+    try {
+      fornecedorListaDisplay.clear();
+      fornecedorLista.clear();
+      fornecedorListaSelecionado.clear();
+      removeKeyCacheData("fornecedor");
+
+      List<Fornecedor> fornecedores = await _fetch();
+      if (fornecedores != null) {
+        await SessaoApiProvider.refreshToken();
+        fornecedores = await _fetch();
       }
 
+      return fornecedores;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<Fornecedor>> _fetch() async {
+    try {
       var sessao = await SessaoApiProvider.readSession();
       var response;
       if (sessao == null || sessao.length == 0) {
@@ -144,19 +178,21 @@ class FornecedorBloc extends Bloc<FornecedorEvent, FornecedorState> {
         final response = await httpClient.get(
             protocolo +
                 baseUrl +
-                '/WebApi/Plataforma/Listas/CarregaLista/fornecedores',
+                '/WebApi/FornecedorController/fornecedor/lista',
             headers: {
               "Authorization": "Bearer $token",
               "Accept": "application/json"
             });
 
         if (response.statusCode == 200) {
-          final List data = json.decode(response.body)["Data"] as List;
+          dynamic data = json.decode(response.body);
+          data = json.decode(data)["DataSet"]["Table"];
+
           ToList lista = new ToList();
 
           for (dynamic rawFornecedor in data) {
             Fornecedor _fornecedor = Fornecedor.fromJson(rawFornecedor);
-            listaFornecedor.add(_fornecedor);
+            fornecedorListaDisplay.add(_fornecedor);
             lista.items.add(_fornecedor);
           }
           // data.map((cliente) {
@@ -164,7 +200,7 @@ class FornecedorBloc extends Bloc<FornecedorEvent, FornecedorState> {
           // });
           await saveCacheData("fornecedor", lista);
 
-          return listaFornecedor;
+          return fornecedorListaDisplay;
         } else if (response.statusCode == 401 || response.statusCode == 500) {
           //  #TODO informar ao usuario sobre a renovação da sessão
           // mostrando mensagem e um widget de LOADING
@@ -173,6 +209,7 @@ class FornecedorBloc extends Bloc<FornecedorEvent, FornecedorState> {
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);
+          return null;
         }
       }
     } catch (e) {

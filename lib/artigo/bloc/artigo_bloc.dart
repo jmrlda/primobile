@@ -104,20 +104,61 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
   bool _pesquisaHasReachedMax(ArtigoState state) =>
       (state is ArtigoSucessoPesquisa) && state.hasReachedMax;
 
-  Future<List<Artigo>> _fetchArtigos(int startIndex, int limit) async {
+  Future<List<Artigo>> _fetchArtigos(int startIndex, int limit,
+      {bool isSync = false}) async {
+    try {
+      if (isSync == true) {
+        artigoListaDisplay.clear();
+        artigoListaArmazemDisplay.clear();
+        artigoListaDisplayFiltro.clear();
+        removeKeyCacheData("artigo");
+      } else {
+        if (artigoListaDisplayFiltro.length > 0) {
+          return artigoListaDisplayFiltro;
+        } else {
+          dynamic data = json.decode(await getCacheData("artigo"));
+          if (data != null) {
+            if (data.length > 0) {
+              for (dynamic rawArtigo in data) {
+                artigoListaDisplayFiltro.add(Artigo.fromJson(rawArtigo));
+              }
+              return artigoListaDisplayFiltro;
+            }
+          }
+        }
+      }
+      return await _fetch();
+    } catch (e) {
+      return await _fetch();
+    }
+
+    // } else {
+    //   throw Exception('Erro na busca por artigos');
+    // }
+  }
+
+  Future<List<Artigo>> syncArtigo() async {
+    try {
+      artigoListaDisplay.clear();
+      artigoListaArmazemDisplay.clear();
+      artigoListaDisplayFiltro.clear();
+      removeKeyCacheData("artigo");
+      List<Artigo> artigos = await _fetch();
+      if (artigos != null && artigos.length == 0) {
+        await SessaoApiProvider.refreshToken();
+        artigos = await _fetch();
+      }
+
+      return artigos;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<Artigo>> _fetch() async {
     try {
       var sessao = await SessaoApiProvider.readSession();
       var response;
-      List<Artigo> lista_artigos = List<Artigo>();
-      // dynamic data = json.decode(await getCacheData("artigo"));
-      // if (data != null) {
-      //   if (data.length > 0) {
-      //     for (dynamic rawArtigo in data) {
-      //       lista_artigos.add(Artigo.fromJson(rawArtigo));
-      //     }
-      //     return lista_artigos;
-      //   }
-      // }
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessao nao existe');
         return List<Artigo>();
@@ -131,7 +172,9 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
         String protocolo = await SessaoApiProvider.getProtocolo();
 
         final response = await httpClient.get(
-            protocolo + baseUrl + '/WebApi/ArtigoController/Artigo/lista',
+            protocolo +
+                baseUrl +
+                '/WebApi/ArtigoController/Artigo/listaarmazem',
             headers: {
               "Authorization": "Bearer $token",
               "Accept": "application/json"
@@ -141,35 +184,84 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
           dynamic data = json.decode(response.body);
           data = json.decode(data)["DataSet"]["Table"];
           ToList lista = new ToList();
+          artigoListaDisplayFiltro.clear();
           for (dynamic rawArtigo in data) {
             Artigo _artigo = Artigo.fromJson(rawArtigo);
-            lista_artigos.add(_artigo);
-            lista.items.add(_artigo);
-          }
+            if (!artigoListaDisplay.contains(_artigo))
+              artigoListaDisplay.add(_artigo);
+            bool rv =
+                existeArtigoNaLista(artigoListaDisplayFiltro, _artigo.artigo);
+            if (rv == false) artigoListaDisplayFiltro.add(_artigo);
+            // String val = _artigo.armazem ?? "@" + "." + _artigo.localizacao ??
+            // String armazem;
+            // String lote;
+            // String local;
+            // // check se o artigo possui armazem valido
+            // if (_artigo.armazem == null)
+            //   armazem = "@";
+            // else if (_artigo.armazem.length == 0)
+            //   armazem = "@";
+            // else
+            //   armazem = _artigo.armazem;
 
-// lista_artigos =
+            // // check se o artigo possui localizacao valido
+            // if (_artigo.localizacao == null)
+            //   local = "@";
+            // else if (_artigo.localizacao.length == 0)
+            //   local = "@";
+            // else {
+            //   local = _artigo.localizacao;
+            // }
+
+            // // check se o artigo possui localizacao valido
+            // if (_artigo.lote == null)
+            //   lote = "@";
+            // else if (_artigo.lote.length == 0)
+            //   lote = "@";
+            // else
+            //   lote = _artigo.lote;
+
+            // String rv = armazem + "." + local + "." + lote;
+            // if (artigoListaArmazemDisplay.containsKey(_artigo.artigo)) {
+            //   if (!artigoListaArmazemDisplay[_artigo.artigo].contains(rv))
+            //     artigoListaArmazemDisplay[_artigo.artigo].add(rv);
+            // } else {
+            //   artigoListaArmazemDisplay[_artigo.artigo] = new List<String>();
+            //   artigoListaArmazemDisplay[_artigo.artigo].add(rv);
+            // }
+
+            // lista.items.add(_artigo);
+          }
+          lista.items.addAll(artigoListaDisplayFiltro);
           await saveCacheData("artigo", lista);
 
-          return lista_artigos;
-        } else if (response.statusCode == 401 || response.statusCode == 500) {
+          return artigoListaDisplayFiltro;
+        } else if (response.statusCode == 401) {
           //  #TODO informar ao usuario sobre a renovação da sessão
           // mostrando mensagem e um widget de LOADING
-          lista_artigos = List<Artigo>();
 
-          return lista_artigos;
+          await SessaoApiProvider.refreshToken();
+          return await _fetch();
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro " + msg);
+          return null;
         }
       }
     } catch (e) {
-      throw e;
+      return null;
+    }
+  }
 
-      // return 3;
+  bool existeArtigoNaLista(List<dynamic> lista, keyword) {
+    bool rv = false;
+    for (dynamic _artigo in lista) {
+      if (_artigo.artigo == keyword) {
+        rv = true;
+        break;
+      }
     }
 
-    // } else {
-    //   throw Exception('Erro na busca por artigos');
-    // }
+    return rv;
   }
 }

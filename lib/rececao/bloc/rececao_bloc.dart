@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/rececao/models/models.dart';
+import 'package:primobile/rececao/util.dart';
 
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:primobile/util/util.dart';
@@ -102,71 +103,100 @@ class RececaoBloc extends Bloc<RececaoEvent, RececaoState> {
       (state is RececaoSucessoPesquisa) && state.hasReachedMax;
 
   Future<List<Rececao>> _fetchRececao(int startIndex, int limit) async {
-    List<Rececao> listaRececao = List<Rececao>();
-
     try {
-      var sessao = await SessaoApiProvider.readSession();
-      var response;
-      dynamic data = await getCacheData("rececao");
-
-      if (data != null) {
-        data = json.decode(data);
-        listaRececao.clear();
-        if (data.length > 0) {
-          for (dynamic rawRececao in data) {
-            listaRececao.add(Rececao.fromJson(rawRececao));
-          }
-
-          return listaRececao;
-        }
-      }
-
-      if (sessao == null || sessao.length == 0) {
-        print('Ficheiro sessao nao existe');
-        return List<Rececao>();
+      if (listaRececaoDisplay.length > 0) {
+        return listaRececaoDisplay;
       } else {
-        String token = sessao['access_token'];
-        String ip = sessao['ip_local'];
-        String porta = sessao['porta'];
-        String baseUrl = await SessaoApiProvider.getHostUrl();
-        String protocolo = await SessaoApiProvider.getProtocolo();
+        dynamic data = await getCacheData("rececao");
 
-        final response = await httpClient.get(
-            protocolo +
-                baseUrl +
-                '/WebApi/Plataforma/Listas/CarregaLista/inv_cabecrececoes',
-            headers: {
-              "Authorization": "Bearer $token",
-              "Accept": "application/json"
-            });
+        if (data != null) {
+          data = json.decode(data);
+          listaRececaoDisplay.clear();
+          if (data.length > 0) {
+            for (dynamic rawRececao in data) {
+              listaRececaoDisplay.add(Rececao.fromJson(rawRececao));
+            }
 
-        if (response.statusCode == 200) {
-          final List data = json.decode(response.body)["Data"] as List;
-          // data.map((rececao) {
-          //   listaRececao.add(Rececao.fromJson(rececao));
-          // });
-          ToList lista = new ToList();
-
-          for (dynamic rececao in data) {
-            Rececao _rececao = Rececao.fromJson(rececao);
-            lista.items.add(_rececao);
-            listaRececao.add(_rececao);
+            return listaRececaoDisplay;
           }
 
-          await saveCacheData("rececao", lista);
-
-          return listaRececao;
-        } else if (response.statusCode == 401 || response.statusCode == 500) {
-          //  #TODO informar ao usuario sobre a renovação da sessão
-          // mostrando mensagem e um widget de LOADING
           return List<Rececao>();
-        } else {
-          final msg = json.decode(response.body);
-          print("Ocorreu um erro" + msg["Message"]);
         }
+        return await _fetch();
       }
     } catch (e) {
-      throw e;
+      try {
+        return await _fetch();
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+
+  Future<List<Rececao>> rececaoSync() async {
+    try {
+      listaRececaoDisplay.clear();
+      listaRececaoSelecionado.clear();
+      removeKeyCacheData("rececao");
+
+      List<Rececao> rececao = await _fetch();
+
+      if (rececao != null && rececao.length == 0) {
+        await SessaoApiProvider.refreshToken();
+        rececao = await _fetch();
+      }
+      return rececao;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<Rececao>> _fetch() async {
+    var sessao = await SessaoApiProvider.readSession();
+    var response;
+    if (sessao == null || sessao.length == 0) {
+      print('Ficheiro sessao nao existe');
+      return List<Rececao>();
+    } else {
+      String token = sessao['access_token'];
+      String ip = sessao['ip_local'];
+      String porta = sessao['porta'];
+      String baseUrl = await SessaoApiProvider.getHostUrl();
+      String protocolo = await SessaoApiProvider.getProtocolo();
+
+      final response = await httpClient.get(
+          protocolo + baseUrl + '/WebApi/RececaoController/Rececao/cabecalho',
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json"
+          });
+
+      if (response.statusCode == 200) {
+        dynamic data = json.decode(response.body);
+        data = json.decode(data)["DataSet"]["Table"];
+        // data.map((rececao) {
+        //   listaRececao.add(Rececao.fromJson(rececao));
+        // });
+        ToList lista = new ToList();
+
+        for (dynamic rececao in data) {
+          Rececao _rececao = Rececao.fromJson(rececao);
+          lista.items.add(_rececao);
+          listaRececaoDisplay.add(_rececao);
+        }
+
+        await saveCacheData("rececao", lista);
+
+        return listaRececaoDisplay;
+      } else if (response.statusCode == 401 || response.statusCode == 500) {
+        //  #TODO informar ao usuario sobre a renovação da sessão
+        // mostrando mensagem e um widget de LOADING
+        return List<Rececao>();
+      } else {
+        final msg = json.decode(response.body);
+        print("Ocorreu um erro" + msg["Message"]);
+        return null;
+      }
     }
   }
 }

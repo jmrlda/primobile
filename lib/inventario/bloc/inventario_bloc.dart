@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/inventario/models/models.dart';
+import 'package:primobile/inventario/util.dart';
 
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:primobile/util/util.dart';
@@ -56,6 +57,7 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
         }
       } catch (_) {
         yield InventarioFalha();
+        return;
       }
     }
 
@@ -103,10 +105,12 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
                   query: this.query);
           return;
         } else {
-          InventarioFalha();
+          yield InventarioFalha();
+          return;
         }
       } catch (e) {
         yield InventarioFalha();
+        return;
       }
     }
   }
@@ -119,22 +123,62 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
 
   Future<List<Inventario>> _fetchInventario(int startIndex, int limit) async {
     try {
+      if (listaInventarioDisplay.length > 0) {
+        return listaInventarioDisplay;
+      } else {
+        dynamic data = await getCacheData("inventario");
+
+        if (data != null) {
+          data = json.decode(data);
+          // listaCliente.clear();
+          if (data.length > 0) {
+            for (dynamic rawInventario in data) {
+              listaInventarioDisplay.add(Inventario.fromJson(rawInventario));
+            }
+
+            return listaInventarioDisplay;
+          }
+        }
+        return await _fetch();
+      }
+    } catch (e) {
+      try {
+        return await _fetch();
+      } catch (e) {
+        return null;
+      }
+
+      // return 3;
+    }
+
+    // } else {
+    //   throw Exception('Erro na busca por artigos');
+    // }
+  }
+
+  Future<List<Inventario>> inventarioSync() async {
+    try {
+      listaInventarioDisplay.clear();
+      listaInventarioDisplayFiltro.clear();
+      listaInventarioSelecionado.clear();
+      removeKeyCacheData("inventario");
+
+      List<Inventario> inventario = await _fetch();
+
+      if (inventario != null && inventario.length == 0) {
+        await SessaoApiProvider.refreshToken();
+        inventario = await _fetch();
+      }
+      return inventario;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<Inventario>> _fetch() async {
+    try {
       var sessao = await SessaoApiProvider.readSession();
       var response;
-      List<Inventario> listaInventario = List<Inventario>();
-      dynamic data = await getCacheData("inventario");
-
-      if (data != null) {
-        data = json.decode(data);
-        // listaCliente.clear();
-        if (data.length > 0) {
-          for (dynamic rawInventario in data) {
-            listaInventario.add(Inventario.fromJson(rawInventario));
-          }
-
-          return listaInventario;
-        }
-      }
       if (sessao == null || sessao.length == 0) {
         print('Ficheiro sessão não existe');
         return List<Inventario>();
@@ -157,19 +201,20 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
           // final List data = json.decode(response.body)["Data"] as List;
           dynamic data = json.decode(response.body);
           data = json.decode(data)["DataSet"]["Table"];
+          ToList lista = new ToList();
 
           for (dynamic rawArtigo in data) {
-            listaInventario.add(Inventario.fromJson(rawArtigo));
+            Inventario _inventario = Inventario.fromJson(rawArtigo);
+            listaInventarioDisplay.add(_inventario);
+            lista.items.add(_inventario);
           }
-          // await saveCacheData("inventario", listaInventario);
+          await saveCacheData("inventario", lista);
 
-          return listaInventario;
+          return listaInventarioDisplay;
         } else if (response.statusCode == 401 || response.statusCode == 500) {
           //  #TODO informar ao usuario sobre a renovação da sessão
           // mostrando mensagem e um widget de LOADING
-          listaInventario = List<Inventario>();
-
-          return listaInventario;
+          return List<Inventario>();
         } else {
           final msg = json.decode(response.body);
           print("Ocorreu um erro" + msg["Message"]);
@@ -177,16 +222,7 @@ class InventarioBloc extends Bloc<InventarioEvent, InventarioState> {
         }
       }
     } catch (e) {
-      if (e.osError.errorCode == 111) {
-        // return 2;
-        print("sem internet ");
-      }
-
-      // return 3;
+      throw e;
     }
-
-    // } else {
-    //   throw Exception('Erro na busca por artigos');
-    // }
   }
 }
