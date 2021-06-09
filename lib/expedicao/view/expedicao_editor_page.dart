@@ -633,13 +633,25 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
 
         if (response.statusCode == 200) {
           dynamic data = json.decode(response.body);
+          ArtigoExpedicao _artigoExp = new ArtigoExpedicao();
 
+          listaArtigoExpedicaoDisplayFiltro.clear();
+          listaArtigoExpedicaoDisplay.clear();
+          expedicaoListaArmazemDisplay.clear();
           await data.map((expedicao) {
-            lista_artigo_expedicao
-                .add(ArtigoExpedicao.fromJson(json.decode(expedicao)));
+            _artigoExp = ArtigoExpedicao.fromJson(json.decode(expedicao));
+            agruparArtigoArmazem(_artigoExp);
+            bool rv = existeArtigoNaLista(
+                listaArtigoExpedicaoDisplayFiltro, _artigoExp.artigo);
+            if (rv == false) listaArtigoExpedicaoDisplayFiltro.add(_artigoExp);
+
+            lista_artigo_expedicao.add(_artigoExp);
           }).toList();
 
           return lista_artigo_expedicao;
+        } else if (response.statusCode == 401) {
+          await SessaoApiProvider.refreshToken();
+          return _fetchLinhaExpedicao(numDoc, 0, 0);
         }
         final msg = json.decode(response.body);
         print("Ocorreu um erro" + msg["Message"]);
