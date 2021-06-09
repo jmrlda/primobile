@@ -14,6 +14,8 @@ class ArtigoInventario {
   double quantidadeStockReserva;
 
   String codigoBarra;
+  String armazem;
+
   String localizacao;
   String lote;
 
@@ -23,6 +25,7 @@ class ArtigoInventario {
       this.unidade,
       this.quantidadeStock,
       this.codigoBarra,
+      this.armazem,
       this.lote,
       this.localizacao,
       this.quantidadeStockReserva});
@@ -31,18 +34,21 @@ class ArtigoInventario {
       new ArtigoInventario(
           artigo: map['artigo'],
           descricao: map['descricao'],
-          quantidadeStock: double.parse(map['quantidade_stock']),
+          quantidadeStock: double.tryParse(map['quantidade_stock'] ?? 0.0),
           codigoBarra: map['codigo_barra'],
+          armazem: map['armazem'] ?? "",
           lote: map['lote'],
           localizacao: map['localizacao'],
           unidade: map['unidade'],
-          quantidadeStockReserva: double.parse(map['quantidade_reserva']));
+          quantidadeStockReserva:
+              double.tryParse(map['quantidade_reserva'] ?? 0.0));
 
   Map<String, dynamic> toJson() => {
         'artigo': artigo,
         'descricao': descricao,
         'quantidade_stock': quantidadeStock,
         'codigo_barra': codigoBarra,
+        'armazem': armazem,
         'lote': lote,
         'localizacao': localizacao,
         'unidade': unidade,
@@ -53,12 +59,14 @@ class ArtigoInventario {
     return ArtigoInventario(
         artigo: json['artigo'],
         descricao: json['descricao'],
-        quantidadeStock: double.parse(json['quantidade_stock']),
+        quantidadeStock: double.tryParse(json['quantidade_stock'] ?? 0.0),
         codigoBarra: json['codigo_barra'],
+        armazem: json['armazem'] ?? "",
         lote: json['lote'],
         localizacao: json['localizacao'],
         unidade: json['unidade'],
-        quantidadeStockReserva: double.parse(json['quantidade_reserva']));
+        quantidadeStockReserva:
+            double.tryParse(json['quantidade_reserva'] ?? 0.0));
   }
 
   List<ArtigoInventario> parseInventario(String response) {
