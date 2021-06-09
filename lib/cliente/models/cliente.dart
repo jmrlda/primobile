@@ -4,39 +4,44 @@ class Cliente {
   String cliente;
   String nome;
   String nomeFiscal;
-  int numContrib;
+  String numContrib;
   Endereco endereco;
   bool anulado;
-  int tipoCred;
+  int tipoCredito;
   double totalDeb;
   double encomendaPendente;
   double vendaNaoConvertida;
   double limiteCredito;
+  double desconto;
+  int tipoPreco;
+  String telefone;
   String imagemBuffer;
 
   Cliente(
       {this.cliente,
       this.nome,
       this.nomeFiscal,
-      this.numContrib = 0,
+      this.numContrib = "0",
       this.endereco,
       this.anulado,
-      this.tipoCred,
       this.totalDeb,
       this.encomendaPendente,
       this.vendaNaoConvertida,
       this.limiteCredito,
+      this.desconto,
+      this.tipoCredito,
+      this.tipoPreco,
+      this.telefone,
       this.imagemBuffer});
 
   factory Cliente.fromMap(Map<String, dynamic> json) => new Cliente(
       cliente: json['Cliente'],
       nome: json['Nome'],
       nomeFiscal: json['Nome Fiscal'],
-      numContrib:
-          int.parse(json['N.º Contribuinte'].toString().replaceAll(" ", "")),
+      numContrib: json['numcontrib'] ?? 0,
       endereco: new Endereco(descricao: json['Morada']),
-      anulado: false,
-      tipoCred: 0,
+      anulado: json['clienteanulado'] ?? false,
+      tipoCredito: 0,
       totalDeb: 0,
       encomendaPendente: 0,
       vendaNaoConvertida: 0,
@@ -48,15 +53,17 @@ class Cliente {
   Map<String, dynamic> toJson() => {
         'cliente': cliente,
         'nome': nome,
-        'numContrib': numContrib,
+        'numcontrib': numContrib,
         'endereco': endereco.toJson(),
         'anulado': anulado,
-        'tipoCred': tipoCred,
-        'totalDeb': totalDeb,
-        'encomendaPendente': encomendaPendente,
-        'vendaNaoConvertida': vendaNaoConvertida,
-        'limiteCredito': limiteCredito,
-        'imagemBuffer': imagemBuffer
+        'totaldeb': totalDeb,
+        'telefone': telefone,
+        'encomendapendente': encomendaPendente,
+        'vendanaoconvertida': vendaNaoConvertida,
+        'limitecredito': limiteCredito,
+        'desconto': desconto,
+        'tipocredito': tipoCredito,
+        'tipopreco': tipoCredito,
       };
 
   Map<String, dynamic> imagemToMap() =>
@@ -65,19 +72,28 @@ class Cliente {
   factory Cliente.fromJson(Map<String, dynamic> json) {
     // String numContrib = json['numContrib'] == "" ? "0" : data['numContrib'];
     // numContrib = numContrib.replaceAll(" ", "");
+    Endereco endereco = new Endereco(
+        bairro: json['morada'],
+        descricao: json['morada'],
+        pais: "Mocambique",
+        provincia: "Maputo",
+        ruaAv: json['morada']);
     return Cliente(
         cliente: json['Cliente'] ?? json['cliente'],
         nome: json['Nome'] ?? json['nome'],
-        nomeFiscal: json['Nome Fiscal'] ?? json['nomeFiscal'],
-        // numContrib:
-        //     int.parse(json['N.º Contribuinte'].toString().replaceAll(" ", "")),
-        endereco: Endereco.fromJson(json['endereco']),
-        anulado: false,
-        tipoCred: 0,
-        totalDeb: 0,
-        encomendaPendente: 0,
-        vendaNaoConvertida: 0,
-        limiteCredito: 0,
+        numContrib: json['numcontrib'] ?? "0",
+        endereco: endereco,
+        anulado: json['clienteanulado'] ?? false,
+        tipoCredito: int.tryParse(json['tipocredito'].toString()),
+        totalDeb: double.tryParse(json['totaldeb'].toString()),
+        encomendaPendente:
+            double.tryParse(json['encomendaspendentes'].toString()),
+        vendaNaoConvertida:
+            double.tryParse(json['vendasnaoconvertidas'].toString()),
+        limiteCredito: double.tryParse(json['limitecredito'].toString()),
+        desconto: double.tryParse(json['desconto'].toString()),
+        tipoPreco: int.tryParse(json['tipopreco']),
+        telefone: json['telefone'] ?? "",
         imagemBuffer: null);
     // data['imagemBuffer'] == null ? null : data['imagemBuffer']);
   }
