@@ -45,9 +45,9 @@ class Fornecedor {
     return Fornecedor(
       fornecedor: json['fornecedor'] ?? json['Fornecedor'],
       nome: json['nome'] ?? json['Nome'],
-      nomeFiscal: json['nomeFiscal'] ?? json['Nome Fiscal'],
+      nomeFiscal: json['nomeFiscal'] ?? json['NomeFiscal'],
       telefone: json['telefone'] ?? json['Telefone'],
-      numContribuinte: json['numContribuinte'] ?? json['N.º Contribuinte'],
+      numContribuinte: json['numContribuinte'] ?? json['NumContrib'],
       //  imagemBuffer:  data['imagemBuffer'] ,
     );
   }
