@@ -285,6 +285,16 @@ class SessaoApiProvider {
     return base_url;
   }
 
+  static Future<String> getRemoteHostUrl() async {
+    var sessao = await SessaoApiProvider.readSession();
+    base_url = "";
+    if (sessao != null && sessao.length > 0) {
+      base_url = sessao['ip_global'] + ":" + sessao['porta'];
+      return base_url;
+    }
+    return null;
+  }
+
   static String getProtocolo() {
     return protocolo;
   }
