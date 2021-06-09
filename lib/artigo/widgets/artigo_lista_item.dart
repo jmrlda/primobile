@@ -220,7 +220,7 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
                 widget.artigo.unidade +
                 '\n' +
                 "PVP: " +
-                widget.artigo.preco.toString() +
+                widget.artigo.pvp1.toString() +
                 ' MT',
             style: TextStyle(color: Colors.blue, fontSize: 11),
           ),
