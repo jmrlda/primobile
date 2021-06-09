@@ -3,6 +3,7 @@ import 'package:primobile/artigo/util.dart';
 import 'package:primobile/artigo/view/view.dart';
 import 'package:primobile/encomenda/view/encomenda_editor_page.dart';
 import 'package:primobile/inventario/inventario.dart';
+import 'package:primobile/menu/view/menu.dart';
 import 'package:primobile/sessao/configPage.dart';
 import 'package:primobile/sessao/loginPage.dart';
 import 'package:primobile/util/view/view.dart';
@@ -14,7 +15,7 @@ import 'expedicao/expedicao.dart';
 import 'expedicao/view/view.dart';
 import 'fornecedor/view/view.dart';
 import 'inventario/view/view.dart';
-import 'menu/view/menu_page.dart';
+// import 'menu/view/menu_page.dart';
 import 'rececao/rececao.dart';
 import 'rececao/view/rececao_pagina.dart';
 
@@ -29,7 +30,7 @@ void main() {
     initialRoute: '/',
     routes: {
       '/': (context) => LoginPage(),
-      '/menu': (context) => MenuPage(),
+      '/menu': (context) => MenuPrincipal(),
       '/artigo_lista': (context) => ArtigoPage(isSelected: false),
       '/artigo_selecionar_lista': (context) => ArtigoPage(isSelected: true),
       '/cliente_lista': (context) => ClientePage(
@@ -78,8 +79,7 @@ void main() {
             modulo: "Inventario",
             mensagemSucesso: "Actualizado com Sucesso",
           ),
-
-           '/fornecedor_lista': (context) => FornecedorPage(
+      '/fornecedor_lista': (context) => FornecedorPage(
             isSelected: false,
           ),
       '/fornecedor_selecionar_lista': (context) => FornecedorPage(
