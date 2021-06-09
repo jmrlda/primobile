@@ -155,7 +155,7 @@ class Artigo {
       civa: 1.0,
       iva: 1.0,
       unidade: data['unidade'],
-      pvp1: data['pvp2'],
+      pvp1: data['pvp1'],
       pvp1Iva: true,
       pvp2: data['pvp2'],
       pvp2Iva: true,
