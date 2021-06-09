@@ -819,26 +819,26 @@ Future<bool> removeKeyCacheData(String key) async {
 }
 
 // metodo para busca de artigos na lista
-List<Fornecedor> fornecedorPesquisar(
-    String query, List<Fornecedor> listaFornecedor) {
-  List<Fornecedor> resultado = List<Fornecedor>();
+// List<Fornecedor> fornecedorPesquisar(
+//     String query, List<Fornecedor> listaFornecedor) {
+//   List<Fornecedor> resultado = List<Fornecedor>();
 
-  if (query.trim().isNotEmpty) {
-    for (Fornecedor item in listaFornecedor) {
-      if (item.nome.toLowerCase().contains(query.toString().toLowerCase()) ||
-          item.fornecedor
-              .toLowerCase()
-              .contains(query.toString().toLowerCase()) ||
-          item.nomeFiscal
-              .toLowerCase()
-              .contains(query.toString().toLowerCase())) {
-        resultado.add(item);
-      }
-    }
-    ;
-  }
-  return resultado;
-}
+//   if (query.trim().isNotEmpty) {
+//     for (Fornecedor item in listaFornecedor) {
+//       if (item.nome.toLowerCase().contains(query.toString().toLowerCase()) ||
+//           item.fornecedor
+//               .toLowerCase()
+//               .contains(query.toString().toLowerCase()) ||
+//           item.nomeFiscal
+//               .toLowerCase()
+//               .contains(query.toString().toLowerCase())) {
+//         resultado.add(item);
+//       }
+//     }
+//     ;
+//   }
+//   return resultado;
+// }
 
 class ToList {
   List<dynamic> items = [];
@@ -892,4 +892,16 @@ Future<bool> createAlertDialog(
           ],
         );
       });
+}
+
+bool existeArtigoNaLista(List<dynamic> lista, keyword) {
+  bool rv = false;
+  for (dynamic _artigo in lista) {
+    if (_artigo.artigo == keyword) {
+      rv = true;
+      break;
+    }
+  }
+
+  return rv;
 }
