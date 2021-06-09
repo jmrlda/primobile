@@ -94,10 +94,18 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 50.0,
-                    child: Image.asset('assets/images/logo.jpg'),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      CircleAvatar(
+                        backgroundColor: Colors.white38,
+                        radius: 55.0,
+                        child: NeumorphicIcon(
+                          Icons.extension,
+                          size: 50,
+                        ),
+                      ),
+                    ],
                   )
                 ],
               ),
