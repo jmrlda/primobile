@@ -3,6 +3,7 @@ import 'package:primobile/sessao/empresaFilial_modelo.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:primobile/usuario/models/models.dart';
 import 'package:primobile/util/util.dart';
+import 'package:progress_indicator_button/progress_button.dart';
 
 // import 'package:primobile/sessao/sessao_api_provider.dart';
 // import 'package:primobile/util.dart';
@@ -270,51 +271,70 @@ class _ConfigPageState extends State<ConfigPage> {
               alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: EdgeInsets.only(left: 30.0, right: 30.0, bottom: 60),
-                child: MaterialButton(
-                    minWidth: double.infinity,
-                    shape: StadiumBorder(),
-                    color: Colors.blue,
+                child: ProgressButton(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    strokeWidth: 2,
                     child: Text(
                       "Conectar",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                      ),
                     ),
-                    onPressed: () async {
-                      // Navigator.pushNamed(context, '/menu');
-                      bool conexao = await temConexao();
-                      if (conexao == true) {
-                        String nome = txtAdmin.text.trim();
-                        String senha = txtAdminSenha.text.trim();
-                        String nomeEmpresa = txtNomeEmpresa.text.trim();
-                        String company = txtCompany.text.trim();
-                        String line = txtLine.text.trim();
-                        String instance = txtInstance.text.trim();
-                        String grantType = txtGrantType.text.trim();
-                        String ipGlobal = txtIpGlobal.text.trim();
-                        String ipLocal = txtIpLocal.text.trim();
-                        String porta = txtPorta.text.trim();
-
-                        // if (true) {
-                        //       // bool rv = await checkAcessoInternet();
-                        conectar(nome, senha, nomeEmpresa, company, line,
-                            instance, grantType, ipGlobal, ipLocal, porta);
-                        // }
-                      } else {
-                        alerta_info(context, "Verifique sua conexão.");
+                    onPressed: (AnimationController controller) async {
+                      try {
+                        await httpConectar(controller);
+                      } catch (e) {
+                        alerta_info(context,
+                            "Ocorreu um erro inesperado. Tente novamente!");
                       }
-                      // else {
-                      //   conectar(nome, senha, false);
-
-                      // }
-
-                      // Usuario usuario = await DBProvider.db.login(nome, senha);
                     }),
+
+                // MaterialButton(
+                //     minWidth: double.infinity,
+                //     shape: StadiumBorder(),
+                //     color: Colors.blue,
+                //     child: Text(
+                //       "Conectar",
+                //       style: TextStyle(color: Colors.white, fontSize: 20),
+                //     ),
+                //     onPressed: () async {
+                //       // Navigator.pushNamed(context, '/menu');
+                //       bool conexao = await temConexao();
+                //       if (conexao == true) {
+                //         String nome = txtAdmin.text.trim();
+                //         String senha = txtAdminSenha.text.trim();
+                //         String nomeEmpresa = txtNomeEmpresa.text.trim();
+                //         String company = txtCompany.text.trim();
+                //         String line = txtLine.text.trim();
+                //         String instance = txtInstance.text.trim();
+                //         String grantType = txtGrantType.text.trim();
+                //         String ipGlobal = txtIpGlobal.text.trim();
+                //         String ipLocal = txtIpLocal.text.trim();
+                //         String porta = txtPorta.text.trim();
+
+                //         // if (true) {
+                //         //       // bool rv = await checkAcessoInternet();
+                //         conectar(nome, senha, nomeEmpresa, company, line,
+                //             instance, grantType, ipGlobal, ipLocal, porta);
+                //         // }
+                //       } else {
+                //         alerta_info(context, "Verifique sua conexão.");
+                //       }
+                //       // else {
+                //       //   conectar(nome, senha, false);
+
+                //       // }
+
+                //       // Usuario usuario = await DBProvider.db.login(nome, senha);
+                //     }),
               ),
             ),
           ],
         )));
   }
 
-  void conectar(
+  Future<int> conectar(
       String admin,
       String senha,
       String nomeEmpresa,
@@ -406,6 +426,43 @@ class _ConfigPageState extends State<ConfigPage> {
       );
     } else if (rv == 0) {
       Navigator.pushNamed(context, '/');
+    }
+
+    return rv;
+  }
+
+  Future<void> httpConectar(AnimationController controller) async {
+    try {
+      controller.forward();
+
+      bool conexao = await temConexao();
+      if (conexao == true) {
+        String nome = txtAdmin.text.trim();
+        String senha = txtAdminSenha.text.trim();
+        String nomeEmpresa = txtNomeEmpresa.text.trim();
+        String company = txtCompany.text.trim();
+        String line = txtLine.text.trim();
+        String instance = txtInstance.text.trim();
+        String grantType = txtGrantType.text.trim();
+        String ipGlobal = txtIpGlobal.text.trim();
+        String ipLocal = txtIpLocal.text.trim();
+        String porta = txtPorta.text.trim();
+
+        // if (true) {
+        //       // bool rv = await checkAcessoInternet();
+        int rv = await conectar(nome, senha, nomeEmpresa, company, line,
+            instance, grantType, ipGlobal, ipLocal, porta);
+
+        if (rv != 0) {
+          controller.reset();
+        }
+        // }
+      } else {
+        alerta_info(context, "Verifique sua conexão.");
+        controller.reset();
+      }
+    } catch (e) {
+      controller.reset();
     }
   }
 }
