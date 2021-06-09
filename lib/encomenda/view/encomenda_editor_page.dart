@@ -14,6 +14,7 @@ import 'package:primobile/util/util.dart';
 import 'package:signature/signature.dart';
 
 BuildContext contexto;
+BuildContext dialogContext;
 
 class EncomendaEditorPage extends StatefulWidget {
   EncomendaEditorPage({Key key, this.title}) : super(key: key);
@@ -289,10 +290,11 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                                                   this.cliente.limiteCredito ==
                                                       0) ||
                                               this.cliente.anulado == false &&
-                                                  this.cliente.totalDeb <
-                                                      this
-                                                          .cliente
-                                                          .limiteCredito) {
+                                                  Encomenda
+                                                          .estaDentroLimiteCredito(
+                                                              cliente,
+                                                              totalVenda) ==
+                                                      true) {
                                             txtClienteController.text =
                                                 this.cliente.nome;
                                           } else {
@@ -300,8 +302,10 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
                                             if (this.cliente.anulado == true) {
                                               msg =
                                                   "Cliente anulado. Entre em contacto com o Administrador";
-                                            } else if (this.cliente.totalDeb >
-                                                this.cliente.limiteCredito) {
+                                            } else if (Encomenda
+                                                    .estaDentroLimiteCredito(
+                                                        cliente, totalVenda) ==
+                                                true) {
                                               msg = "Cliente excedeu o limite de Credito de " +
                                                   this
                                                       .cliente
@@ -433,42 +437,43 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
       // await Navigator.pushReplacementNamed(contexto, '/encomenda_sucesso');
 
       // createAlertDialogErroEncomenda
-      createAlertDialogEncomendaProcesso(BuildContext context) {
-        if (erroEncomenda == true) {
-          Navigator.of(context).pop();
-        }
+      // createAlertDialogEncomendaProcesso(BuildContext context) {
+      //   if (erroEncomenda == true) {
+      //     Navigator.of(context).pop();
+      //   }
 
-        bool rv = false;
-        return showDialog(
-            context: contexto,
-            builder: (contexto) {
-              // 3 minutos ate fechar a janela devido a demora do processo de envio de encomenda
-              Future.delayed(Duration(seconds: 180), () {
-                // alerta_info(contexto, "Parado processo devido o tempo de espera!");
-                if (this.mounted) {
-                  setState(() {
-                    rv = true;
-                  });
-                }
-                // Navigator.of(context).pop(true);
-              });
-              return WillPopScope(
-                child: AlertDialog(
-                  title: Center(child: Text('Aguarde')),
-                  content: Container(
-                      width: 50,
-                      height: 50,
-                      child: Center(child: CircularProgressIndicator())),
-                ),
-                onWillPop: () async {
-                  return rv;
-                },
-              );
-            });
-      }
+      //   bool rv = false;
+      //   return showDialog(
+      //       context: contexto,
+      //       builder: (contexto) {
+      //         // 3 minutos ate fechar a janela devido a demora do processo de envio de encomenda
+      //         Future.delayed(Duration(seconds: 180), () {
+      //           // alerta_info(contexto, "Parado processo devido o tempo de espera!");
+      //           if (this.mounted) {
+      //             setState(() {
+      //               rv = true;
+      //             });
+      //           }
+      //           // Navigator.of(context).pop(true);
+      //         });
+      //         return WillPopScope(
+      //           child: AlertDialog(
+      //             title: Center(child: Text('Aguarde')),
+      //             content: Container(
+      //                 width: 50,
+      //                 height: 50,
+      //                 child: Center(child: CircularProgressIndicator())),
+      //           ),
+      //           onWillPop: () async {
+      //             return rv;
+      //           },
+      //         );
+      //       });
+      // }
 
       //await temConexao(
       // 'Sem conexão WIFI ou Dados Moveis. Por Favor Active para criar encomenda');
+
       bool dado = true; //await temDados('Sem acesso a internet!', contexto);
       bool localizacao = true; //await temLocalizacao();
       bool conexao = await temConexao();
@@ -480,246 +485,291 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
             this.cliente.cliente != null) {
           // EncomendaApiProvider encomendaApi = EncomendaApiProvider();
           // Map<String, dynamic> rv = await SessaoApiProvider.readSession();
-          Map<String, dynamic> _usuario = await SessaoApiProvider.readSession();
 
-          Usuario usuario = Usuario(
-              usuario: _usuario['usuario'],
-              nome: _usuario['usuario'],
-              perfil: "usuario",
-              documento: "ECL");
-          Encomenda encomenda = new Encomenda(
-              cliente: this.cliente,
-              vendedor: usuario,
-              artigos: artigos,
-              dataHora: DateTime.now(),
-              estado: "pendente",
-              valorTotal: 0.0,
-              encomenda_id: usuario.usuario +
-                  DateTime.now().day.toString() +
-                  DateTime.now().month.toString() +
-                  "/" +
-                  DateTime.now().hour.toString() +
-                  "/" +
-                  DateTime.now().minute.toString() +
-                  "/" +
-                  DateTime.now().second.toString(),
-              regrasPreco: new List<RegraPrecoDesconto>());
+          if (Encomenda.estaDentroLimiteCredito(this.cliente, totalVenda) ==
+              false) {
+            var msg = "Total da encomenda  " +
+                totalVenda.toString() +
+                " do Cliente excedeu o saldo disponivel de " +
+                Encomenda.calcularSaldoCliente(this.cliente).toString() +
+                " MTN. Entre em contacto com o Administrador";
 
-          dynamic confirmado = await Navigator.pushNamed(
-              contexto, '/encomenda_lista_confirmacao',
-              arguments: encomenda);
-
-          if (confirmado != null && confirmado['estado'] == false) {
-            setState(() {
-              artigos = confirmado["resultado"].artigos;
-            });
-          } else if (confirmado != null &&
-              confirmado['estado'] == true &&
-              confirmado['resultado'] != null) {
-            try {
-              encomenda = confirmado['resultado'] as Encomenda;
-            } catch (err) {
-              print(err);
-            }
-            final SignatureController _controller = SignatureController(
-              penStrokeWidth: 3.5,
-              penColor: Colors.black,
-              exportBackgroundColor: Colors.white,
+            showDialog(
+              context: contexto,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("atenção"),
+                  content: Text(msg),
+                  actions: <Widget>[
+                    new FlatButton(
+                      child: new Text("ok"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
             );
-            // var assinatura = await Navigator.of(contexto).push(
-            //   MaterialPageRoute(builder: (BuildContext context) {
-            //     return MaterialApp(
-            //       home: Builder(
-            //         builder: (context) => Scaffold(
-            //           body: Column(
-            //             children: <Widget>[
-            //               Container(
-            //                 height: 50,
-            //                 margin: const EdgeInsets.only(top: 50.0),
-            //                 child: Center(
-            //                   child: Text('ASSINATURA CLIENTE'),
-            //                 ),
-            //               ),
-            //               //SIGNATURE CANVAS
-            //               Signature(
-            //                 controller: _controller,
-            //                 // height: 300,
-            //                 backgroundColor: Colors.white,
-            //               ),
-            //               // OK AND CLEAR BUTTONS
-            //               Container(
-            //                 decoration:
-            //                     const BoxDecoration(color: Colors.black),
-            //                 child: Row(
-            //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //                   mainAxisSize: MainAxisSize.max,
-            //                   children: <Widget>[
-            //                     IconButton(
-            //                       icon: const Icon(Icons.check),
-            //                       color: Colors.blue,
-            //                       onPressed: () async {
-            //                         // if (_controller.isNotEmpty) {
+          } else {
+            Map<String, dynamic> _usuario =
+                await SessaoApiProvider.readSession();
 
-            //                         Uint8List data =
-            //                             await _controller.toPngBytes();
+            Usuario usuario = Usuario(
+                usuario: _usuario['usuario'],
+                nome: _usuario['usuario'],
+                perfil: "usuario",
+                documento: "ECL");
+            Encomenda encomenda = new Encomenda(
+                cliente: this.cliente,
+                vendedor: usuario,
+                artigos: artigos,
+                dataHora: DateTime.now(),
+                estado: "pendente",
+                valorTotal: 0.0,
+                encomenda_id: usuario.usuario +
+                    DateTime.now().day.toString() +
+                    DateTime.now().month.toString() +
+                    "/" +
+                    DateTime.now().hour.toString() +
+                    "/" +
+                    DateTime.now().minute.toString() +
+                    "/" +
+                    DateTime.now().second.toString(),
+                regrasPreco: new List<RegraPrecoDesconto>());
 
-            //                         if (data.length > 0) {
-            //                           Navigator.of(contexto).pop(data);
-            //                         }
-            //                       },
-            //                     ),
-            //                     //CLEAR CANVAS
-            //                     IconButton(
-            //                       icon: const Icon(Icons.clear),
-            //                       color: Colors.blue,
-            //                       onPressed: () {
-            //                         setState(() => _controller.clear());
-            //                       },
-            //                     ),
-            //                   ],
-            //                 ),
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //       ),
-            //     );
-            //   }),
-            // );
-            // if (assinatura != null) {
-            try {
-              // encomenda.assinaturaImagemBuffer = assinatura;
-              // final Geolocator geolocator = Geolocator()
-              //   ..forceAndroidLocationManager;
+            dynamic confirmado = await Navigator.pushNamed(
+                contexto, '/encomenda_lista_confirmacao',
+                arguments: encomenda);
 
-              // if ((await Geolocator.isLocationServiceEnabled())) {
-              // createAlertDialogEncomendaProcesso(contexto);
-              int idEncomenda = -1;
-              //
-              // encomenda.setLocalizacao().then((coordenada) async {
-              // encomendaApi.insertEncomenda(encomenda).then((id) async {
-              //   idEncomenda = id;
-              // if (id >= 0) {
-              String filename =
-                  encomenda.encomenda_id.replaceAll('/', '_') + '.png';
-
-              // writeByteFile(filename, assinatura).then((file) {
-              // encomenda.assinaturaImagemBuffer = "";
-
-              Encomenda.postEncomenda(encomenda).then((value) async {
-                if (value.statusCode == 200) {
-                  await Navigator.pushReplacementNamed(
-                      contexto, '/encomenda_sucesso');
-                } else if (value.statusCode == 401 || value.statusCode == 500) {
-                  //  #TODO informar ao usuario sobre a renovação da sessão
-                  // mostrando mensagem e um widget de LOADING
-                  alerta_info(
-                      contexto, 'Aguarde a sua sessão esta a ser renovada');
-                  await SessaoApiProvider.refreshToken();
-                } else {
-                  // remover encomenda em caso de erro no envio da encomenda.
-                  // TODO: armazenar temporariamente ate haver sucesso. Se estiver tudo bem com a encomenda.
-                  // notificar ao usuario se a encomenda  nao estiver completa
-                  // Encomenda.removeEncomendaByid(idEncomenda)
-                  //     .then((value) {
-                  //   if (this.mounted == true) {
-                  //     setState(() {
-                  //       erroEncomenda = true;
-                  //     });
-                  //   }
-                  // });
-                  alerta_info(contexto,
-                      'Servidor não respondeu com sucesso o envio da encomenda! Por favor tente novamente');
-                }
-              }).catchError((err) {
-                print('[postEncomenda] ERRO');
-                print(err);
-                if (this.mounted == true) {
-                  setState(() {
-                    erroEncomenda = true;
-                  });
-                }
-
-                alerta_info(contexto,
-                    'Ocorreu um erro interno ao enviar encomenda! Por favor tente novamente');
+            if (confirmado != null && confirmado['estado'] == false) {
+              setState(() {
+                artigos = confirmado["resultado"].artigos;
               });
-              // });
-
-              // } else {
-              //   print('[_onItemTapped] Erro:  ao inserir encomenda');
-              //   /* TODO: Remover a encomenda ou armazenar em um repositorio temporario
-              //  * para posterior enviar pela rede ate terminar com sucesso.
-              //  */
-
-              //   encomendaApi
-              //       .removeEncomendaByid(idEncomenda)
-              //       .then((value) {
-              //     if (this.mounted == true) {
-              //       setState(() {
-              //         erroEncomenda = true;
-              //       });
-              //     }
-              //   });
-              //   // return null;
-
-              // }
-              // }).catchError((err) {
-              //   print('[insertEncomenda] ERRO');
-              //   print(err);
-              //   alerta_info(contexto,
-              //       'Erro ao inserir encomenda! Por favor tente novamente');
-
-              //   encomendaApi
-              //       .removeEncomendaByid(idEncomenda)
-              //       .then((value) {
-              //     if (this.mounted == true) {
-              //       setState(() {
-              //         erroEncomenda = true;
-              //       });
-              //     }
-              //   });
-              // });
-              // }).catchError((err) {
-              //   print('[setLocalizacao] Erro: ');
-              //   print(err);
-              //   alerta_info(
-              //       contexto, 'Activar Localização GPS Ou Permita o acesso!');
-
-              //   if (this.mounted == true) {
-              //     setState(() {
-              //       erroEncomenda = true;
-              //     });
-              //   }
-              // });
-              // } else {
-              //   alerta_info(contexto, 'Activar Localização GPS!');
-              // }
-
-              // AssinaturaDigital();
-              // Navigator.pushNamed(contexto, '/assinatura');
-            } catch (e) {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text("atenção"),
-                    content: Text("Ocorreu um erro. " + e.toString()),
-                    actions: <Widget>[
-                      new FlatButton(
-                        child: new Text("Fechar"),
-                        onPressed: () {
-                          // Navigator.of(context).pop();
-                          Navigator.pushNamed(contexto, '/encomenda_lista');
-                        },
-                      ),
-                    ],
-                  );
-                },
+            } else if (confirmado != null &&
+                confirmado['estado'] == true &&
+                confirmado['resultado'] != null) {
+              try {
+                encomenda = confirmado['resultado'] as Encomenda;
+              } catch (err) {
+                print(err);
+              }
+              final SignatureController _controller = SignatureController(
+                penStrokeWidth: 3.5,
+                penColor: Colors.black,
+                exportBackgroundColor: Colors.white,
               );
+              // var assinatura = await Navigator.of(contexto).push(
+              //   MaterialPageRoute(builder: (BuildContext context) {
+              //     return MaterialApp(
+              //       home: Builder(
+              //         builder: (context) => Scaffold(
+              //           body: Column(
+              //             children: <Widget>[
+              //               Container(
+              //                 height: 50,
+              //                 margin: const EdgeInsets.only(top: 50.0),
+              //                 child: Center(
+              //                   child: Text('ASSINATURA CLIENTE'),
+              //                 ),
+              //               ),
+              //               //SIGNATURE CANVAS
+              //               Signature(
+              //                 controller: _controller,
+              //                 // height: 300,
+              //                 backgroundColor: Colors.white,
+              //               ),
+              //               // OK AND CLEAR BUTTONS
+              //               Container(
+              //                 decoration:
+              //                     const BoxDecoration(color: Colors.black),
+              //                 child: Row(
+              //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //                   mainAxisSize: MainAxisSize.max,
+              //                   children: <Widget>[
+              //                     IconButton(
+              //                       icon: const Icon(Icons.check),
+              //                       color: Colors.blue,
+              //                       onPressed: () async {
+              //                         // if (_controller.isNotEmpty) {
+
+              //                         Uint8List data =
+              //                             await _controller.toPngBytes();
+
+              //                         if (data.length > 0) {
+              //                           Navigator.of(contexto).pop(data);
+              //                         }
+              //                       },
+              //                     ),
+              //                     //CLEAR CANVAS
+              //                     IconButton(
+              //                       icon: const Icon(Icons.clear),
+              //                       color: Colors.blue,
+              //                       onPressed: () {
+              //                         setState(() => _controller.clear());
+              //                       },
+              //                     ),
+              //                   ],
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //     );
+              //   }),
+              // );
+              // if (assinatura != null) {
+              try {
+                // encomenda.assinaturaImagemBuffer = assinatura;
+                // final Geolocator geolocator = Geolocator()
+                //   ..forceAndroidLocationManager;
+
+                // if ((await Geolocator.isLocationServiceEnabled())) {
+                // await createAlertDialogEncomendaProcesso(contexto);
+                int idEncomenda = -1;
+                //
+                // encomenda.setLocalizacao().then((coordenada) async {
+                // encomendaApi.insertEncomenda(encomenda).then((id) async {
+                //   idEncomenda = id;
+                // if (id >= 0) {
+                String filename =
+                    encomenda.encomenda_id.replaceAll('/', '_') + '.png';
+
+                // writeByteFile(filename, assinatura).then((file) {
+                // encomenda.assinaturaImagemBuffer = "";
+
+                Encomenda.postEncomenda(encomenda).then((value) async {
+                  // createAlertDialogEncomendaProcesso(contexto);
+                  if (value.statusCode == 200) {
+                    await Navigator.pushReplacementNamed(
+                        contexto, '/encomenda_sucesso');
+                  } else if (value.statusCode == 401 ||
+                      value.statusCode == 500) {
+                    //  #TODO informar ao usuario sobre a renovação da sessão
+                    // mostrando mensagem e um widget de LOADING
+                    if (this.mounted == true) {
+                      setState(() {
+                        erroEncomenda = true;
+                      });
+                    }
+                    alerta_info(contexto,
+                        'Sessão esta a ser renovada. Tente novamente!');
+                    await SessaoApiProvider.refreshToken();
+                  } else {
+                    // remover encomenda em caso de erro no envio da encomenda.
+                    // TODO: armazenar temporariamente ate haver sucesso. Se estiver tudo bem com a encomenda.
+                    // notificar ao usuario se a encomenda  nao estiver completa
+                    // Encomenda.removeEncomendaByid(idEncomenda)
+                    //     .then((value) {
+                    //   if (this.mounted == true) {
+                    //     setState(() {
+                    //       erroEncomenda = true;
+                    //     });
+                    //   }
+                    // });
+
+                    if (this.mounted == true) {
+                      setState(() {
+                        erroEncomenda = true;
+                      });
+                    }
+                    alerta_info(
+                        contexto,
+                        'Servidor não respondeu com sucesso:\n ' +
+                            value.body.toString() +
+                            "\n Se persistir Contacte o Administrador.");
+                  }
+                }).catchError((err) {
+                  print('[postEncomenda] ERRO');
+                  print(err);
+                  if (this.mounted == true) {
+                    setState(() {
+                      erroEncomenda = true;
+                    });
+                  }
+
+                  alerta_info(contexto,
+                      'Ocorreu um erro interno ao enviar encomenda! Por favor tente novamente');
+                });
+                // });
+
+                // } else {
+                //   print('[_onItemTapped] Erro:  ao inserir encomenda');
+                //   /* TODO: Remover a encomenda ou armazenar em um repositorio temporario
+                //  * para posterior enviar pela rede ate terminar com sucesso.
+                //  */
+
+                //   encomendaApi
+                //       .removeEncomendaByid(idEncomenda)
+                //       .then((value) {
+                //     if (this.mounted == true) {
+                //       setState(() {
+                //         erroEncomenda = true;
+                //       });
+                //     }
+                //   });
+                //   // return null;
+
+                // }
+                // }).catchError((err) {
+                //   print('[insertEncomenda] ERRO');
+                //   print(err);
+                //   alerta_info(contexto,
+                //       'Erro ao inserir encomenda! Por favor tente novamente');
+
+                //   encomendaApi
+                //       .removeEncomendaByid(idEncomenda)
+                //       .then((value) {
+                //     if (this.mounted == true) {
+                //       setState(() {
+                //         erroEncomenda = true;
+                //       });
+                //     }
+                //   });
+                // });
+                // }).catchError((err) {
+                //   print('[setLocalizacao] Erro: ');
+                //   print(err);
+                //   alerta_info(
+                //       contexto, 'Activar Localização GPS Ou Permita o acesso!');
+
+                //   if (this.mounted == true) {
+                //     setState(() {
+                //       erroEncomenda = true;
+                //     });
+                //   }
+                // });
+                // } else {
+                //   alerta_info(contexto, 'Activar Localização GPS!');
+                // }
+
+                // AssinaturaDigital();
+                // Navigator.pushNamed(contexto, '/assinatura');
+              } catch (e) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("atenção"),
+                      content: Text("Ocorreu um erro. " + e.toString()),
+                      actions: <Widget>[
+                        new FlatButton(
+                          child: new Text("Fechar"),
+                          onPressed: () {
+                            // Navigator.of(context).pop();
+                            Navigator.pushNamed(contexto, '/encomenda_lista');
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
+              // } else {
+              //   createAlertDialogAssinatura(contexto);
+              // }
             }
-            // } else {
-            //   createAlertDialogAssinatura(contexto);
-            // }
           }
         } else {
           alerta_info(contexto,
@@ -907,7 +957,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
           mercadServicValor += (a.pvp1 / ((iva + 100) / 100)) * a.quantidade;
 
           subtotal += a.pvp1 * a.quantidade;
-          totalVenda = subtotal;
+          totalVenda += subtotal;
           ivaTotal = mercadServicValor * (iva / 100);
           encomendaItens.add(artigoEncomenda(a));
         } else {
