@@ -17,7 +17,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 BuildContext contexto;
 http.Client httpClient = http.Client();
 List<ArtigoExpedicao> linhaExpedicao = List<ArtigoExpedicao>();
-List<ArtigoExpedicao> lista_artigo_expedicao = List<ArtigoExpedicao>();
 ScrollController _scrollController = new ScrollController();
 TextEditingController txtPesquisar = new TextEditingController();
 List<bool> posicao;
@@ -200,19 +199,16 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
 
                                     result.then((value) async {
                                       expedicao = value;
-                                      lista_artigo_expedicao.clear();
-                                      lista_artigo_expedicao =
-                                          await _fetchLinhaExpedicao(
-                                              expedicao.expedicao, 0, 0);
+                                      await _fetchLinhaExpedicao(
+                                          expedicao.expedicao, 0, 0);
 
                                       if (lista_artigo_expedicao == null) {
                                         SessaoApiProvider.refreshToken();
-                                        lista_artigo_expedicao =
-                                            await _fetchLinhaExpedicao(
-                                                int.parse(expedicao.expedicao
-                                                    .toString()),
-                                                0,
-                                                0);
+                                        await _fetchLinhaExpedicao(
+                                            int.parse(
+                                                expedicao.expedicao.toString()),
+                                            0,
+                                            0);
                                       }
                                       posicao = List.filled(
                                           lista_artigo_expedicao.length, false);
@@ -448,7 +444,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
       encomendaItens.clear();
       expedicaoNumDoc = expedicao.expedicao.toString();
 
-      items = getListaArtigo(lista_artigo_expedicao);
+      items = getListaArtigo(listaArtigoExpedicaoDisplayFiltro);
     });
   }
 
@@ -667,7 +663,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
     ArtigoExpedicaoCard artigoInventario;
     final GlobalKey expansionTileKey = GlobalKey();
 
-    if (posicao[idx] == true) {
+    if (posicao.length > 0 && posicao[idx] == true) {
       // txtArtigoQtd.selection = TextSelection(
       //     baseOffset: 0, extentOffset: txtArtigoQtd.value.text.length);
       artigoInventario =
@@ -704,17 +700,6 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                     Text("Artigo:    " + artigo.artigo,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(color: Colors.blue, fontSize: 13)),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Text(
-                        "Armazem:    " +
-                            artigo.armazem +
-                            "  Localização:    " +
-                            artigo.localizacao,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.blue, fontSize: 12)),
                   ],
                 ),
               ],
@@ -762,36 +747,135 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                     ),
                   ),
                   Spacer(),
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: 5, left: 15, right: 20, bottom: 15),
-                    child: Container(
-                      child: TextField(
-                        autofocus: true,
-                        keyboardType: TextInputType.number,
-                        controller: txtPesquisa,
-                        onChanged: (value) {
-                          try {
-                            if (double.parse(txtPesquisa.text) > 0) {
-                              artigo.quantidadeExpedir =
-                                  double.parse(txtPesquisa.text);
-                            }
-                          } catch (e) {}
+                  IconButton(
+                    color: Colors.blue,
+                    icon: const Icon(Icons.create),
+                    tooltip: 'Artigo Quantidade',
+                    onPressed: () async {
+                      String msgQtd = "";
+                      await showDialog(
+                        context: contexto,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            scrollable: true,
+                            content: StatefulBuilder(
+                                // You need this, notice the parameters below:
+                                builder: (BuildContext context,
+                                    StateSetter setState) {
+                              return Column(
+                                // Then, the content of your dialog.
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Center(
+                                      child: Text(artigo.descricao,
+                                          style: TextStyle(fontSize: 12))),
+                                  Center(
+                                      child: Text(
+                                          'Quantidade em ' + artigo.unidade ??
+                                              "",
+                                          style: TextStyle(fontSize: 12))),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: DataTable(
+                                        columnSpacing: 10.0,
+                                        columns: const <DataColumn>[
+                                          DataColumn(
+                                            label: Text(
+                                              'Armaz.',
+                                              style: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 11),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Loc.',
+                                              style: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 11),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Lote',
+                                              style: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 11),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Qtd. Pendente',
+                                              style: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 11),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Quantidade.',
+                                              style: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 11),
+                                            ),
+                                          ),
+                                        ],
+                                        rows: buildInventarioDataRow(
+                                            artigo.artigo,
+                                            artigoObj: artigo),
+                                      )),
+                                  Container(
+                                      alignment: Alignment.bottomRight,
+                                      child: MaterialButton(
+                                        elevation: 5.0,
+                                        child: Text('Fechar'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ))
+                                ],
+                              );
+                            }),
+                            actions: null,
+                          );
                         },
-                        onTap: () {
-                          txtPesquisa.selection = TextSelection(
-                              baseOffset: 0,
-                              extentOffset: txtPesquisa.value.text.length);
-                        },
-                        textAlign: TextAlign.end,
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 13,
-                        ),
-                      ),
-                      width: 100,
-                    ),
-                  ),
+                      );
+                    },
+                  )
+                  // Padding(
+                  //   padding: EdgeInsets.only(
+                  //       top: 5, left: 15, right: 20, bottom: 15),
+                  //   child: Container(
+                  //     child: TextField(
+                  //       autofocus: true,
+                  //       keyboardType: TextInputType.number,
+                  //       controller: txtPesquisa,
+                  //       onChanged: (value) {
+                  //         try {
+                  //           if (double.parse(txtPesquisa.text) > 0) {
+                  //             artigo.quantidadeExpedir =
+                  //                 double.parse(txtPesquisa.text);
+                  //           }
+                  //         } catch (e) {}
+                  //       },
+                  //       onTap: () {
+                  //         txtPesquisa.selection = TextSelection(
+                  //             baseOffset: 0,
+                  //             extentOffset: txtPesquisa.value.text.length);
+                  //       },
+                  //       textAlign: TextAlign.end,
+                  //       style: TextStyle(
+                  //         color: Colors.blue,
+                  //         fontSize: 13,
+                  //       ),
+                  //     ),
+                  //     width: 100,
+                  //   ),
+                  // ),
                 ],
               )
             ],
@@ -898,9 +982,10 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
 
               setState(() {
                 if (value.length >= 0) {
-                  items = PesquisaListaArtigo(lista_artigo_expedicao, value);
+                  items = PesquisaListaArtigo(
+                      listaArtigoExpedicaoDisplayFiltro, value);
                 } else {
-                  items = getListaArtigo(lista_artigo_expedicao);
+                  items = getListaArtigo(listaArtigoExpedicaoDisplayFiltro);
                 }
               });
             },

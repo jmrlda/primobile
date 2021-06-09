@@ -14,8 +14,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 BuildContext contexto;
 http.Client httpClient = http.Client();
-List<ArtigoInventario> linhaInventario = List<ArtigoInventario>();
-List<ArtigoInventario> lista_artigo_inventario = List<ArtigoInventario>();
+
 ScrollController _scrollController = new ScrollController();
 int index = 0;
 int idx = 0;
@@ -59,6 +58,8 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
     // items.addAll(encomendaItens);
 
     super.initState();
+
+    inventarioListaArmazemDisplay.clear();
 
     try {
       updateConnection(() {
@@ -482,7 +483,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
 
     setState(() {
       inventarioNumDoc = inventario.documentoNumero.toString();
-      items = getListaArtigo(lista_artigo_inventario);
+      items = getListaArtigo(listaInventarioDisplayFiltro);
     });
   }
 
@@ -610,7 +611,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
         String ip = sessao['ip_local'];
         String porta = sessao['porta'];
         String baseUrl = await SessaoApiProvider.getHostUrl();
-        String protocolo = await SessaoApiProvider.getProtocolo();
+        String protocolo = SessaoApiProvider.getProtocolo();
 
         final response = await httpClient.get(
             protocolo +
@@ -687,138 +688,243 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                 style: TextStyle(
                     color: Colors.blue,
                     // fontWeight: FontWeight.bold,
-                    fontSize: 13)),
+                    fontSize: 12)),
             subtitle: Column(
               children: <Widget>[
                 Row(
                   children: <Widget>[
                     Text("Artigo: " + artigo.artigo,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.blue, fontSize: 13)),
+                        style: TextStyle(color: Colors.blue, fontSize: 12)),
+                    if (artigo.quantidadeStockReserva <= 0)
+                      IconButton(
+                        color: Colors.blue,
+                        icon: const Icon(Icons.create),
+                        tooltip: 'Artigo Quantidade',
+                        onPressed: () async {
+                          String msgQtd = "";
+                          await showDialog(
+                            context: contexto,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                scrollable: true,
+                                content: StatefulBuilder(
+                                    // You need this, notice the parameters below:
+                                    builder: (BuildContext context,
+                                        StateSetter setState) {
+                                  return Column(
+                                    // Then, the content of your dialog.
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Center(
+                                          child: Text(artigo.descricao,
+                                              style: TextStyle(fontSize: 12))),
+                                      Center(
+                                          child: Text(
+                                              'Quantidade em ' + artigo.unidade,
+                                              style: TextStyle(fontSize: 12))),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: DataTable(
+                                            columnSpacing: 10.0,
+                                            columns: const <DataColumn>[
+                                              DataColumn(
+                                                label: Text(
+                                                  'Armaz.',
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                      fontSize: 11),
+                                                ),
+                                              ),
+                                              DataColumn(
+                                                label: Text(
+                                                  'Loc.',
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                      fontSize: 11),
+                                                ),
+                                              ),
+                                              DataColumn(
+                                                label: Text(
+                                                  'Lote',
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                      fontSize: 11),
+                                                ),
+                                              ),
+                                              DataColumn(
+                                                label: Text(
+                                                  'Quantidade.',
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                      fontSize: 11),
+                                                ),
+                                              ),
+                                            ],
+                                            rows: buildInventarioDataRow(
+                                                artigo.artigo),
+                                          )),
+                                      Container(
+                                          alignment: Alignment.bottomRight,
+                                          child: MaterialButton(
+                                            elevation: 5.0,
+                                            child: Text('Fechar'),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ))
+                                    ],
+                                  );
+                                }),
+                                actions: null,
+                              );
+                            },
+                          );
+                        },
+                      )
                   ],
                 ),
-                Row(
-                  children: <Widget>[
-                    Text("Lote: " + artigo.lote,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.blue, fontSize: 13)),
-                  ],
-                ),
+                // Row(
+                //   children: <Widget>[
+                //     OutlinedButton(
+                //       onPressed: () {
+                //         print('Received click');
+                //       },
+                //       child: const Text('Quantidade'),
+                //     ),
+                //   ],
+                // ),
+                //     Row(
+                //       children: <Widget>[
+                //         Text("Lote: " + artigo.lote,
+                //             overflow: TextOverflow.ellipsis,
+                //             style: TextStyle(color: Colors.blue, fontSize: 13)),
+                //       ],
+                //     ),
+                //   ],
+                // ),
+                // children: [
+                //   Row(
+                //     mainAxisAlignment: MainAxisAlignment.start,
+                //     children: <Widget>[
+                //       Padding(
+                //         padding:
+                //             EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+                //         child: Text(
+                //           "Localização: ",
+                //           style: TextStyle(
+                //             color: Colors.blue,
+                //             fontSize: 13,
+                //           ),
+                //         ),
+                //       ),
+                //       Padding(
+                //         padding:
+                //             EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+                //         child: Text(
+                //           artigo.localizacao,
+                //           style: TextStyle(
+                //             color: Colors.blue,
+                //             fontSize: 13,
+                //             fontWeight: FontWeight.bold,
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                //   Row(
+                //     mainAxisAlignment: MainAxisAlignment.start,
+                //     children: <Widget>[
+                //       Padding(
+                //         padding:
+                //             EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+                //         child: Text(
+                //           "Quantidade: ",
+                //           style: TextStyle(
+                //             color: Colors.blue,
+                //             fontSize: 13,
+                //           ),
+                //         ),
+                //       ),
+                //       // Spacer(),
+                //       Container(
+                //         padding:
+                //             EdgeInsets.only(top: 0, left: 15, right: 5, bottom: 0),
+                //         child: TextField(
+                //           autofocus: true,
+                //           keyboardType: TextInputType.number,
+                //           controller: txtArtigoQtd,
+                //           onChanged: (value) {
+                //             try {
+                //               if (double.parse(txtArtigoQtd.text) > 0) {
+                //                 artigo.quantidadeStock =
+                //                     double.parse(txtArtigoQtd.text);
+                //               }
+                //             } catch (e) {
+                //               print(e);
+                //             }
+                //           },
+                //           onTap: () {
+                //             txtArtigoQtd.selection = TextSelection(
+                //                 baseOffset: 0,
+                //                 extentOffset: txtArtigoQtd.value.text.length);
+                //           },
+                //           textAlign: TextAlign.start,
+                //           style: TextStyle(
+                //             color: Colors.blue,
+                //             fontWeight: FontWeight.bold,
+                //             fontSize: 13,
+                //           ),
+                //         ),
+                //         width: 100,
+                //       ),
+                //     ],
+                //   ),
               ],
             ),
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
-                    child: Text(
-                      "Localização: ",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
-                    child: Text(
-                      artigo.localizacao,
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-                    child: Text(
-                      "Quantidade: ",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                  // Spacer(),
-                  Container(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 15, right: 5, bottom: 0),
-                    child: TextField(
-                      autofocus: true,
-                      keyboardType: TextInputType.number,
-                      controller: txtArtigoQtd,
-                      onChanged: (value) {
-                        try {
-                          if (double.parse(txtArtigoQtd.text) > 0) {
-                            artigo.quantidadeStock =
-                                double.parse(txtArtigoQtd.text);
-                          }
-                        } catch (e) {
-                          print(e);
-                        }
-                      },
-                      onTap: () {
-                        txtArtigoQtd.selection = TextSelection(
-                            baseOffset: 0,
-                            extentOffset: txtArtigoQtd.value.text.length);
-                      },
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                    ),
-                    width: 100,
-                  ),
-                ],
-              ),
-            ],
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: <Widget>[
+            //     Padding(
+            //       padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
+            //       child: Text(artigo.descricao,
+            //           overflow: TextOverflow.ellipsis,
+            //           style: TextStyle(
+            //               color: Colors.blue,
+            //               fontWeight: FontWeight.bold,
+            //               fontSize: 16)),
+            //     ),
+            //   ],
+            // ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.start,
+            //   children: <Widget>[
+            //     Padding(
+            //       padding:
+            //           EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+            //       child: Text("Artigo: ",
+            //           style: TextStyle(color: Colors.blue, fontSize: 16)),
+            //     ),
+            //     Padding(
+            //       padding:
+            //           EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
+            //       child: Text(artigo.artigo,
+            //           style: TextStyle(
+            //               color: Colors.blue,
+            //               fontWeight: FontWeight.bold,
+            //               fontSize: 16)),
+            //     ),
+            //   ],
           ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: <Widget>[
-          //     Padding(
-          //       padding: EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 0),
-          //       child: Text(artigo.descricao,
-          //           overflow: TextOverflow.ellipsis,
-          //           style: TextStyle(
-          //               color: Colors.blue,
-          //               fontWeight: FontWeight.bold,
-          //               fontSize: 16)),
-          //     ),
-          //   ],
-          // ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.start,
-          //   children: <Widget>[
-          //     Padding(
-          //       padding:
-          //           EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
-          //       child: Text("Artigo: ",
-          //           style: TextStyle(color: Colors.blue, fontSize: 16)),
-          //     ),
-          //     Padding(
-          //       padding:
-          //           EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 0),
-          //       child: Text(artigo.artigo,
-          //           style: TextStyle(
-          //               color: Colors.blue,
-          //               fontWeight: FontWeight.bold,
-          //               fontSize: 16)),
-          //     ),
-          //   ],
-          // ),
         ],
       ),
     );
@@ -837,9 +943,10 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
 
               setState(() {
                 if (value.length >= 0) {
-                  items = PesquisaListaArtigo(lista_artigo_inventario, value);
+                  items =
+                      PesquisaListaArtigo(listaInventarioDisplayFiltro, value);
                 } else {
-                  items = getListaArtigo(lista_artigo_inventario);
+                  items = getListaArtigo(listaInventarioDisplayFiltro);
                 }
               });
             },
@@ -894,6 +1001,132 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
     }
 
     return lista_widget;
+  }
+
+  void agruparArtigoArmazem(ArtigoInventario _artigo) {
+    String armazem;
+    String lote;
+    String local;
+    // check se o artigo possui armazem valido
+    if (_artigo.armazem == null)
+      armazem = "@";
+    else if (_artigo.armazem.length == 0)
+      armazem = "@";
+    else
+      armazem = _artigo.armazem;
+
+    // check se o artigo possui localizacao valido
+    if (_artigo.localizacao == null)
+      local = "@";
+    else if (_artigo.localizacao.length == 0)
+      local = "@";
+    else {
+      local = _artigo.localizacao;
+    }
+
+    // check se o artigo possui localizacao valido
+    if (_artigo.lote == null)
+      lote = "@";
+    else if (_artigo.lote.length == 0)
+      lote = "@";
+    else
+      lote = _artigo.lote;
+
+    String rv = armazem +
+        "-" +
+        local +
+        "-" +
+        lote +
+        "-" +
+        _artigo.quantidadeStock.toString();
+
+    if (inventarioListaArmazemDisplay.containsKey(_artigo.artigo)) {
+      if (!inventarioListaArmazemDisplay[_artigo.artigo].contains(rv))
+        inventarioListaArmazemDisplay[_artigo.artigo].add(rv);
+    } else {
+      inventarioListaArmazemDisplay[_artigo.artigo] = new List<String>();
+      inventarioListaArmazemDisplay[_artigo.artigo].add(rv);
+    }
+  }
+
+  List<DataRow> buildInventarioDataRow(String artigo) {
+    List<DataRow> listaDataRow = List<DataRow>();
+    String armazem = "";
+    for (int i = 0; i < inventarioListaArmazemDisplay[artigo].length; i++) {
+      armazem = inventarioListaArmazemDisplay[artigo][i];
+
+      listaDataRow.add(DataRow(
+        cells: <DataCell>[
+          DataCell(
+            Text(armazem.split("-")[0], style: TextStyle(fontSize: 11)),
+          ),
+          DataCell(Text(armazem.split("-")[1], style: TextStyle(fontSize: 11))),
+          DataCell(Text(armazem.split("-")[2], style: TextStyle(fontSize: 11))),
+          DataCell(TextFieldCustom(artigo, armazem)),
+        ],
+      ));
+    }
+    return listaDataRow;
+  }
+
+  // Atribuir quatidade ao artigo que tenha mesmo armazem, localizacao e lote.
+  void setArtigQuantidadeByArmazem(
+      String artigo, double quantidade, String artigoKey) {
+    // inventarioListaArmazemDisplay[artigo];
+    bool found = false;
+    for (int i = 0; i < inventarioListaArmazemDisplay[artigo].length; i++) {
+      String armazem = inventarioListaArmazemDisplay[artigo][i];
+      List<String> arm = armazem.split("-");
+      String _armazem = arm[0] == "@" ? "" : arm[0];
+      String _loc = arm[1] == "@" ? "" : arm[1];
+      String _lote = arm[2] == "@" ? "" : arm[2];
+
+      for (int j = 0; j < lista_artigo_inventario.length; j++) {
+        ArtigoInventario _artInv = new ArtigoInventario();
+        _artInv = lista_artigo_inventario[j];
+        if (_artInv.artigo == artigo &&
+            _artInv.armazem == _armazem &&
+            _artInv.localizacao == _loc &&
+            _artInv.lote == _lote &&
+            artigoKey.contains(armazem)) {
+          lista_artigo_inventario[j].quantidadeStock = quantidade;
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+// lista_artigo_inventario
+    }
+  }
+
+  Widget TextFieldCustom(String artigo, String armazem) {
+    // final GlobalKey linhaInvKey = GlobalKey(debugLabel: armazem);
+    Key linhaInvKey = new Key(armazem);
+    TextEditingController _controller = new TextEditingController();
+    _controller.text = armazem.split("-")[3];
+    return TextField(
+      key: linhaInvKey,
+      keyboardType: TextInputType.number,
+      autofocus: false,
+      style: TextStyle(fontSize: 13),
+      textAlign: TextAlign.right,
+      controller: _controller,
+      onChanged: (value) {
+        try {
+          print(linhaInvKey.toString().contains(armazem));
+          if (double.parse(_controller.text) > 0) {
+            setArtigQuantidadeByArmazem(
+                artigo, double.parse(_controller.text), linhaInvKey.toString());
+          }
+        } catch (e) {
+          print(e);
+        }
+      },
+      onTap: () {
+        _controller.selection = TextSelection(
+            baseOffset: 0, extentOffset: _controller.value.text.length);
+      },
+    );
   }
 }
 

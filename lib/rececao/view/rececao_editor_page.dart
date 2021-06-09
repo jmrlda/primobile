@@ -13,7 +13,6 @@ import 'package:primobile/util/util.dart';
 BuildContext contexto;
 http.Client httpClient = http.Client();
 List<ArtigoRececao> linhaRececao = List<ArtigoRececao>();
-List<ArtigoRececao> lista_artigo_rececao = List<ArtigoRececao>();
 ScrollController _scrollController = new ScrollController();
 int idx = 0;
 
@@ -194,18 +193,16 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                                       rececao = value;
                                       if (lista_artigo_rececao != null)
                                         lista_artigo_rececao.clear();
-                                      lista_artigo_rececao =
-                                          await _fetchLinhaRececao(
-                                              rececao.rececao, 0, 0);
+                                      await _fetchLinhaRececao(
+                                          rececao.rececao, 0, 0);
 
                                       if (lista_artigo_rececao == null) {
                                         SessaoApiProvider.refreshToken();
-                                        lista_artigo_rececao =
-                                            await _fetchLinhaRececao(
-                                                int.parse(
-                                                    rececao.rececao.toString()),
-                                                0,
-                                                0);
+                                        await _fetchLinhaRececao(
+                                            int.parse(
+                                                rececao.rececao.toString()),
+                                            0,
+                                            0);
                                       }
 
                                       posicao = List<bool>.filled(
@@ -598,112 +595,111 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                 ),
                 Row(
                   children: <Widget>[
-                    Text(
-                        "Armazem:    " +
-                            artigo.armazem +
-                            "  Localização:    " +
-                            artigo.localizacao,
+                    Text("Quantidade:    ",
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(color: Colors.blue, fontSize: 12)),
+                    IconButton(
+                      color: Colors.blue,
+                      icon: const Icon(Icons.create),
+                      tooltip: 'Artigo Quantidade',
+                      onPressed: () async {
+                        String msgQtd = "";
+                        await showDialog(
+                          context: contexto,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              scrollable: true,
+                              content: StatefulBuilder(
+                                  // You need this, notice the parameters below:
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
+                                return Column(
+                                  // Then, the content of your dialog.
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Center(
+                                        child: Text(artigo.descricao,
+                                            style: TextStyle(fontSize: 12))),
+                                    Center(
+                                        child: Text(
+                                            'Quantidade em ' + artigo.unidade,
+                                            style: TextStyle(fontSize: 12))),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: DataTable(
+                                          columnSpacing: 9.0,
+                                          columns: const <DataColumn>[
+                                            DataColumn(
+                                              label: Text(
+                                                'Armaz.',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 11),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Loc.',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 11),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Lote',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 11),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Receção',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 11),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Rejeitada',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 11),
+                                              ),
+                                            )
+                                          ],
+                                          rows: buildInventarioDataRow(
+                                              artigo.artigo),
+                                        )),
+                                    Container(
+                                        alignment: Alignment.bottomRight,
+                                        child: MaterialButton(
+                                          elevation: 5.0,
+                                          child: Text('Fechar'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ))
+                                  ],
+                                );
+                              }),
+                              actions: null,
+                            );
+                          },
+                        );
+                      },
+                    )
                   ],
                 ),
               ],
             ),
-            children: [
-              Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 5),
-                    child: Text(
-                      "Qtd. Recebida: ",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 0, right: 0, bottom: 0),
-                    child: Container(
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        autofocus: true,
-                        controller: txtArtigoQtdRecebida,
-                        onChanged: (value) {
-                          try {
-                            if (double.parse(txtArtigoQtdRecebida.text) > 0) {
-                              artigo.quantidadeRecebida =
-                                  double.parse(txtArtigoQtdRecebida.text);
-                            }
-                          } catch (e) {
-                            print(e);
-                          }
-                        },
-                        onTap: () {
-                          txtArtigoQtdRecebida.selection = TextSelection(
-                              baseOffset: 0,
-                              extentOffset:
-                                  txtArtigoQtdRecebida.value.text.length);
-                        },
-                        textAlign: TextAlign.end,
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 12,
-                        ),
-                      ),
-                      width: 100,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: 5, left: 15, right: 5, bottom: 5),
-                    child: Text(
-                      "Qtd. Rejeitada: ",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 0, right: 0, bottom: 0),
-                    child: Container(
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        controller: txtArtigoQtdRejeitada,
-                        onChanged: (value) {
-                          if (double.parse(txtArtigoQtdRejeitada.text) > 0) {
-                            artigo.quantidadeRejeitada =
-                                double.parse(txtArtigoQtdRejeitada.text);
-                          }
-                        },
-                        onTap: () {
-                          txtArtigoQtdRejeitada.selection = TextSelection(
-                              baseOffset: 0,
-                              extentOffset:
-                                  txtArtigoQtdRejeitada.value.text.length);
-                        },
-                        textAlign: TextAlign.end,
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 12,
-                        ),
-                      ),
-                      width: 100,
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ),
 
           //
