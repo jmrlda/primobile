@@ -522,15 +522,21 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
 
         if (response.statusCode == 200) {
           List data = json.decode(response.body);
-          // if (lista_artigo_rececao != null)
-          //
-          List<ArtigoRececao> _lista_artigo_rececao = List<ArtigoRececao>();
+          ArtigoRececao _artigoRec = new ArtigoRececao();
+          lista_artigo_rececao.clear();
+          rececaoListaArmazemDisplay.clear();
+          listaArtigoRececaoDisplayFiltro.clear();
           data.map((rececao) {
-            _lista_artigo_rececao
-                .add(ArtigoRececao.fromJson(json.decode(rececao)));
+            _artigoRec = ArtigoRececao.fromJson(json.decode(rececao));
+            agruparArtigoArmazem(_artigoRec);
+            bool rv = existeArtigoNaLista(
+                listaArtigoRececaoDisplayFiltro, _artigoRec.artigo);
+            if (rv == false) listaArtigoRececaoDisplayFiltro.add(_artigoRec);
+
+            lista_artigo_rececao.add(_artigoRec);
           }).toList();
 
-          return _lista_artigo_rececao;
+          return lista_artigo_rececao;
         }
         final msg = json.decode(response.body);
         print("Ocorreu um erro " + msg["Message"]);

@@ -624,17 +624,28 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
 
         if (response.statusCode == 200) {
           dynamic data = json.decode(response.body);
+          ArtigoInventario _artigoInv = new ArtigoInventario();
           lista_artigo_inventario.clear();
+          listaInventarioDisplayFiltro.clear();
+          inventarioListaArmazemDisplay.clear();
           await data.map((inventario) {
-            lista_artigo_inventario
-                .add(ArtigoInventario.fromJson(json.decode(inventario)));
+            _artigoInv = ArtigoInventario.fromJson(json.decode(inventario));
+            agruparArtigoArmazem(_artigoInv);
+            bool rv = existeArtigoNaLista(
+                listaInventarioDisplayFiltro, _artigoInv.artigo);
+            if (rv == false) listaInventarioDisplayFiltro.add(_artigoInv);
+
+            lista_artigo_inventario.add(_artigoInv);
           }).toList();
           posicao = List<bool>.filled(lista_artigo_inventario.length, false);
 
           return lista_artigo_inventario;
+        } else if (response.statusCode == 401) {
+          await SessaoApiProvider.refreshToken();
+          return _fetchLinhaInventario(numDoc, 0, 0);
         }
         final msg = json.decode(response.body);
-        print("Ocorreu um erro" + msg["Message"]);
+        print("Ocorreu um erro" + msg.toString());
       }
     } catch (e) {
       throw e;
