@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:primobile/cliente/bloc/bloc.dart';
 import 'package:primobile/cliente/models/cliente.dart';
 import 'package:primobile/cliente/util.dart';
+import 'package:primobile/encomenda/models/encomenda.dart';
 import 'package:primobile/util/util.dart';
 
 class _ListaTile extends ListTile {
@@ -90,7 +91,96 @@ class ClienteListaItem extends StatelessWidget {
                   builder: (BuildContext context) {
                     BuildContext contexto = context;
                     return AlertDialog(
-                      title: Center(child: Text(cliente.nome)),
+                      title: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                cliente.nome ?? "",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Telefone: " +
+                                        cliente.telefone.replaceAll(" ", "") ??
+                                    "",
+                                style:
+                                    TextStyle(color: Colors.blue, fontSize: 11),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Limite Credito: " +
+                                        cliente.limiteCredito
+                                            .toString()
+                                            .replaceAll(" ", "") ??
+                                    "",
+                                style:
+                                    TextStyle(color: Colors.blue, fontSize: 11),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "enc. Pendente: " +
+                                        cliente.encomendaPendente
+                                            .toString()
+                                            .replaceAll(" ", "") ??
+                                    "",
+                                style:
+                                    TextStyle(color: Colors.blue, fontSize: 11),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Venda não Convertida: " +
+                                        cliente.vendaNaoConvertida
+                                            .toString()
+                                            .replaceAll(" ", "") ??
+                                    "",
+                                style:
+                                    TextStyle(color: Colors.blue, fontSize: 11),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Total Débito: " +
+                                        cliente.totalDeb
+                                            .toString()
+                                            .replaceAll(" ", "") ??
+                                    "",
+                                style:
+                                    TextStyle(color: Colors.blue, fontSize: 11),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Saldo Disponivel: " +
+                                        Encomenda.calcularSaldoCliente(cliente)
+                                            .toString() ??
+                                    "",
+                                style:
+                                    TextStyle(color: Colors.blue, fontSize: 11),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
                       actions: <Widget>[
                         IconButton(
                           icon: new Icon(Icons.close),
@@ -123,8 +213,16 @@ class ClienteListaItem extends StatelessWidget {
                 children: [
                   Text(
                     "Nº Contribuinte: " +
-                            cliente.numContrib.toString().replaceAll(" ", "") ??
+                            cliente.numContrib.replaceAll(" ", "") ??
                         "",
+                    style: TextStyle(color: Colors.blue, fontSize: 13),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Telefone: " + cliente.telefone.replaceAll(" ", "") ?? "",
                     style: TextStyle(color: Colors.blue, fontSize: 13),
                   )
                 ],
