@@ -171,9 +171,17 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
                   if (qtd != null) {
                     widget.artigo.quantidade = qtd;
                     adicionarArtigo(widget.artigo);
+
+                    setState(() {
+                      listaArtigoSelecionado = listaArtigoSelecionado;
+                    });
                   } else {
                     widget.artigo.quantidade = 1.0;
                     adicionarArtigo(widget.artigo);
+
+                    setState(() {
+                      listaArtigoSelecionado = listaArtigoSelecionado;
+                    });
                   }
                 } catch (e) {
                   widget.artigo.quantidade = 1.0;
