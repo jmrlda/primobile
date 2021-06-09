@@ -53,6 +53,7 @@ class _EncomendaEditorPageState extends State<EncomendaEditorPage> {
     // items.addAll(encomendaItens);
 
     super.initState();
+    listaArtigoSelecionado.clear();
 
     try {
       updateConnection(() {
