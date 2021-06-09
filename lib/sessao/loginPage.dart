@@ -192,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
         )));
   }
 
-  void autenticar(String nome, String senha, bool online) async {
+  Future<int> autenticar(String nome, String senha, bool online) async {
     Map<String, dynamic> resultado = new Map<String, dynamic>();
     resultado = await SessaoApiProvider.login(nome, senha, online);
     int rv = resultado['status'];
