@@ -170,7 +170,10 @@ class _MenuPageState extends State<MenuPage> {
                         CircleAvatar(
                           backgroundColor: Colors.white,
                           radius: 55.0,
-                          child: Image.asset('assets/images/logo.jpg'),
+                          child: Image.asset(
+                            'assets/images/logo.jpg',
+                            height: 25,
+                          ),
                         ),
                       ],
                     ),
