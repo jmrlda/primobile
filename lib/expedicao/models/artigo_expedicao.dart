@@ -15,6 +15,7 @@ class ArtigoExpedicao {
   String codigoBarra;
   String armazem;
   String localizacao;
+  String lote;
 
   ArtigoExpedicao(
       {this.artigo,
@@ -24,17 +25,20 @@ class ArtigoExpedicao {
       this.quantidadePendente,
       this.codigoBarra,
       this.armazem = "",
-      this.localizacao = ""});
+      this.localizacao = "",
+      this.lote = ""});
 
   factory ArtigoExpedicao.fromMap(Map<String, dynamic> json) =>
       new ArtigoExpedicao(
-          artigo: json['artigo'],
-          descricao: json['descricao'],
-          quantidadeExpedir: json['quantidade_expedir'],
-          quantidadePendente: json['quantidade_pendente'],
+          artigo: json['artigo'] ?? "",
+          descricao: json['descricao'] ?? "",
+          quantidadeExpedir: json['quantidade_expedir'] ?? "",
+          quantidadePendente: json['quantidade_pendente'] ?? "",
+          unidade: json['unidade'] ?? "",
           codigoBarra: json['codigo_barra'],
-          armazem: json['armazem'],
-          localizacao: json['localizacao']);
+          armazem: json['armazem'] ?? "",
+          lote: json['lote'] ?? "",
+          localizacao: json['localizacao'] ?? "");
 
   Map<String, dynamic> toJson() => {
         'artigo': artigo,
@@ -43,7 +47,9 @@ class ArtigoExpedicao {
         'quantidade_pendente': quantidadePendente,
         'codigo_barra': codigoBarra,
         'armazem': armazem,
-        'localizacao': localizacao
+        'localizacao': localizacao,
+        'lote': lote,
+        'unidade': unidade
       };
 
   factory ArtigoExpedicao.fromJson(Map<String, dynamic> json) {
@@ -55,7 +61,9 @@ class ArtigoExpedicao {
         quantidadeExpedir: json['quantidade_expedir'],
         quantidadePendente: json['quantidade_pendente'],
         codigoBarra: json['codigo_barra'],
+        unidade: json['unidade'] ?? "",
         armazem: json['armazem'],
+        lote: json['lote'],
         localizacao: json['localizacao']);
     // data['imagemBuffer'] == null ? null : data['imagemBuffer']);
   }
