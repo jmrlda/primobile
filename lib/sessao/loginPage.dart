@@ -1,11 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:primobile/artigo/util.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:primobile/util/util.dart';
 // import 'package:primobile/sessao/sessao_api_provider.dart';
 // import 'package:connectivity/connectivity.dart';
 // import 'package:primobile/util.dart';
+import 'package:progress_indicator_button/button_stagger_animation.dart';
+import 'package:progress_indicator_button/progress_button.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 BuildContext contexto;
 
@@ -154,37 +158,18 @@ class _LoginPageState extends State<LoginPage> {
               alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: EdgeInsets.only(left: 30.0, right: 30.0, bottom: 60),
-                child: MaterialButton(
-                    minWidth: double.infinity,
-                    shape: StadiumBorder(),
-                    color: Colors.blue,
+                child: ProgressButton(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    strokeWidth: 2,
                     child: Text(
                       "Entrar",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                      ),
                     ),
-                    onPressed: () async {
-                      // Navigator.pushNamed(context, '/menu');
-                      //
-                      bool conexao = await temConexao();
-                      if (conexao == true) {
-                        String nome = txtNomeEmail.text.trim();
-                        String senha = txtSenha.text.trim();
-
-                        // if (true) {
-                        //       // bool rv = await checkAcessoInternet();
-                        autenticar(nome, senha, true);
-                      } else {
-                        alerta_info(context, "Verifique sua conexão.");
-                      }
-
-                      // }
-
-                      // else {
-                      //   autenticar(nome, senha, false);
-
-                      // }
-
-                      // Usuario usuario = await DBProvider.db.login(nome, senha);
+                    onPressed: (AnimationController controller) async {
+                      await httpLogin(controller);
                     }),
               ),
             ),
@@ -275,8 +260,13 @@ class _LoginPageState extends State<LoginPage> {
     } else if (rv == 0) {
       txtNomeEmail.clear();
       txtSenha.clear();
+      // Limpar todos dados em cache
+      artigoListaDisplay.clear();
+      // artigoListaArmazemDisplay.clear();
       Navigator.pushNamed(context, '/menu');
     }
+
+    return rv;
   }
 
   AppBar loginAppBar() {
@@ -307,6 +297,30 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> httpLogin(AnimationController controller) async {
+    // Navigator.pushNamed(context, '/menu');
+    //
+    controller.forward();
+    try {
+      bool conexao = await temConexao();
+      if (conexao == true) {
+        String nome = txtNomeEmail.text.trim();
+        String senha = txtSenha.text.trim();
+
+        int rv = await autenticar(nome, senha, true);
+        if (rv != 0) {
+          controller.reset();
+        }
+      } else {
+        controller.reset();
+
+        alerta_info(context, "Verifique sua conexão.");
+      }
+    } catch (e) {
+      controller.reset();
+      alerta_info(context, "Ocorreu um erro inesperado. Tente novamente!");
+    }
+  }
   // Future<void> _updateConexao(ConnectivityResult result) async {
   //   switch (result) {
   //     case ConnectivityResult.wifi:
