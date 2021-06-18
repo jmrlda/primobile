@@ -137,7 +137,7 @@ class DBProvider {
     var res =
         await db.query('Artigo', where: "artigo = ?", whereArgs: [artigo]);
 
-    return res.isEmpty ? Artigo.fromMap(res.first) : Artigo;
+    return res.isEmpty ? Artigo.fromJson(res.first) : Artigo;
   }
 
   Future<Cliente> getCliente(String cliente) async {
@@ -174,7 +174,7 @@ class DBProvider {
     final db = await database;
     var res = await db.query('Artigo');
     List<Artigo> artigos =
-        res.isNotEmpty ? res.map((c) => Artigo.fromMap(c)).toList() : null;
+        res.isNotEmpty ? res.map((c) => Artigo.fromJson(c)).toList() : null;
 
     return artigos;
   }
@@ -331,7 +331,7 @@ class DBProvider {
       db.transaction((txn) {
         return txn.insert(
           "Artigo",
-          artigo.toMapDb(),
+          artigo.toJson(),
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
       });
@@ -375,7 +375,7 @@ class DBProvider {
     Batch batch = db.batch();
     try {
       for (Artigo artigo in artigos) {
-        batch.insert("Artigo", artigo.toMapDb(),
+        batch.insert("Artigo", artigo.toJson(),
             conflictAlgorithm: ConflictAlgorithm.replace);
       }
       await batch.commit(noResult: true);
