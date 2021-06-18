@@ -208,3 +208,10 @@ class Artigo {
 
     return _artigo;
   }
+
+  List<Map<String, dynamic>> listaArmazemToJson() {
+    return this.artigoArmazem.map((armazem) {
+      return armazem.toJson();
+    }).toList();
+  }
+}
