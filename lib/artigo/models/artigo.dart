@@ -195,3 +195,16 @@ class Artigo {
     ArtigoArmazem armazem = new ArtigoArmazem.fromJson(data);
     this.artigoArmazem.add(armazem);
   }
+
+  // Percorrer a lista de artigo e retornar o artigo pretendido
+  static Artigo getArtigo(List<Artigo> lstArtigo, String artigo) {
+    Artigo _artigo;
+    lstArtigo.forEach((element) {
+      if (element.artigo == artigo) {
+        _artigo = element;
+        return;
+      }
+    });
+
+    return _artigo;
+  }
