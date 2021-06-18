@@ -191,7 +191,15 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
               artigoListaDisplay.add(_artigo);
             bool rv =
                 existeArtigoNaLista(artigoListaDisplayFiltro, _artigo.artigo);
-            if (rv == false) artigoListaDisplayFiltro.add(_artigo);
+            if (rv == false)
+              artigoListaDisplayFiltro.add(_artigo);
+            else
+              artigoListaDisplayFiltro.forEach((element) {
+                if (element.artigo == _artigo.artigo) {
+                  element.artigoArmazem.add(_artigo.artigoArmazem.first);
+                  return;
+                }
+              });
             // String val = _artigo.armazem ?? "@" + "." + _artigo.localizacao ??
             // String armazem;
             // String lote;
