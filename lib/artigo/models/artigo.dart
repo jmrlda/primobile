@@ -26,10 +26,7 @@ class Artigo {
   Uint8List imagemBuffer;
   String imagemBufferStr;
   String codigoBarra;
-  String armazem;
-  String localizacao;
-
-  String lote;
+  List<ArtigoArmazem> artigoArmazem = new List<ArtigoArmazem>();
 
   Artigo(
       {this.artigo,
@@ -55,37 +52,7 @@ class Artigo {
       this.imagemBuffer,
       this.imagemBufferStr,
       this.codigoBarra,
-      this.armazem,
-      this.localizacao,
-      this.lote});
-
-  factory Artigo.fromMap(Map<String, dynamic> data) => new Artigo(
-        artigo: data['artigo'],
-        descricao: data['descricao'],
-        preco: data['PVP1'],
-        quantidade: 1,
-        quantidadeStock: 1,
-        civa: 1.0,
-        iva: 1.0,
-        unidade: data['unidade'],
-        pvp1: data['PVP1'],
-        pvp1Iva: true,
-        pvp2: data['PVP2'],
-        pvp2Iva: true,
-        pvp3: data['PVP3'],
-        pvp3Iva: true,
-        pvp4: 1.0,
-        pvp4Iva: true,
-        pvp5: 1.0,
-        pvp5Iva: true,
-        pvp6: 2,
-        pvp6Iva: true,
-        imagemBuffer: null,
-        codigoBarra: data['codigoBarra'],
-        armazem: data['armazem'] ?? "",
-        localizacao: data['armazem'] ?? "",
-        lote: data['lote'] ?? "",
-      );
+      this.artigoArmazem});
 
   Map<String, dynamic> toJson() => {
         'artigo': artigo,
@@ -109,49 +76,20 @@ class Artigo {
         'pvp5Iva': pvp5Iva == true ? 1 : 0,
         'pvp6': pvp6,
         'pvp6Iva': pvp6Iva == true ? 1 : 0,
-        'codigoBarra': codigoBarra,
-        'armazem': armazem,
-        'localizacao': localizacao,
-        'lote': lote
+        'artigoArmazem': this.listaArmazemToJson()
       };
 
   Map<String, dynamic> imagemToMap() =>
       {'artigo': this.artigo, 'imagemBuffer': this.imagemBuffer};
 
-  Map<String, dynamic> toMapDb() => {
-        'artigo': artigo,
-        'descricao': descricao,
-        'preco': preco,
-        'quantidadeStock': quantidadeStock,
-        'civa': civa,
-        'iva': iva,
-        'unidade': unidade,
-        'imagemBuffer': imagemBuffer,
-        'pvp1': pvp1,
-        // 'pvp1Iva': pvp1Iva == true ? 1 : 0,
-        'pvp2': pvp2,
-        // 'pvp2Iva': pvp2Iva == true ? 1 : 0,
-        'pvp3': pvp3,
-        // 'pvp3Iva': pvp3Iva == true ? 1 : 0,
-        // 'pvp4': pvp4,
-        // 'pvp4Iva': pvp4Iva == true ? 1 : 0,
-        // 'pvp5': pvp5,
-        // 'pvp5Iva': pvp5Iva == true ? 1 : 0,
-        // 'pvp6': pvp6,
-        // 'pvp6Iva': pvp6Iva == true ? 1 : 0,
-        'codigoBarra': codigoBarra,
-        'armazem': armazem,
-        'localizacao': localizacao,
-
-        'lote': lote
-      };
   factory Artigo.fromJson(Map<String, dynamic> data) {
-    return Artigo(
+    Artigo _artigo = new Artigo(
       artigo: data['artigo'],
       descricao: data['descricao'],
       preco: data['pvp1'],
       quantidade: 0,
-      quantidadeStock: data['quantidadeStock'],
+      quantidadeStock: double.tryParse(
+          data['totalStock'].toString() ?? data['quantidadeStock'].toString()),
       civa: 1.0,
       iva: 1.0,
       unidade: data['unidade'],
