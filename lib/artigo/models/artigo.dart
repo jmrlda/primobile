@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
+import 'package:primobile/artigo/models/models.dart';
 // import 'package:http/http.dart' as http;
 
 class Artigo {
@@ -107,12 +109,20 @@ class Artigo {
       pvp6Iva: true,
       imagemBuffer: null,
       codigoBarra: data['codigoBarra'] ?? "",
-      armazem: data['armazem'] ?? "",
-      localizacao: data['localizacao'] ?? "",
-      lote: data['lote'] ?? "",
     );
+    ArtigoArmazem _armazem = ArtigoArmazem.fromJson(data);
+    if (_armazem != null) {
+      if (_artigo.artigoArmazem != null)
+        _artigo.artigoArmazem.add(_armazem);
+      else {
+        _artigo.artigoArmazem = new List<ArtigoArmazem>();
+        _artigo.artigoArmazem.add(_armazem);
+      }
+    }
+    return _artigo;
   }
 
+  // Converter dados json em objeto
   static List<Artigo> parseArtigos(String response) {
     final parsed = json.decode(response).cast<Map<String, dynamic>>();
     return parsed.map<Artigo>((json) => Artigo.fromJson(json)).toList();
@@ -128,6 +138,7 @@ class Artigo {
     else
       return false;
   }
+
   // Instanciar objecto ArtigoArmazem e armazenar na lista de artigoArmazem
   void addArtigoArmazem(Map<String, dynamic> data) {
     ArtigoArmazem armazem = new ArtigoArmazem.fromJson(data);
