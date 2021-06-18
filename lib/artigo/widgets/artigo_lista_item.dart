@@ -203,7 +203,54 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Center(child: Text(widget.artigo.descricao)),
+                      title: Center(
+                          child: Text(
+                        widget.artigo.descricao,
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12),
+                      )),
+                      content: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            columnSpacing: 10.0,
+                            columns: const <DataColumn>[
+                              DataColumn(
+                                label: Text(
+                                  'Armaz.',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 11),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Loc.',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 11),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Lote',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 11),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Qtd. stock',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 11),
+                                ),
+                              ),
+                            ],
+                            rows: buildArtigoArmazemDataRow(widget.artigo),
+                          )),
                       actions: <Widget>[
                         IconButton(
                           icon: new Icon(Icons.close),
@@ -217,17 +264,13 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
           title: Text(
             widget.artigo.descricao,
             style: TextStyle(
-                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12),
+                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 11),
           ),
           subtitle: Text(
             "COD: " +
                 widget.artigo.artigo +
                 " -- " +
                 widget.artigo.codigoBarra.toString() +
-                "\nQTD: " +
-                widget.artigo.quantidadeStock.toString() +
-                ' ' +
-                widget.artigo.unidade +
                 '\n' +
                 "PVP: " +
                 widget.artigo.pvp1.toString() +
