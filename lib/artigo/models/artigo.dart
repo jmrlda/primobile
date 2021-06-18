@@ -190,4 +190,8 @@ class Artigo {
     else
       return false;
   }
-}
+  // Instanciar objecto ArtigoArmazem e armazenar na lista de artigoArmazem
+  void addArtigoArmazem(Map<String, dynamic> data) {
+    ArtigoArmazem armazem = new ArtigoArmazem.fromJson(data);
+    this.artigoArmazem.add(armazem);
+  }
