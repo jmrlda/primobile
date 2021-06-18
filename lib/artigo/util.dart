@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:primobile/artigo/models/artigo.dart';
 
 import 'bloc/bloc.dart';
@@ -69,4 +70,27 @@ bool existeArtigoSelecionado(Artigo a) {
     }
   }
   return existe;
+}
+
+List<DataRow> buildArtigoArmazemDataRow(
+  Artigo artigo,
+) {
+  List<DataRow> listaDataRow = List<DataRow>();
+  String armazem = "";
+
+  for (int i = 0; i < artigo.artigoArmazem.length; i++) {
+    armazem = artigo.artigoArmazem[i].artigoArmazemId();
+    listaDataRow.add(DataRow(
+      cells: <DataCell>[
+        DataCell(
+          Text(armazem.split(":")[1], style: TextStyle(fontSize: 11)),
+        ),
+        DataCell(Text(armazem.split(":")[2], style: TextStyle(fontSize: 11))),
+        DataCell(Text(armazem.split(":")[3], style: TextStyle(fontSize: 11))),
+        DataCell(Text(armazem.split(":")[4], style: TextStyle(fontSize: 11))),
+      ],
+    ));
+  }
+
+  return listaDataRow;
 }
