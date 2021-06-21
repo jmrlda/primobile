@@ -799,7 +799,8 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                                           style: TextStyle(fontSize: 12))),
                                   Center(
                                       child: Text(
-                                          'Quantidade em ' + artigo.unidade ??
+                                          'Quantidade em ' +
+                                                  artigo.artigoObj.unidade ??
                                               "",
                                           style: TextStyle(fontSize: 12))),
                                   SizedBox(
