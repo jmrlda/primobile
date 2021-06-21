@@ -353,7 +353,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
 
         bool conexao = await temConexao();
         if (conexao == true) {
-          ArtigoRececao.postRececao(rececao, lista_artigo_rececao)
+          ArtigoRececao.postRececao(rececao, listaArtigoRececaoDisplayFiltro)
               .then((value) async {
             if (value.statusCode == 200) {
               await Navigator.pushReplacementNamed(
@@ -404,7 +404,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
       items.clear();
 
       rececaoNumDoc = rececao.rececao.toString();
-      items = getListaArtigo(lista_artigo_rececao);
+      items = getListaArtigo(listaArtigoRececaoDisplayFiltro);
     });
   }
 
