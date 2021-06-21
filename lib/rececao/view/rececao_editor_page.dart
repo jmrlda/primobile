@@ -564,6 +564,9 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
           }).toList();
 
           return lista_artigo_rececao;
+        } else if (response.statusCode == 401) {
+          await SessaoApiProvider.refreshToken();
+          return _fetchLinhaRececao(numDoc, 0, 0);
         }
         final msg = json.decode(response.body);
         print("Ocorreu um erro " + msg["Message"]);
