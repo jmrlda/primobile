@@ -15,21 +15,26 @@ List<ArtigoRececao> lista_artigo_rececao = List<ArtigoRececao>();
 Map<String, List<String>> rececaoListaArmazemDisplay =
     Map<String, List<String>>();
 
-List<DataRow> buildInventarioDataRow(String artigo) {
+List<DataRow> buildInventarioDataRow(ArtigoRececao artigoObj) {
+  String artigo = artigoObj.artigo;
   List<DataRow> listaDataRow = List<DataRow>();
-  String armazem = "";
-  for (int i = 0; i < rececaoListaArmazemDisplay[artigo].length; i++) {
-    armazem = rececaoListaArmazemDisplay[artigo][i];
+
+  Artigo _artigo = Artigo.getArtigo(artigoListaDisplayFiltro, artigo);
+
+  for (int i = 0; i < _artigo.artigoArmazem.length; i++) {
+    ArtigoArmazem armazem = _artigo.artigoArmazem[i];
+
+    if (_artigo.artigoArmazem.length > 1 && armazem.lote == "<L01>") continue;
 
     listaDataRow.add(DataRow(
       cells: <DataCell>[
         DataCell(
-          Text(armazem.split("-")[0], style: TextStyle(fontSize: 11)),
+          Text(armazem.armazem, style: TextStyle(fontSize: 11)),
         ),
-        DataCell(Text(armazem.split("-")[1], style: TextStyle(fontSize: 11))),
-        DataCell(Text(armazem.split("-")[2], style: TextStyle(fontSize: 11))),
-        DataCell(TextFieldCustom(artigo, armazem, 0)),
-        DataCell(TextFieldCustom(artigo, armazem, 1)),
+        DataCell(Text(armazem.localizacao, style: TextStyle(fontSize: 11))),
+        DataCell(Text(armazem.lote, style: TextStyle(fontSize: 11))),
+        DataCell(TextFieldCustom(artigoObj, i, 0)),
+        DataCell(TextFieldCustom(artigoObj, i, 1)),
       ],
     ));
   }

@@ -16,62 +16,104 @@ Map<String, List<String>> expedicaoListaArmazemDisplay =
 TextEditingController expedicaoPesquisarController = TextEditingController();
 List<ArtigoExpedicao> lista_artigo_expedicao = List<ArtigoExpedicao>();
 
-List<DataRow> buildInventarioDataRow(String artigo, {ArtigoExpedicao artigoObj}) {
+List<DataRow> buildInventarioDataRow(ArtigoExpedicao artigoObj) {
   List<DataRow> listaDataRow = List<DataRow>();
   String armazem = "";
-  for (int i = 0; i < expedicaoListaArmazemDisplay[artigo].length; i++) {
-    armazem = expedicaoListaArmazemDisplay[artigo][i];
+  String artigo = artigoObj.artigo;
 
+  // artigoListaDisplayFiltro
+
+  Artigo _artigo = Artigo.getArtigo(artigoListaDisplayFiltro, artigo);
+
+  // for (int i = 0; i < _artigo.artigoArmazem.length; i++) {
+  // armazem = expedicaoListaArmazemDisplay[artigo][i];
+  // _artigo.artigoArmazem.forEach((armazem) {
+  for (int i = 0; i < _artigo.artigoArmazem.length; i++) {
+    ArtigoArmazem armazem = _artigo.artigoArmazem[i];
+    if (_artigo.artigoArmazem.length > 1 && armazem.lote == "<L01>") continue;
     listaDataRow.add(DataRow(
       cells: <DataCell>[
         DataCell(
-          Text(armazem.split("-")[0], style: TextStyle(fontSize: 11)),
+          Text(armazem.armazem, style: TextStyle(fontSize: 11)),
         ),
-        DataCell(Text(armazem.split("-")[1], style: TextStyle(fontSize: 11))),
-        DataCell(Text(armazem.split("-")[2], style: TextStyle(fontSize: 11))),
-        DataCell(Text(artigoObj != null ? artigoObj.quantidadePendente.toString() : "0", style: TextStyle(fontSize: 11))),
-        DataCell(TextFieldCustom(artigo, armazem)),
+        DataCell(Text(armazem.localizacao, style: TextStyle(fontSize: 11))),
+        DataCell(Text(armazem.lote, style: TextStyle(fontSize: 11))),
+        DataCell(Text(armazem.quantidadePendente.toString() ?? "0.0",
+            style: TextStyle(fontSize: 11))),
+        DataCell(TextFieldCustom(artigoObj, i)),
       ],
     ));
   }
+
   return listaDataRow;
 }
 
 // Atribuir quatidade ao artigo que tenha mesmo armazem, localizacao e lote.
-void setArtigQuantidadeByArmazem(
-    String artigo, double quantidade, String artigoKey) {
+void setArtigQuantidadeByArmazem(ArtigoExpedicao artigoExpedicao,
+    double quantidade, Key artigoKey, int posicao) {
   // inventarioListaArmazemDisplay[artigo];
   bool found = false;
-  for (int i = 0; i < expedicaoListaArmazemDisplay[artigo].length; i++) {
-    String armazem = expedicaoListaArmazemDisplay[artigo][i];
-    List<String> arm = armazem.split("-");
-    String _armazem = arm[0] == "@" ? "" : arm[0];
-    String _loc = arm[1] == "@" ? "" : arm[1];
-    String _lote = arm[2] == "@" ? "" : arm[2];
+  // for (int i = 0; i < expedicaoListaArmazemDisplay[artigo].length; i++) {
 
-    for (int j = 0; j < lista_artigo_expedicao.length; j++) {
-      ArtigoExpedicao _artInv = new ArtigoExpedicao();
-      _artInv = lista_artigo_expedicao[j];
-      if (_artInv.artigo == artigo &&
-          _artInv.armazem == _armazem &&
-          _artInv.localizacao == _loc &&
-          _artInv.lote == _lote &&
-          artigoKey.contains(armazem)) {
-        lista_artigo_expedicao[j].quantidadeExpedir = quantidade;
-        found = true;
-        break;
-      }
+  // artigoExpedicao.artigoObj.artigoArmazem.forEach((element) {
+  // String _armazem = element.armazem;
+  // String _loc = element.localizacao;
+  // String _lote = element.lote;
+
+  for (int j = 0; j < listaArtigoExpedicaoDisplayFiltro.length; j++) {
+    ArtigoExpedicao _artInv = new ArtigoExpedicao();
+    _artInv = listaArtigoExpedicaoDisplayFiltro[j];
+    int i = 0;
+    if (artigoExpedicao.artigo == listaArtigoExpedicaoDisplayFiltro[j].artigo) {
+      // lista_artigo_expedicao[j].artigoObj. = quantidade;
+      // element.quantidadeExpedir = quantidade;
+      listaArtigoExpedicaoDisplayFiltro[j]
+          .artigoObj
+          .artigoArmazem[posicao]
+          .quantidadeExpedir = quantidade;
+      found = true;
+      break;
     }
-    if (found) break;
-// lista_artigo_inventario
   }
+  if (found) return;
+// lista_artigo_inventario
+  // });
 }
+// void setArtigQuantidadeByArmazem(
+//     String artigo, double quantidade, String artigoKey) {
+//   // inventarioListaArmazemDisplay[artigo];
+//   bool found = false;
+//   for (int i = 0; i < expedicaoListaArmazemDisplay[artigo].length; i++) {
+//     String armazem = expedicaoListaArmazemDisplay[artigo][i];
+//     List<String> arm = armazem.split("-");
+//     String _armazem = arm[0] == "@" ? "" : arm[0];
+//     String _loc = arm[1] == "@" ? "" : arm[1];
+//     String _lote = arm[2] == "@" ? "" : arm[2];
 
-Widget TextFieldCustom(String artigo, String armazem) {
+//     for (int j = 0; j < lista_artigo_expedicao.length; j++) {
+//       ArtigoExpedicao _artInv = new ArtigoExpedicao();
+//       _artInv = lista_artigo_expedicao[j];
+//       if (_artInv.artigo == artigo &&
+//           _artInv.armazem == _armazem &&
+//           _artInv.localizacao == _loc &&
+//           _artInv.lote == _lote &&
+//           artigoKey.contains(armazem)) {
+//         lista_artigo_expedicao[j].quantidadeExpedir = quantidade;
+//         found = true;
+//         break;
+//       }
+//     }
+//     if (found) break;
+// // lista_artigo_inventario
+//   }
+// }
+Widget TextFieldCustom(ArtigoExpedicao _artigoExpedicao, int posicao) {
+  ArtigoArmazem _artigoArmazem =
+      _artigoExpedicao.artigoObj.artigoArmazem[posicao];
   // final GlobalKey linhaInvKey = GlobalKey(debugLabel: armazem);
-  Key linhaInvKey = new Key(armazem);
+  Key linhaInvKey = new Key(_artigoArmazem.artigoArmazemId());
   TextEditingController _controller = new TextEditingController();
-  _controller.text = armazem.split("-")[3];
+  _controller.text = _artigoArmazem.quantidadeExpedir.toString();
   return TextField(
     key: linhaInvKey,
     keyboardType: TextInputType.number,
