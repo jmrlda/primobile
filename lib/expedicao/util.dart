@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:primobile/artigo/models/models.dart';
+import 'package:primobile/artigo/util.dart';
 import 'package:primobile/expedicao/bloc/bloc.dart';
 import 'package:primobile/expedicao/models/artigo_expedicao.dart';
 import 'package:primobile/expedicao/models/expedicao.dart';
@@ -123,10 +125,11 @@ Widget TextFieldCustom(ArtigoExpedicao _artigoExpedicao, int posicao) {
     controller: _controller,
     onChanged: (value) {
       try {
-        print(linhaInvKey.toString().contains(armazem));
+        print(
+            linhaInvKey.toString().contains(_artigoArmazem.artigoArmazemId()));
         if (double.parse(_controller.text) > 0) {
-          setArtigQuantidadeByArmazem(
-              artigo, double.parse(_controller.text), linhaInvKey.toString());
+          setArtigQuantidadeByArmazem(_artigoExpedicao,
+              double.parse(_controller.text), linhaInvKey, posicao);
         }
       } catch (e) {
         print(e);
