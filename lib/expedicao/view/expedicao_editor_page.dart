@@ -750,7 +750,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                     padding:
                         EdgeInsets.only(top: 5, left: 0, right: 20, bottom: 5),
                     child: Text(
-                      artigo.quantidadePendente.toString(),
+                      artigo.totalPendente().toString(),
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: 12,
