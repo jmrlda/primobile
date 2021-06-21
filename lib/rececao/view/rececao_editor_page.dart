@@ -545,15 +545,17 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
             }
             _artigoRec.setArtigo(artigoListaDisplayFiltro);
             _artigoRec.artigoObj.artigoArmazem.forEach((obj) {
-              if (obj.armazem == map['armazem'] &&
-                  obj.lote == map['lote'] &&
-                  obj.localizacao == map['localizacao']) {
-                obj.quantidadeRecebido = double.tryParse(
-                    map['quantidadeRecebido'].toString() ??
-                        map['quantidade_recebido'].toString());
-                obj.quantidadeRejeitada = double.tryParse(
-                    map['quantidadeRejeitada'].toString() ??
-                        map['quantidadeRejeitada'].toString());
+              if (obj.armazem == _artigoRec.armazem &&
+                  obj.lote == _artigoRec.lote &&
+                  obj.localizacao == _artigoRec.localizacao) {
+                // map['localizacao']) {
+                obj.quantidadeRecebido = _artigoRec.quantidadeRecebida;
+                // double.tryParse(map['quantidadeRecebido'].toString() ??
+                //     map['quantidade_recebido'].toString());
+                obj.quantidadeRejeitada = _artigoRec.quantidadeRejeitada;
+
+                // double.tryParse(map['quantidadeRejeitada'].toString() ??
+                //     map['quantidadeRejeitada'].toString());
               }
             });
 
