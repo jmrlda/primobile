@@ -693,7 +693,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                                             ),
                                             DataColumn(
                                               label: Text(
-                                                'Receção',
+                                                'Recebido',
                                                 style: TextStyle(
                                                     fontStyle: FontStyle.italic,
                                                     fontSize: 11),
