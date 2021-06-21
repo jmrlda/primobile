@@ -4,6 +4,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:primobile/artigo/models/models.dart';
+import 'package:primobile/artigo/util.dart';
 import 'package:primobile/rececao/models/models.dart';
 import 'package:primobile/rececao/util.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
@@ -708,8 +709,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                                               ),
                                             )
                                           ],
-                                          rows: buildInventarioDataRow(
-                                              artigo.artigo),
+                                          rows: buildInventarioDataRow(artigo),
                                         )),
                                     Container(
                                         alignment: Alignment.bottomRight,
