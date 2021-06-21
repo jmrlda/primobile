@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:primobile/artigo/models/models.dart';
+import 'package:primobile/artigo/util.dart';
 import 'package:primobile/inventario/models/inventario.dart';
 import 'package:primobile/inventario/models/models.dart';
 import 'package:primobile/inventario/util.dart';
@@ -51,6 +52,7 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
   String inventarioNumDoc = "Selecionar";
   bool evtPesquisar = false;
   final GlobalKey inventarioPesquisaKey = GlobalKey();
+  String armazem = "";
 
   @override
   void initState() {
@@ -439,7 +441,8 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
       bool localizacao = false; //await temLocalizacao();
       bool conexao = await temConexao();
       if (conexao == true) {
-        ArtigoInventario.postInventario(inventario, lista_artigo_inventario)
+        ArtigoInventario.postInventario(
+                inventario, listaInventarioDisplayFiltro)
             .then((value) async {
           if (value.statusCode == 200) {
             await Navigator.pushReplacementNamed(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:primobile/artigo/models/models.dart';
+import 'package:primobile/artigo/util.dart';
 import 'package:primobile/expedicao/models/expedicao.dart';
 import 'package:primobile/expedicao/models/models.dart';
 import 'package:primobile/expedicao/util.dart';
@@ -357,7 +358,8 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
 
       // Terminar
     } else if (index == 2) {
-      if (lista_artigo_expedicao != null && lista_artigo_expedicao.length > 0) {
+      if (lista_artigo_expedicao != null &&
+          listaArtigoExpedicaoDisplayFiltro.length > 0) {
         createAlertDialogEncomendaProcesso(BuildContext context) {
           bool rv = false;
           return showDialog(
@@ -391,7 +393,8 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
         bool conexao = await temConexao();
 
         if (conexao == true) {
-          ArtigoExpedicao.postExpedicao(expedicao, lista_artigo_expedicao)
+          ArtigoExpedicao.postExpedicao(
+                  expedicao, listaArtigoExpedicaoDisplayFiltro)
               .then((value) async {
             if (value.statusCode == 200) {
               await Navigator.pushReplacementNamed(
@@ -644,7 +647,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
             lista_artigo_expedicao.add(_artigoExp);
           }).toList();
 
-          return lista_artigo_expedicao;
+          return listaArtigoExpedicaoDisplayFiltro;
         } else if (response.statusCode == 401) {
           await SessaoApiProvider.refreshToken();
           return _fetchLinhaExpedicao(numDoc, 0, 0);
