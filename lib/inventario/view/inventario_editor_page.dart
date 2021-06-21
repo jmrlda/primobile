@@ -774,7 +774,8 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                                               ),
                                             ],
                                             rows: buildInventarioDataRow(
-                                                artigo.artigo),
+                                              artigo,
+                                            ),
                                           )),
                                       Container(
                                           alignment: Alignment.bottomRight,
@@ -1052,20 +1053,26 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
     }
   }
 
-  List<DataRow> buildInventarioDataRow(String artigo) {
+  List<DataRow> buildInventarioDataRow(ArtigoInventario artigoObj) {
     List<DataRow> listaDataRow = List<DataRow>();
-    String armazem = "";
-    for (int i = 0; i < inventarioListaArmazemDisplay[artigo].length; i++) {
-      armazem = inventarioListaArmazemDisplay[artigo][i];
+    String artigo = artigoObj.artigo;
+
+    Artigo _artigo = Artigo.getArtigo(artigoListaDisplayFiltro, artigo);
+
+    for (int i = 0; i < _artigo.artigoArmazem.length; i++) {
+      ArtigoArmazem armazem = _artigo.artigoArmazem[i];
+      //igonorar lote <L01> se o artigo ja tiver controlo de lote.
+      if ((_artigo.artigoArmazem.length > 1 && armazem.lote == "<L01>") ||
+          armazem.armazem != artigoObj.armazem) continue;
 
       listaDataRow.add(DataRow(
         cells: <DataCell>[
           DataCell(
-            Text(armazem.split("-")[0], style: TextStyle(fontSize: 11)),
+            Text(armazem.armazem, style: TextStyle(fontSize: 11)),
           ),
-          DataCell(Text(armazem.split("-")[1], style: TextStyle(fontSize: 11))),
-          DataCell(Text(armazem.split("-")[2], style: TextStyle(fontSize: 11))),
-          DataCell(TextFieldCustom(artigo, armazem)),
+          DataCell(Text(armazem.localizacao, style: TextStyle(fontSize: 11))),
+          DataCell(Text(armazem.lote, style: TextStyle(fontSize: 11))),
+          DataCell(TextFieldCustom(artigoObj, i)),
         ],
       ));
     }

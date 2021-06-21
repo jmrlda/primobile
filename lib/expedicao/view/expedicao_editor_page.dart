@@ -827,9 +827,7 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                                             ),
                                           ),
                                         ],
-                                        rows: buildInventarioDataRow(
-                                            artigo.artigo,
-                                            artigoObj: artigo),
+                                        rows: buildInventarioDataRow(artigo),
                                       )),
                                   Container(
                                       alignment: Alignment.bottomRight,
