@@ -796,9 +796,10 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
 
               setState(() {
                 if (value.length >= 0) {
-                  items = PesquisaListaArtigo(lista_artigo_rececao, value);
+                  items = PesquisaListaArtigo(
+                      listaArtigoRececaoDisplayFiltro, value);
                 } else {
-                  items = getListaArtigo(lista_artigo_rececao);
+                  items = getListaArtigo(listaArtigoRececaoDisplayFiltro);
                 }
               });
             },
