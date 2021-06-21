@@ -1,5 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:primobile/artigo/models/models.dart';
+import 'package:primobile/artigo/util.dart';
+import 'package:primobile/expedicao/util.dart';
 import 'package:primobile/rececao/bloc/bloc.dart';
 import 'package:primobile/rececao/models/models.dart';
 
@@ -43,45 +46,75 @@ List<DataRow> buildInventarioDataRow(ArtigoRececao artigoObj) {
 
 // Atribuir quatidade ao artigo que tenha mesmo armazem, localizacao e lote.
 void setArtigQuantidadeByArmazem(
-    String artigo, double quantidade, String artigoKey, int type) {
+    ArtigoRececao artigoObj, double quantidade, int posicao, int type) {
+  String artigo = artigoObj.artigo;
   // inventarioListaArmazemDisplay[artigo];
   bool found = false;
-  for (int i = 0; i < rececaoListaArmazemDisplay[artigo].length; i++) {
-    String armazem = rececaoListaArmazemDisplay[artigo][i];
-    List<String> arm = armazem.split("-");
-    String _armazem = arm[0] == "@" ? "" : arm[0];
-    String _loc = arm[1] == "@" ? "" : arm[1];
-    String _lote = arm[2] == "@" ? "" : arm[2];
 
-    for (int j = 0; j < lista_artigo_rececao.length; j++) {
-      ArtigoRececao _artInv = new ArtigoRececao();
-      _artInv = lista_artigo_rececao[j];
-      if (_artInv.artigo == artigo &&
-          _artInv.armazem == _armazem &&
-          _artInv.localizacao == _loc &&
-          _artInv.lote == _lote &&
-          artigoKey.contains(armazem)) {
-        if (type == 0) {
-          lista_artigo_rececao[j].quantidadeRecebida = quantidade;
-        } else {
-          lista_artigo_rececao[j].quantidadeRejeitada = quantidade;
-        }
-
-        found = true;
-        break;
+  for (int j = 0; j < listaArtigoRececaoDisplayFiltro.length; j++) {
+    ArtigoRececao _artInv = new ArtigoRececao();
+    _artInv = listaArtigoRececaoDisplayFiltro[j];
+    int i = 0;
+    if (artigoObj.artigo == listaArtigoRececaoDisplayFiltro[j].artigo) {
+      // lista_artigo_expedicao[j].artigoObj. = quantidade;
+      // element.quantidadeExpedir = quantidade;
+      if (type == 0) {
+        listaArtigoRececaoDisplayFiltro[j]
+            .artigoObj
+            .artigoArmazem[posicao]
+            .quantidadeRecebido = quantidade;
+      } else {
+        listaArtigoRececaoDisplayFiltro[j]
+            .artigoObj
+            .artigoArmazem[posicao]
+            .quantidadeRejeitada = quantidade;
       }
+
+      found = true;
+      break;
     }
-    if (found) break;
-// lista_artigo_inventario
   }
+
+//   for (int i = 0; i < rececaoListaArmazemDisplay[artigo].length; i++) {
+//     String armazem = rececaoListaArmazemDisplay[artigo][i];
+//     List<String> arm = armazem.split("-");
+//     String _armazem = arm[0] == "@" ? "" : arm[0];
+//     String _loc = arm[1] == "@" ? "" : arm[1];
+//     String _lote = arm[2] == "@" ? "" : arm[2];
+
+//     for (int j = 0; j < lista_artigo_rececao.length; j++) {
+//       ArtigoRececao _artInv = new ArtigoRececao();
+//       _artInv = lista_artigo_rececao[j];
+//       if (_artInv.artigo == artigo &&
+//           _artInv.armazem == _armazem &&
+//           _artInv.localizacao == _loc &&
+//           _artInv.lote == _lote &&
+//           artigoKey.contains(armazem)) {
+//         if (type == 0) {
+//           lista_artigo_rececao[j].quantidadeRecebida = quantidade;
+//         } else {
+//           lista_artigo_rececao[j].quantidadeRejeitada = quantidade;
+//         }
+
+//         found = true;
+//         break;
+//       }
+//     }
+//     if (found) break;
+// // lista_artigo_inventario
+//   }
 }
 
-Widget TextFieldCustom(String artigo, String armazem, int type) {
+Widget TextFieldCustom(ArtigoRececao artigoRececao, int posicao, int type) {
   // final GlobalKey linhaInvKey = GlobalKey(debugLabel: armazem);
-  Key linhaInvKey = new Key(armazem);
+  ArtigoArmazem _artigoArmazem = artigoRececao.artigoObj.artigoArmazem[posicao];
+
+  Key linhaInvKey = new Key(_artigoArmazem.artigoArmazemId() + type.toString());
   TextEditingController _controller = new TextEditingController();
 
-  _controller.text = type == 0 ? armazem.split("-")[3] : armazem.split("-")[4];
+  _controller.text = type == 0
+      ? _artigoArmazem.quantidadeRecebido.toString()
+      : _artigoArmazem.quantidadeRejeitada.toString();
   return TextField(
     key: linhaInvKey,
     keyboardType: TextInputType.number,
@@ -91,10 +124,9 @@ Widget TextFieldCustom(String artigo, String armazem, int type) {
     controller: _controller,
     onChanged: (value) {
       try {
-        print(linhaInvKey.toString().contains(armazem));
         if (double.tryParse(_controller.text) > 0) {
-          setArtigQuantidadeByArmazem(artigo, double.parse(_controller.text),
-              linhaInvKey.toString(), type);
+          setArtigQuantidadeByArmazem(
+              artigoRececao, double.parse(_controller.text), posicao, type);
         }
       } catch (e) {
         print(e);
