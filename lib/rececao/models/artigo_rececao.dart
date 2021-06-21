@@ -119,4 +119,26 @@ class ArtigoRececao {
 
     return response;
   }
+
+  void setArtigo(List<Artigo> lstArtigos) {
+    lstArtigos.forEach((_artigo) {
+      if (_artigo.artigo == this.artigo) {
+        this.artigoObj = _artigo;
+        return;
+      }
+    });
+  }
+
+  void setQuantidadePorArmazem(dynamic json) {
+    this.artigoObj.artigoArmazem.forEach((_artigo) {
+      if (_artigo.armazem == json['armazem'] &&
+          _artigo.lote == json['lote'] &&
+          _artigo.localizacao == json['localizacao']) {
+        _artigo.quantidadeRecebido = json['quantidadeRecebido'];
+        _artigo.quantidadeRejeitada = json['quantidadeRejeitada'];
+
+        return;
+      }
+    });
+  }
 }
