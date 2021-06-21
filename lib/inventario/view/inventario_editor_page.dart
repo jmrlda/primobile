@@ -1103,40 +1103,65 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
   }
 
   // Atribuir quatidade ao artigo que tenha mesmo armazem, localizacao e lote.
-  void setArtigQuantidadeByArmazem(
-      String artigo, double quantidade, String artigoKey) {
+  void setArtigQuantidadeByArmazem(ArtigoInventario artigoInv,
+      double quantidade, String artigoKey, int posicao) {
     // inventarioListaArmazemDisplay[artigo];
     bool found = false;
-    for (int i = 0; i < inventarioListaArmazemDisplay[artigo].length; i++) {
-      String armazem = inventarioListaArmazemDisplay[artigo][i];
-      List<String> arm = armazem.split("-");
-      String _armazem = arm[0] == "@" ? "" : arm[0];
-      String _loc = arm[1] == "@" ? "" : arm[1];
-      String _lote = arm[2] == "@" ? "" : arm[2];
+    // for (int i = 0; i < inventarioListaArmazemDisplay[artigo].length; i++) {
+    //   String armazem = inventarioListaArmazemDisplay[artigo][i];
+    //   List<String> arm = armazem.split("-");
+    //   String _armazem = arm[0] == "@" ? "" : arm[0];
+    //   String _loc = arm[1] == "@" ? "" : arm[1];
+    //   String _lote = arm[2] == "@" ? "" : arm[2];
 
-      for (int j = 0; j < lista_artigo_inventario.length; j++) {
-        ArtigoInventario _artInv = new ArtigoInventario();
-        _artInv = lista_artigo_inventario[j];
-        if (_artInv.artigo == artigo &&
-            _artInv.armazem == _armazem &&
-            _artInv.localizacao == _loc &&
-            _artInv.lote == _lote &&
-            artigoKey.contains(armazem)) {
-          lista_artigo_inventario[j].quantidadeStock = quantidade;
-          found = true;
-          break;
-        }
+    for (int j = 0; j < listaInventarioDisplayFiltro.length; j++) {
+      ArtigoInventario _artInv = new ArtigoInventario();
+      _artInv = listaInventarioDisplayFiltro[j];
+      if (artigoInv.artigo == listaInventarioDisplayFiltro[j].artigo) {
+        // lista_artigo_expedicao[j].artigoObj. = quantidade;
+        // element.quantidadeExpedir = quantidade;
+        listaInventarioDisplayFiltro[j]
+            .artigoObj
+            .artigoArmazem[posicao]
+            .quantidadeStock = quantidade;
+        listaInventarioDisplayFiltro[j]
+            .artigoObj
+            .artigoArmazem[posicao]
+            .quantidade = quantidade;
+        found = true;
+        break;
       }
-      if (found) break;
-// lista_artigo_inventario
+      // if (_artInv.artigo == artigo &&
+      //     _artInv.armazem == _armazem &&
+      //     _artInv.localizacao == _loc &&
+      //     _artInv.lote == _lote &&
+      //     artigoKey.contains(armazem)) {
+      //   lista_artigo_inventario[j].quantidadeStock = quantidade;
+      //   // setState(() {
+      //   //   armazem = inventarioListaArmazemDisplay[artigo][i] = arm[0] +
+      //   //       "-" +
+      //   //       arm[1] +
+      //   //       "-" +
+      //   //       arm[2] +
+      //   //       "-" +
+      //   //       quantidade.toString();
+      //   // });
+
+      if (found) return;
+      // }
     }
+// lista_artigo_inventario
   }
 
-  Widget TextFieldCustom(String artigo, String armazem) {
+  Widget TextFieldCustom(ArtigoInventario _artigoInventario, int posicao) {
     // final GlobalKey linhaInvKey = GlobalKey(debugLabel: armazem);
-    Key linhaInvKey = new Key(armazem);
+    ArtigoArmazem _artigoArmazem =
+        _artigoInventario.artigoObj.artigoArmazem[posicao];
+    // final GlobalKey linhaInvKey = GlobalKey(debugLabel: armazem);
+    Key linhaInvKey = new Key(_artigoArmazem.artigoArmazemId());
+
     TextEditingController _controller = new TextEditingController();
-    _controller.text = armazem.split("-")[3];
+    _controller.text = _artigoArmazem.quantidadeStock.toString();
     return TextField(
       key: linhaInvKey,
       keyboardType: TextInputType.number,
