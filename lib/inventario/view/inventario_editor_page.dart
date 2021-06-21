@@ -1171,10 +1171,16 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
       controller: _controller,
       onChanged: (value) {
         try {
-          print(linhaInvKey.toString().contains(armazem));
+          print(linhaInvKey
+              .toString()
+              .contains(_artigoArmazem.artigoArmazemId()));
+
           if (double.parse(_controller.text) > 0) {
             setArtigQuantidadeByArmazem(
-                artigo, double.parse(_controller.text), linhaInvKey.toString());
+                _artigoInventario,
+                double.parse(_controller.text),
+                linhaInvKey.toString(),
+                posicao);
           }
         } catch (e) {
           print(e);
