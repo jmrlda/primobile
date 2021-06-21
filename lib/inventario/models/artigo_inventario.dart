@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'dart:ffi';
 
+import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/inventario/models/models.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:http/http.dart' as http;
 
 class ArtigoInventario {
+  String id;
   String artigo;
   String descricao;
   String unidade;
@@ -18,9 +20,11 @@ class ArtigoInventario {
 
   String localizacao;
   String lote;
+  Artigo artigoObj;
 
   ArtigoInventario(
-      {this.artigo,
+      {this.id,
+      this.artigo,
       this.descricao,
       this.unidade,
       this.quantidadeStock,
@@ -32,6 +36,7 @@ class ArtigoInventario {
 
   factory ArtigoInventario.fromMap(Map<String, dynamic> map) =>
       new ArtigoInventario(
+          id: map['id'],
           artigo: map['artigo'],
           descricao: map['descricao'],
           quantidadeStock: double.tryParse(map['quantidade_stock'] ?? 0.0),
@@ -44,6 +49,7 @@ class ArtigoInventario {
               double.tryParse(map['quantidade_reserva'] ?? 0.0));
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'artigo': artigo,
         'descricao': descricao,
         'quantidade_stock': quantidadeStock,
@@ -53,10 +59,12 @@ class ArtigoInventario {
         'localizacao': localizacao,
         'unidade': unidade,
         'quantidade_reserva': quantidadeStockReserva,
+        'artigoObj': artigoObj.toJson()
       };
 
   factory ArtigoInventario.fromJson(Map<String, dynamic> json) {
     return ArtigoInventario(
+        id: json['id'],
         artigo: json['artigo'],
         descricao: json['descricao'],
         quantidadeStock: double.tryParse(json['quantidade_stock'] ?? 0.0),

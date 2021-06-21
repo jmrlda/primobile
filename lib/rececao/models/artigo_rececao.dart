@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'dart:ffi';
 
+import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/rececao/models/models.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:http/http.dart' as http;
@@ -16,6 +17,7 @@ class ArtigoRececao {
   String armazem;
   String localizacao;
   String lote;
+  Artigo artigoObj;
 
   ArtigoRececao(
       {this.artigo,
@@ -42,12 +44,13 @@ class ArtigoRececao {
   Map<String, dynamic> toJson() => {
         'artigo': artigo,
         'descricao': descricao,
-        'quantidade_recebida': quantidadeRecebida,
-        'quantidade_rejeitada': quantidadeRejeitada,
+        'quantidadeRecebida': quantidadeRecebida,
+        'quantidadeRejeitada': quantidadeRejeitada,
         'codigo_barra': codigoBarra,
         'armazem': armazem,
         'lote': lote,
-        'localizacao': localizacao
+        'localizacao': localizacao,
+        'artigoObj': artigoObj.toJson()
       };
 
   factory ArtigoRececao.fromJson(Map<String, dynamic> json) {
@@ -57,9 +60,10 @@ class ArtigoRececao {
         artigo: json['artigo'] ?? "",
         descricao: json['descricao'] ?? "",
         unidade: json['unidade'] ?? "",
-        quantidadeRecebida: double.tryParse(json['quantidade_recebida'] ?? 0.0),
+        quantidadeRecebida:
+            double.tryParse(json['quantidadeRecebida'].toString() ?? 0.0),
         quantidadeRejeitada:
-            double.tryParse(json['quantidade_rejeitada'] ?? 0.0),
+            double.tryParse(json['quantidadeRejeitada'].toString() ?? 0.0),
         codigoBarra: json['codigo_barra'] ?? "",
         armazem: json['armazem'] ?? "",
         lote: json['lote'],

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'dart:ffi';
 
+import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/expedicao/models/models.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:http/http.dart' as http;
@@ -16,6 +17,7 @@ class ArtigoExpedicao {
   String armazem;
   String localizacao;
   String lote;
+  Artigo artigoObj;
 
   ArtigoExpedicao(
       {this.artigo,
@@ -49,7 +51,8 @@ class ArtigoExpedicao {
         'armazem': armazem,
         'localizacao': localizacao,
         'lote': lote,
-        'unidade': unidade
+        'unidade': unidade,
+        'artigoObj': artigoObj.toJson()
       };
 
   factory ArtigoExpedicao.fromJson(Map<String, dynamic> json) {
