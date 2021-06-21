@@ -637,9 +637,33 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
           listaArtigoExpedicaoDisplayFiltro.clear();
           listaArtigoExpedicaoDisplay.clear();
           expedicaoListaArmazemDisplay.clear();
-          await data.map((expedicao) {
+          lista_artigo_expedicao.clear();
+          await data.map((expedicao) async {
             _artigoExp = ArtigoExpedicao.fromJson(json.decode(expedicao));
+            Map<String, dynamic> map = json.decode(expedicao);
             agruparArtigoArmazem(_artigoExp);
+
+            if (artigoListaDisplayFiltro == null ||
+                artigoListaDisplayFiltro.length == 0) {
+              List data = json.decode(await getCacheData("artigo"));
+              artigoListaDisplayFiltro = new List<Artigo>();
+              if (data == null || data.length == 0) return null;
+              for (dynamic rawArtigo in data) {
+                artigoListaDisplayFiltro.add(Artigo.fromJson(rawArtigo));
+              }
+            }
+            _artigoExp.setArtigo(artigoListaDisplayFiltro);
+            _artigoExp.artigoObj.artigoArmazem.forEach((obj) {
+              if (obj.armazem == map['armazem'] &&
+                  obj.lote == map['lote'] &&
+                  obj.localizacao == map['localizacao']) {
+                obj.quantidadeExpedir =
+                    map['quantidadeExpedir'] ?? map['quantidade_expedir'];
+                obj.quantidadePendente =
+                    map['quantidadePendente'] ?? map['quantidade_pendente'];
+              }
+            });
+
             bool rv = existeArtigoNaLista(
                 listaArtigoExpedicaoDisplayFiltro, _artigoExp.artigo);
             if (rv == false) listaArtigoExpedicaoDisplayFiltro.add(_artigoExp);

@@ -523,9 +523,39 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
           lista_artigo_rececao.clear();
           rececaoListaArmazemDisplay.clear();
           listaArtigoRececaoDisplayFiltro.clear();
-          data.map((rececao) {
+          data.map((rececao) async {
             _artigoRec = ArtigoRececao.fromJson(json.decode(rececao));
+            Map<String, dynamic> map = json.decode(rececao);
+
             agruparArtigoArmazem(_artigoRec);
+
+            if (artigoListaDisplayFiltro == null ||
+                artigoListaDisplayFiltro.length == 0) {
+              String artigoJson = await getCacheData("artigo");
+              List data;
+              if (artigoJson != null) data = json.decode(artigoJson);
+              if (data == null) return new List<Artigo>();
+
+              artigoListaDisplayFiltro = new List<Artigo>();
+
+              for (dynamic rawArtigo in data) {
+                artigoListaDisplayFiltro.add(Artigo.fromJson(rawArtigo));
+              }
+            }
+            _artigoRec.setArtigo(artigoListaDisplayFiltro);
+            _artigoRec.artigoObj.artigoArmazem.forEach((obj) {
+              if (obj.armazem == map['armazem'] &&
+                  obj.lote == map['lote'] &&
+                  obj.localizacao == map['localizacao']) {
+                obj.quantidadeRecebido = double.tryParse(
+                    map['quantidadeRecebido'].toString() ??
+                        map['quantidade_recebido'].toString());
+                obj.quantidadeRejeitada = double.tryParse(
+                    map['quantidadeRejeitada'].toString() ??
+                        map['quantidadeRejeitada'].toString());
+              }
+            });
+
             bool rv = existeArtigoNaLista(
                 listaArtigoRececaoDisplayFiltro, _artigoRec.artigo);
             if (rv == false) listaArtigoRececaoDisplayFiltro.add(_artigoRec);

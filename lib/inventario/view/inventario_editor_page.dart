@@ -632,9 +632,32 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
           lista_artigo_inventario.clear();
           listaInventarioDisplayFiltro.clear();
           inventarioListaArmazemDisplay.clear();
-          await data.map((inventario) {
+          await data.map((inventario) async {
             _artigoInv = ArtigoInventario.fromJson(json.decode(inventario));
+            Map<String, dynamic> map = json.decode(inventario);
+
             agruparArtigoArmazem(_artigoInv);
+
+            if (artigoListaDisplayFiltro == null ||
+                artigoListaDisplayFiltro.length == 0) {
+              List data = json.decode(await getCacheData("artigo"));
+              artigoListaDisplayFiltro = new List<Artigo>();
+              if (data == null || data.length == 0) return null;
+              for (dynamic rawArtigo in data) {
+                artigoListaDisplayFiltro.add(Artigo.fromJson(rawArtigo));
+              }
+            }
+            _artigoInv.setArtigo(artigoListaDisplayFiltro);
+            _artigoInv.artigoObj.artigoArmazem.forEach((obj) {
+              if (obj.armazem == map['armazem'] &&
+                  obj.lote == map['lote'] &&
+                  obj.localizacao == map['localizacao']) {
+                obj.quantidade =
+                    double.tryParse(map['quantidade_stock']) ?? 0.0;
+                obj.quantidadeStock =
+                    double.tryParse(map['quantidade_stock']) ?? 0.0;
+              }
+            });
             bool rv = existeArtigoNaLista(
                 listaInventarioDisplayFiltro, _artigoInv.artigo);
             if (rv == false) listaInventarioDisplayFiltro.add(_artigoInv);
@@ -1008,16 +1031,16 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
   }
 
   void agruparArtigoArmazem(ArtigoInventario _artigo) {
-    String armazem;
+    String _armazem;
     String lote;
     String local;
     // check se o artigo possui armazem valido
     if (_artigo.armazem == null)
-      armazem = "@";
+      _armazem = "@";
     else if (_artigo.armazem.length == 0)
-      armazem = "@";
+      _armazem = "@";
     else
-      armazem = _artigo.armazem;
+      _armazem = _artigo.armazem;
 
     // check se o artigo possui localizacao valido
     if (_artigo.localizacao == null)
@@ -1036,13 +1059,13 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
     else
       lote = _artigo.lote;
 
-    String rv = armazem +
+    String rv = _armazem +
         "-" +
         local +
         "-" +
         lote +
         "-" +
-        _artigo.quantidadeStock.toString();
+        _artigo.quantidadeStockReserva.toString();
 
     if (inventarioListaArmazemDisplay.containsKey(_artigo.artigo)) {
       if (!inventarioListaArmazemDisplay[_artigo.artigo].contains(rv))
