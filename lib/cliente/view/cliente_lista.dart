@@ -28,15 +28,15 @@ class _ClienteLista extends State<ClienteLista> {
     _scrollController.addListener(_onScroll);
     _clienteBloc = BlocProvider.of<ClienteBloc>(context);
 
-      try {
+    try {
       updateConnection(() {
-          setState(() {
-            PRIMARY_COLOR = CONEXAO_ON_COLOR;
-          });
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_ON_COLOR;
+        });
       }, () {
-          setState(() {
-            PRIMARY_COLOR = CONEXAO_OFF_COLOR;
-          });
+        setState(() {
+          PRIMARY_COLOR = CONEXAO_OFF_COLOR;
+        });
       });
     } catch (e) {}
   }
@@ -92,6 +92,7 @@ class _ClienteLista extends State<ClienteLista> {
                   : ClienteListaItem(
                       cliente: state.clientes[index],
                       clienteBloc: _clienteBloc,
+                      isSelected: this.isSeleted,
                     );
             },
             itemCount: state.hasReachedMax
