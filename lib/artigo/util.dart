@@ -83,11 +83,14 @@ List<DataRow> buildArtigoArmazemDataRow(
     listaDataRow.add(DataRow(
       cells: <DataCell>[
         DataCell(
-          Text(armazem.split(":")[1], style: TextStyle(fontSize: 11)),
+          Text(artigo.artigoArmazem[i].armazem, style: TextStyle(fontSize: 11)),
         ),
-        DataCell(Text(armazem.split(":")[2], style: TextStyle(fontSize: 11))),
-        DataCell(Text(armazem.split(":")[3], style: TextStyle(fontSize: 11))),
-        DataCell(Text(armazem.split(":")[4], style: TextStyle(fontSize: 11))),
+        DataCell(Text(artigo.artigoArmazem[i].localizacao,
+            style: TextStyle(fontSize: 11))),
+        DataCell(
+            Text(artigo.artigoArmazem[i].lote, style: TextStyle(fontSize: 11))),
+        DataCell(Text(artigo.artigoArmazem[i].quantidadeStock.toString(),
+            style: TextStyle(fontSize: 11))),
       ],
     ));
   }
