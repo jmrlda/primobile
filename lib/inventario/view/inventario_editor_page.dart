@@ -5,13 +5,16 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/artigo/util.dart';
+import 'package:primobile/artigo/view/view.dart';
 import 'package:primobile/inventario/models/inventario.dart';
 import 'package:primobile/inventario/models/models.dart';
 import 'package:primobile/inventario/util.dart';
+import 'package:primobile/rececao/util.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/util/util.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 BuildContext contexto;
 http.Client httpClient = http.Client();
@@ -754,61 +757,129 @@ class _InventarioEditorPageState extends State<InventarioEditorPage> {
                                       SizedBox(
                                         height: 10,
                                       ),
-                                      SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          child: DataTable(
-                                            columnSpacing: 10.0,
-                                            columns: const <DataColumn>[
-                                              DataColumn(
-                                                label: Text(
-                                                  'Armaz.',
-                                                  style: TextStyle(
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                      fontSize: 11),
-                                                ),
-                                              ),
-                                              DataColumn(
-                                                label: Text(
-                                                  'Loc.',
-                                                  style: TextStyle(
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                      fontSize: 11),
-                                                ),
-                                              ),
-                                              DataColumn(
-                                                label: Text(
-                                                  'Lote',
-                                                  style: TextStyle(
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                      fontSize: 11),
-                                                ),
-                                              ),
-                                              DataColumn(
-                                                label: Text(
-                                                  'Quantidade.',
-                                                  style: TextStyle(
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                      fontSize: 11),
-                                                ),
-                                              ),
-                                            ],
-                                            rows: buildInventarioDataRow(
-                                              artigo,
+                                      new ConstrainedBox(
+                                          constraints: new BoxConstraints(
+                                            maxHeight: 250.0,
+                                          ),
+                                          child: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: new Scrollbar(
+                                                  isAlwaysShown: true,
+                                                  child: SingleChildScrollView(
+                                                      scrollDirection:
+                                                          Axis.vertical,
+                                                      child: DataTable(
+                                                        columnSpacing: 10.0,
+                                                        columns: const <
+                                                            DataColumn>[
+                                                          DataColumn(
+                                                            label: Text(
+                                                              'Armaz.',
+                                                              style: TextStyle(
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                  fontSize: 11),
+                                                            ),
+                                                          ),
+                                                          DataColumn(
+                                                            label: Text(
+                                                              'Loc.',
+                                                              style: TextStyle(
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                  fontSize: 11),
+                                                            ),
+                                                          ),
+                                                          DataColumn(
+                                                            label: Text(
+                                                              'Lote',
+                                                              style: TextStyle(
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                  fontSize: 11),
+                                                            ),
+                                                          ),
+                                                          DataColumn(
+                                                            label: Text(
+                                                              'Quantidade.',
+                                                              style: TextStyle(
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                  fontSize: 11),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                        rows:
+                                                            buildInventarioDataRow(
+                                                          artigo,
+                                                        ),
+                                                      ))))),
+                                      Row(
+                                        children: [
+                                          OutlinedButton(
+                                            onPressed: () async {
+                                              ArtigoArmazem data =
+                                                  await showDialog(
+                                                context: contexto,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return ArtigoLoteForm(
+                                                      artigoArmazem: artigo
+                                                          .artigoObj
+                                                          .artigoArmazem
+                                                          .first);
+                                                },
+                                              );
+
+                                              if (data != null) {
+                                                data.id = Uuid().v4();
+                                                artigo.artigoObj.artigoArmazem
+                                                    .add(data);
+                                                // Navigator.of(context).pop(artigo);
+                                                for (int i = 0;
+                                                    i <
+                                                        lista_artigo_inventario
+                                                            .length;
+                                                    i++) {
+                                                  if (lista_artigo_inventario[i]
+                                                          .artigo ==
+                                                      data.artigo) {
+                                                    lista_artigo_inventario[i] =
+                                                        artigo;
+
+                                                    break;
+                                                  }
+                                                }
+
+                                                actualizarEstado();
+                                                setState(() {
+                                                  items = getListaArtigo(
+                                                      lista_artigo_inventario);
+                                                });
+                                              }
+
+                                              print(data);
+                                            },
+                                            child: const Text(
+                                              'Novo Lote',
+                                              style: TextStyle(
+                                                  color: Colors.black),
                                             ),
-                                          )),
-                                      Container(
-                                          alignment: Alignment.bottomRight,
-                                          child: MaterialButton(
-                                            elevation: 5.0,
-                                            child: Text('Fechar'),
+                                          ),
+                                          OutlinedButton(
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
-                                          ))
+                                            child: const Text('Fechar'),
+                                          )
+                                        ],
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                      )
                                     ],
                                   );
                                 }),

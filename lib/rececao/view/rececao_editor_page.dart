@@ -643,90 +643,7 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
                         await showDialog(
                           context: contexto,
                           builder: (BuildContext context) {
-                            return AlertDialog(
-                              scrollable: true,
-                              content: StatefulBuilder(
-                                  // You need this, notice the parameters below:
-                                  builder: (BuildContext context,
-                                      StateSetter setState) {
-                                return Column(
-                                  // Then, the content of your dialog.
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Center(
-                                        child: Text(artigo.descricao,
-                                            style: TextStyle(fontSize: 12))),
-                                    Center(
-                                        child: Text(
-                                            'Quantidade em ' + artigo.unidade,
-                                            style: TextStyle(fontSize: 12))),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: DataTable(
-                                          columnSpacing: 9.0,
-                                          columns: const <DataColumn>[
-                                            DataColumn(
-                                              label: Text(
-                                                'Armaz.',
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    fontSize: 11),
-                                              ),
-                                            ),
-                                            DataColumn(
-                                              label: Text(
-                                                'Loc.',
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    fontSize: 11),
-                                              ),
-                                            ),
-                                            DataColumn(
-                                              label: Text(
-                                                'Lote',
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    fontSize: 11),
-                                              ),
-                                            ),
-                                            DataColumn(
-                                              label: Text(
-                                                'Recebido',
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    fontSize: 11),
-                                              ),
-                                            ),
-                                            DataColumn(
-                                              label: Text(
-                                                'Rejeitada',
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    fontSize: 11),
-                                              ),
-                                            )
-                                          ],
-                                          rows: buildInventarioDataRow(artigo),
-                                        )),
-                                    Container(
-                                        alignment: Alignment.bottomRight,
-                                        child: MaterialButton(
-                                          elevation: 5.0,
-                                          child: Text('Fechar'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ))
-                                  ],
-                                );
-                              }),
-                              actions: null,
-                            );
+                            return setArtigoArmazemLote(artigo);
                           },
                         );
                       },
@@ -822,6 +739,147 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
             controller: rececaoPesquisarController,
           )
         : new Text('Receção');
+  }
+
+  Widget setArtigoArmazemLote(ArtigoRececao artigo) {
+    return AlertDialog(
+      scrollable: true,
+      content: StatefulBuilder(
+          // You need this, notice the parameters below:
+          builder: (BuildContext context, StateSetter setState) {
+        return Column(
+          // Then, the content of your dialog.
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+                child: Text(artigo.descricao, style: TextStyle(fontSize: 12))),
+            Center(
+                child: Text('Quantidade em ' + artigo.unidade,
+                    style: TextStyle(fontSize: 12))),
+            SizedBox(
+              height: 10,
+            ),
+            new ConstrainedBox(
+                constraints: new BoxConstraints(
+                  maxHeight: 250.0,
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: new Scrollbar(
+                      isAlwaysShown: true,
+                      child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: DataTable(
+                            columnSpacing: 9.0,
+                            columns: const <DataColumn>[
+                              DataColumn(
+                                label: Text(
+                                  'Armaz.',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 11),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Loc.',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 11),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Lote',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 11),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Recebido',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 11),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Rejeitado',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 11),
+                                ),
+                              )
+                            ],
+                            rows: buildInventarioDataRow(artigo),
+                          ))),
+                )),
+            Row(
+              children: [
+                OutlinedButton(
+                  onPressed: () async {
+                    ArtigoArmazem data = await showDialog(
+                      context: contexto,
+                      builder: (BuildContext context) {
+                        return ArtigoLoteForm(
+                            artigoArmazem:
+                                artigo.artigoObj.artigoArmazem.first);
+                      },
+                    );
+
+                    if (data != null) {
+                      data.id = Uuid().v4();
+                      artigo.artigoObj.artigoArmazem.add(data);
+                      // Navigator.of(context).pop(artigo);
+                      for (int i = 0;
+                          i < listaArtigoRececaoDisplayFiltro.length;
+                          i++) {
+                        if (listaArtigoRececaoDisplayFiltro[i].artigo ==
+                            data.artigo) {
+                          listaArtigoRececaoDisplayFiltro[i] = artigo;
+
+                          break;
+                        }
+                      }
+
+                      actualizarEstado();
+                      setState(() {
+                        items = getListaArtigo(listaArtigoRececaoDisplayFiltro);
+                      });
+                    }
+
+                    print(data);
+                  },
+                  child: const Text(
+                    'Novo Lote',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Fechar'),
+                )
+              ],
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            // Container(
+            //     alignment: Alignment.bottomRight,
+            //     child: MaterialButton(
+            //       elevation: 5.0,
+            //       child: Text('Fechar'),
+            //       onPressed: () {
+            //       },
+            //     ))
+          ],
+        );
+      }),
+      actions: null,
+    );
   }
 }
 

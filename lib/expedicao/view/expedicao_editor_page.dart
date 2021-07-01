@@ -783,6 +783,8 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                       await showDialog(
                         context: contexto,
                         builder: (BuildContext context) {
+                          ScrollController scrollControl =
+                              new ScrollController();
                           return AlertDialog(
                             scrollable: true,
                             content: StatefulBuilder(
@@ -806,54 +808,77 @@ class _ExpedicaoEditorPageState extends State<ExpedicaoEditorPage> {
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: DataTable(
-                                        columnSpacing: 10.0,
-                                        columns: const <DataColumn>[
-                                          DataColumn(
-                                            label: Text(
-                                              'Armaz.',
-                                              style: TextStyle(
-                                                  fontStyle: FontStyle.italic,
-                                                  fontSize: 11),
-                                            ),
-                                          ),
-                                          DataColumn(
-                                            label: Text(
-                                              'Loc.',
-                                              style: TextStyle(
-                                                  fontStyle: FontStyle.italic,
-                                                  fontSize: 11),
-                                            ),
-                                          ),
-                                          DataColumn(
-                                            label: Text(
-                                              'Lote',
-                                              style: TextStyle(
-                                                  fontStyle: FontStyle.italic,
-                                                  fontSize: 11),
-                                            ),
-                                          ),
-                                          DataColumn(
-                                            label: Text(
-                                              'Qtd. Pendente',
-                                              style: TextStyle(
-                                                  fontStyle: FontStyle.italic,
-                                                  fontSize: 11),
-                                            ),
-                                          ),
-                                          DataColumn(
-                                            label: Text(
-                                              'Quantidade.',
-                                              style: TextStyle(
-                                                  fontStyle: FontStyle.italic,
-                                                  fontSize: 11),
-                                            ),
-                                          ),
-                                        ],
-                                        rows: buildInventarioDataRow(artigo),
-                                      )),
+                                  new ConstrainedBox(
+                                      constraints: new BoxConstraints(
+                                        maxHeight: 250.0,
+                                      ),
+                                      child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: new Scrollbar(
+                                              controller: scrollControl,
+                                              isAlwaysShown: true,
+                                              child: SingleChildScrollView(
+                                                  controller: scrollControl,
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  child: DataTable(
+                                                    columnSpacing: 9.0,
+                                                    columns: const <DataColumn>[
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Armaz.',
+                                                          style: TextStyle(
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic,
+                                                              fontSize: 11),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Loc.',
+                                                          style: TextStyle(
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic,
+                                                              fontSize: 11),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Lote',
+                                                          style: TextStyle(
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic,
+                                                              fontSize: 11),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Qtd. Pendente',
+                                                          style: TextStyle(
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic,
+                                                              fontSize: 11),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Quantidade.',
+                                                          style: TextStyle(
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic,
+                                                              fontSize: 11),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                    rows:
+                                                        buildInventarioDataRow(
+                                                            artigo),
+                                                  ))))),
                                   Container(
                                       alignment: Alignment.bottomRight,
                                       child: MaterialButton(

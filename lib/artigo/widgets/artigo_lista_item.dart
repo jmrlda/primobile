@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:primobile/artigo/bloc/artigo_bloc.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/artigo/util.dart';
+import 'package:primobile/artigo/view/view.dart';
 import 'package:primobile/util/util.dart';
 
 class _ListaTile extends ListTile {
@@ -203,58 +204,71 @@ class _ArtigoListaItemState extends State<ArtigoListaItem> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Center(
-                          child: Text(
-                        widget.artigo.descricao,
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12),
-                      )),
-                      content: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: DataTable(
-                            columnSpacing: 10.0,
-                            columns: const <DataColumn>[
-                              DataColumn(
-                                label: Text(
-                                  'Armaz.',
-                                  style: TextStyle(
-                                      fontStyle: FontStyle.italic,
-                                      fontSize: 11),
-                                ),
+                      title: Container(
+                        child: new Center(
+                            child: Text(
+                          widget.artigo.artigo +
+                              " - " +
+                              widget.artigo.descricao,
+                          style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12),
+                        )),
+                      ),
+                      content: new Scrollbar(
+                          isAlwaysShown: true,
+                          child: new ConstrainedBox(
+                              constraints: new BoxConstraints(
+                                maxHeight: 250.0,
                               ),
-                              DataColumn(
-                                label: Text(
-                                  'Loc.',
-                                  style: TextStyle(
-                                      fontStyle: FontStyle.italic,
-                                      fontSize: 11),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Lote',
-                                  style: TextStyle(
-                                      fontStyle: FontStyle.italic,
-                                      fontSize: 11),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Qtd. stock',
-                                  style: TextStyle(
-                                      fontStyle: FontStyle.italic,
-                                      fontSize: 11),
-                                ),
-                              ),
-                            ],
-                            rows: buildArtigoArmazemDataRow(widget.artigo),
-                          )),
+                              child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: DataTable(
+                                    columnSpacing: 10.0,
+                                    columns: const <DataColumn>[
+                                      DataColumn(
+                                        label: Text(
+                                          'Armaz.',
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic,
+                                              fontSize: 11),
+                                        ),
+                                      ),
+                                      DataColumn(
+                                        label: Text(
+                                          'Loc.',
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic,
+                                              fontSize: 11),
+                                        ),
+                                      ),
+                                      DataColumn(
+                                        label: Text(
+                                          'Lote',
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic,
+                                              fontSize: 11),
+                                        ),
+                                      ),
+                                      DataColumn(
+                                        label: Text(
+                                          'Stock',
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic,
+                                              fontSize: 11),
+                                        ),
+                                      ),
+                                    ],
+                                    rows: buildArtigoArmazemDataRow(
+                                        widget.artigo),
+                                  )))),
                       actions: <Widget>[
-                        IconButton(
-                          icon: new Icon(Icons.close),
-                          onPressed: () => Navigator.of(context).pop(),
+                        OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Fechar'),
                         )
                       ],
                     );
