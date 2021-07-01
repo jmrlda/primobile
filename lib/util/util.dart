@@ -528,7 +528,7 @@ Future<bool> temDados(String mensagem, BuildContext contexto) async {
   return result;
 }
 
-// Mensagens de alerta
+// Mensagens de alerta info
 void alerta_info(BuildContext contexto, String texto) {
   Flushbar(
     title: "Atenção",
@@ -537,6 +537,18 @@ void alerta_info(BuildContext contexto, String texto) {
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     duration: Duration(seconds: 4),
     backgroundColor: Colors.red,
+  )..show(contexto);
+}
+
+// Mensagens de alerta sucesso
+void alerta_sucesso(BuildContext contexto, String texto) {
+  Flushbar(
+    title: "Atenção",
+    // message:  "Dispositivo sem conexão WIFI ou Dados Moveis. Por Favor Active para criar encomenda!",
+    messageText: Text(texto,
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+    duration: Duration(seconds: 4),
+    backgroundColor: Colors.blue[700],
   )..show(contexto);
 }
 
