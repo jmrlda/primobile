@@ -60,6 +60,8 @@ dependencies:
   # flutter_local_notifications: ^4.0.1+2
   # connectivity: ^3.0.3
   progress_indicator_button: ^0.0.3
+  datetime_picker_formfield: ^2.0.0
+  date_time_picker: ^2.0.0
 
 dev_dependencies:
   flutter_test:
