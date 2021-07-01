@@ -182,11 +182,16 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
 
         if (response.statusCode == 200) {
           dynamic data = json.decode(response.body);
+          ArtigoArmazem armazem = new ArtigoArmazem();
           data = json.decode(data)["DataSet"]["Table"];
           ToList lista = new ToList();
           artigoListaDisplayFiltro.clear();
+          mapaListaLote.clear();
+          await ArtigoLote.httpGet();
+
           for (dynamic rawArtigo in data) {
             Artigo _artigo = Artigo.fromJson(rawArtigo);
+
             if (!artigoListaDisplay.contains(_artigo))
               artigoListaDisplay.add(_artigo);
             bool rv =
