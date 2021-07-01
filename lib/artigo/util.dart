@@ -1,17 +1,24 @@
+import 'dart:convert';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:primobile/artigo/models/artigo.dart';
+import 'package:primobile/artigo/models/models.dart';
+import 'package:primobile/util/util.dart';
 
 import 'bloc/bloc.dart';
+import 'package:uuid/uuid.dart';
 
 List<Artigo> artigoListaDisplay = new List<Artigo>();
 List<Artigo> artigoListaDisplayFiltro = new List<Artigo>();
-
+List<ArtigoLote> listaLote = new List<ArtigoLote>();
+Map<String, List<ArtigoLote>> mapaListaLote = Map<String, List<ArtigoLote>>();
 // List<Artigo> artigoListaArmazemDisplay = new List<Artigo>();
 Map<String, List<String>> artigoListaArmazemDisplay =
     Map<String, List<String>>();
 List<Artigo> artigosDuplicado = new List<Artigo>();
 List<Artigo> listaArtigoSelecionado = List<Artigo>();
+
 bool isSelected = false;
 
 String baseUrl = "";
