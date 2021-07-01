@@ -95,6 +95,15 @@ class ArtigoArmazem {
         .toList();
   }
 
+  void resetQuantidade() {
+    this.quantidadeStock = 0.0;
+    this.quantidade = 0.0;
+    this.quantidadeExpedir = 0.0;
+    this.quantidadePendente = 0.0;
+    this.quantidadeRecebido = 0.0;
+    this.quantidadeRejeitada = 0.0;
+  }
+
   @override
   String toString() =>
       'ArtigoArmazem { id: $id, artigo: $artigo , armazem: $armazem, localizacao: $localizacao, lote: $lote, stock: $quantidadeStock, qtd: $quantidade}';
