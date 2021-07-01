@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:uuid/uuid.dart';
 
 class ArtigoArmazem {
-  final id = Uuid().v4();
+  String id = Uuid().v4();
 
   String artigo;
   String armazem;
