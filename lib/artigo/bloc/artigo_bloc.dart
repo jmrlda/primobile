@@ -197,52 +197,12 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
               artigoListaDisplayFiltro.forEach((element) {
                 if (element.artigo == _artigo.artigo) {
                   element.artigoArmazem.add(_artigo.artigoArmazem.first);
-                  return;
                 }
               });
-            // String val = _artigo.armazem ?? "@" + "." + _artigo.localizacao ??
-            // String armazem;
-            // String lote;
-            // String local;
-            // // check se o artigo possui armazem valido
-            // if (_artigo.armazem == null)
-            //   armazem = "@";
-            // else if (_artigo.armazem.length == 0)
-            //   armazem = "@";
-            // else
-            //   armazem = _artigo.armazem;
-
-            // // check se o artigo possui localizacao valido
-            // if (_artigo.localizacao == null)
-            //   local = "@";
-            // else if (_artigo.localizacao.length == 0)
-            //   local = "@";
-            // else {
-            //   local = _artigo.localizacao;
-            // }
-
-            // // check se o artigo possui localizacao valido
-            // if (_artigo.lote == null)
-            //   lote = "@";
-            // else if (_artigo.lote.length == 0)
-            //   lote = "@";
-            // else
-            //   lote = _artigo.lote;
-
-            // String rv = armazem + "." + local + "." + lote;
-            // if (artigoListaArmazemDisplay.containsKey(_artigo.artigo)) {
-            //   if (!artigoListaArmazemDisplay[_artigo.artigo].contains(rv))
-            //     artigoListaArmazemDisplay[_artigo.artigo].add(rv);
-            // } else {
-            //   artigoListaArmazemDisplay[_artigo.artigo] = new List<String>();
-            //   artigoListaArmazemDisplay[_artigo.artigo].add(rv);
-            // }
-
-            // lista.items.add(_artigo);
           }
           lista.items.addAll(artigoListaDisplayFiltro);
           await saveCacheData("artigo", lista);
-
+          await setArtigoArmazemLote();
           return artigoListaDisplayFiltro;
         } else if (response.statusCode == 401) {
           //  #TODO informar ao usuario sobre a renovação da sessão
