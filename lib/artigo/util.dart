@@ -97,3 +97,44 @@ List<DataRow> buildArtigoArmazemDataRow(
 
   return listaDataRow;
 }
+
+Future<List<ArtigoLote>> getLoteInCache() async {
+  List<ArtigoLote> lista = new List<ArtigoLote>();
+  try {
+    dynamic data = json.decode(await getCacheData("lote"));
+    if (data != null) {
+      if (data.length > 0) {
+        for (dynamic lote in data) {
+          lista.add(ArtigoLote.fromJson(lote));
+        }
+      }
+    }
+  } catch (e) {
+    lista = null;
+  }
+
+  return lista;
+}
+
+Future<void> setArtigoArmazemLote() {
+  // artigoListaDisplayFiltro.f
+  ArtigoLote lote = new ArtigoLote();
+
+  for (int i = 0; i < artigoListaDisplayFiltro.length; i++) {
+    Artigo _artigo = artigoListaDisplayFiltro[i];
+    if (mapaListaLote[_artigo.artigo] != null) {
+      // armazem = _artigo.artigoArmazem.first;
+
+      mapaListaLote[_artigo.artigo].forEach((element) {
+        ArtigoArmazem armazem = new ArtigoArmazem();
+
+        armazem.lote = element.lote;
+        armazem.localizacao = _artigo.artigoArmazem.first.localizacao;
+        armazem.armazem = _artigo.artigoArmazem.first.armazem;
+        armazem.resetQuantidade();
+
+        artigoListaDisplayFiltro[i].artigoArmazem.add(armazem);
+      });
+    }
+  }
+}
