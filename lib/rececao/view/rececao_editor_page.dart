@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
 import 'package:primobile/artigo/models/models.dart';
 import 'package:primobile/artigo/util.dart';
+import 'package:primobile/artigo/view/view.dart';
 import 'package:primobile/rececao/models/models.dart';
 import 'package:primobile/rececao/util.dart';
 import 'package:primobile/sessao/sessao_api_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:primobile/util/util.dart';
+import 'package:uuid/uuid.dart';
 
 BuildContext contexto;
 http.Client httpClient = http.Client();
@@ -208,7 +211,6 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
 
                                       posicao = List<bool>.filled(
                                           lista_artigo_rececao.length, false);
-
                                       actualizarEstado();
                                     }).catchError((e) {
                                       print('lista rececao erro');
@@ -545,6 +547,10 @@ class _RececaoEditorPageState extends State<RececaoEditorPage> {
             }
             _artigoRec.setArtigo(artigoListaDisplayFiltro);
             _artigoRec.artigoObj.artigoArmazem.forEach((obj) {
+              obj.quantidadeRecebido = 0.0;
+
+              obj.quantidadeRejeitada = 0.0;
+
               if (obj.armazem == _artigoRec.armazem &&
                   obj.lote == _artigoRec.lote &&
                   obj.localizacao == _artigoRec.localizacao) {
