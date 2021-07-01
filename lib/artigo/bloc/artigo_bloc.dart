@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:bloc/bloc.dart';
+import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
@@ -171,7 +172,7 @@ class ArtigoBloc extends Bloc<ArtigoEvent, ArtigoState> {
         String baseUrl = await SessaoApiProvider.getHostUrl();
         String protocolo = await SessaoApiProvider.getProtocolo();
 
-        final response = await httpClient.get(
+        Response response = await httpClient.get(
             protocolo +
                 baseUrl +
                 '/WebApi/ArtigoController/Artigo/listaarmazem',
